@@ -1,10 +1,10 @@
+import prisma from "@/lib/prisma";
 import { validateDonationAmount, sanitizeInput } from "@/lib/security";
 import { PAYMENT_CHANNELS } from "@/data/paymentChannels";
 
-// In-memory donation store for client/server mock sessions
+// Fallback in-memory donation store for offline/demo sessions
 const donationStore = new Map();
 
-// Seed a sample invoice for testing
 donationStore.set("INV-2026-DEMO", {
   id: "don-demo",
   invoiceId: "INV-2026-DEMO",
@@ -57,13 +57,21 @@ export async function createDonation({
 
   let virtualAccountNumber = "";
   if (channel.type === "VA") {
-    virtualAccountNumber = `${channel.accountNumberPrefix || "88"}${donorPhone ? donorPhone.replace(/\D/g, "").slice(-8) : "12345678"}`;
+    virtualAccountNumber = `${channel.accountNumberPrefix || "88"}${
+      donorPhone ? donorPhone.replace(/\D/g, "").slice(-8) : "12345678"
+    }`;
   }
 
-  const donation = {
+  const cleanDonorName = isAnonymous ? "Hamba Allah" : sanitizeInput(donorName) || "Hamba Allah";
+  const cleanDonorEmail = sanitizeInput(donorEmail);
+  const cleanDonorPhone = sanitizeInput(donorPhone);
+  const cleanPrayer = sanitizeInput(prayer);
+  const expiredAtDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  const donationData = {
     id: `don-${Date.now()}`,
     invoiceId,
-    campaignId,
+    campaignId: campaignId || null,
     campaignTitle,
     campaignSlug,
     donationType,
@@ -75,22 +83,99 @@ export async function createDonation({
     paymentChannelName: channel.name,
     paymentChannelType: channel.type,
     virtualAccountNumber,
-    donorName: isAnonymous ? "Hamba Allah" : sanitizeInput(donorName) || "Hamba Allah",
-    donorEmail: sanitizeInput(donorEmail),
-    donorPhone: sanitizeInput(donorPhone),
+    donorName: cleanDonorName,
+    donorEmail: cleanDonorEmail,
+    donorPhone: cleanDonorPhone,
     isAnonymous: Boolean(isAnonymous),
-    prayer: sanitizeInput(prayer),
+    prayer: cleanPrayer,
     status: "PENDING",
-    idempotencyKey,
+    idempotencyKey: idempotencyKey || null,
     createdAt: new Date().toISOString(),
-    expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    expiredAt: expiredAtDate.toISOString(),
   };
 
-  donationStore.set(invoiceId, donation);
-  return donation;
+  // Always keep in fallback cache
+  donationStore.set(invoiceId, donationData);
+
+  // Save to PostgreSQL via Prisma
+  try {
+    const createdDb = await prisma.donation.create({
+      data: {
+        invoiceId,
+        campaignId: campaignId || undefined,
+        donationType,
+        amount: Number(amount),
+        uniqueCode,
+        totalAmount,
+        paymentChannel: channel.id,
+        paymentRef: virtualAccountNumber || null,
+        donorName: cleanDonorName,
+        donorEmail: cleanDonorEmail || null,
+        donorPhone: cleanDonorPhone,
+        isAnonymous: Boolean(isAnonymous),
+        prayer: cleanPrayer || null,
+        status: "PENDING",
+        expiredAt: expiredAtDate,
+        idempotencyKey: idempotencyKey || null,
+      },
+      include: {
+        campaign: true,
+      },
+    });
+
+    if (createdDb) {
+      donationData.id = createdDb.id;
+    }
+  } catch (error) {
+    console.warn("Prisma createDonation fallback:", error.message);
+  }
+
+  return donationData;
 }
 
 export async function getDonationByInvoiceId(invoiceId) {
   if (!invoiceId) return null;
+
+  try {
+    const dbDonation = await prisma.donation.findUnique({
+      where: { invoiceId },
+      include: {
+        campaign: true,
+      },
+    });
+
+    if (dbDonation) {
+      const channel =
+        PAYMENT_CHANNELS.find((p) => p.id === dbDonation.paymentChannel) || PAYMENT_CHANNELS[0];
+
+      return {
+        id: dbDonation.id,
+        invoiceId: dbDonation.invoiceId,
+        campaignId: dbDonation.campaignId,
+        campaignTitle: dbDonation.campaign?.title || "Sedekah Umum YGSM",
+        campaignSlug: dbDonation.campaign?.slug || "",
+        donationType: dbDonation.donationType,
+        amount: dbDonation.amount,
+        uniqueCode: dbDonation.uniqueCode,
+        adminFee: channel.fee || 0,
+        totalAmount: dbDonation.totalAmount,
+        paymentChannelId: channel.id,
+        paymentChannelName: channel.name,
+        paymentChannelType: channel.type,
+        virtualAccountNumber: dbDonation.paymentRef || "",
+        donorName: dbDonation.donorName,
+        donorEmail: dbDonation.donorEmail || "",
+        donorPhone: dbDonation.donorPhone,
+        isAnonymous: dbDonation.isAnonymous,
+        prayer: dbDonation.prayer || "",
+        status: dbDonation.status,
+        createdAt: dbDonation.createdAt.toISOString(),
+        expiredAt: dbDonation.expiredAt.toISOString(),
+      };
+    }
+  } catch (error) {
+    console.warn("Prisma getDonationByInvoiceId fallback:", error.message);
+  }
+
   return donationStore.get(invoiceId) || null;
 }

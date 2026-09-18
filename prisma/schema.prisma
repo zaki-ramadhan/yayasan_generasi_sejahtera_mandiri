@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Category {
@@ -28,6 +27,8 @@ model Campaign {
   endDate         DateTime
   isUrgent        Boolean          @default(false)
   isFeatured      Boolean          @default(false)
+  location        String?
+  excerpt         String?
   story           String
   bannerUrl       String?
   status          String           @default("ACTIVE") // ACTIVE, COMPLETED, PAUSED
@@ -91,6 +92,8 @@ model AuditReport {
   totalFundsIn     Float
   totalFundsOut    Float
   beneficiaryCount Int
+  operationalRatio String?
+  summary          String?
   pdfUrl           String?
   publishedAt      DateTime @default(now())
 
@@ -112,15 +115,20 @@ model Volunteer {
 }
 
 model Article {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  category    String
-  excerpt     String
-  content     String
-  author      String
-  bannerUrl   String?
-  publishedAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  category       String
+  tags           String[] @default([])
+  excerpt        String
+  content        String
+  author         String
+  bannerUrl      String?
+  imageSource    String?
+  imageSourceUrl String?
+  likeCount      Int      @default(0)
+  dislikeCount   Int      @default(0)
+  publishedAt    DateTime @default(now())
 
   @@index([category])
 }
