@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -20,18 +18,36 @@
 # production
 /build
 
-# misc
+# docs & ai notes
+*.md
+!README.md
+!PRD.md
+!AGENTS.md
+!CLAUDE.md
+
+# misc & os
 .DS_Store
+Thumbs.db
 *.pem
 
-# debug
+# ide & editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# debug & logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
+*.tmp
+*.bak
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +55,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+

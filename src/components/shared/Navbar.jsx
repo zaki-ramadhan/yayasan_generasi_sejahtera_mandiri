@@ -1,0 +1,104 @@
+"use client";
+
+import { useState, useSyncExternalStore } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import { getStoredUser, logoutUser } from "@/services/authService";
+import { NavDesktopMenu } from "@/components/nav/NavDesktopMenu";
+import { NavUserDropdown } from "@/components/nav/NavUserDropdown";
+import { NavMobileDrawer } from "@/components/nav/NavMobileDrawer";
+
+function subscribeAuth(callback) {
+  window.addEventListener("ygsm_auth_change", callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener("ygsm_auth_change", callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+function getAuthSnapshot() {
+  return localStorage.getItem("ygsm_auth_user");
+}
+
+function getAuthServerSnapshot() {
+  return null;
+}
+
+export function Navbar() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const userJson = useSyncExternalStore(subscribeAuth, getAuthSnapshot, getAuthServerSnapshot);
+  const currentUser = userJson ? JSON.parse(userJson) : null;
+
+  const handleLogout = () => {
+    logoutUser();
+    router.push("/");
+  };
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-15">
+          {/* Brand Logo & Text */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 sm:gap-2.5 select-none focus:outline-none"
+            title="Beranda Yayasan Generasi Sejahtera Mandiri"
+          >
+            <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-lg overflow-hidden shrink-0 border border-slate-300 shadow-2xs bg-white flex items-center justify-center p-0.5">
+              <Image
+                src="/logo_yayasan_GSM.png"
+                alt="Logo Yayasan Generasi Sejahtera Mandiri"
+                width={36}
+                height={36}
+                className="w-full h-full object-contain rounded-md select-none pointer-events-none"
+                priority
+              />
+            </div>
+            <div className="flex flex-col leading-tight select-none">
+              <span className="font-semibold text-[11px] sm:text-xs text-slate-950 tracking-tight">
+                Yayasan Generasi
+              </span>
+              <span className="font-semibold text-[11px] sm:text-xs text-slate-700 tracking-tight">
+                Sejahtera Mandiri
+              </span>
+            </div>
+          </Link>
+
+          {/* Modular Desktop Navigation */}
+          <NavDesktopMenu pathname={pathname} />
+
+          {/* Right Action & User Profile */}
+          <div className="flex items-center gap-2.5">
+            <NavUserDropdown currentUser={currentUser} onLogout={handleLogout} />
+
+            {/* Mobile Hamburger Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-md text-slate-900 hover:bg-slate-100 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+              aria-label="Toggle navigation menu"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Modular Mobile Drawer */}
+      {isMobileMenuOpen && (
+        <NavMobileDrawer
+          pathname={pathname}
+          currentUser={currentUser}
+          onClose={() => setIsMobileMenuOpen(false)}
+          onLogout={handleLogout}
+        />
+      )}
+    </header>
+  );
+}
