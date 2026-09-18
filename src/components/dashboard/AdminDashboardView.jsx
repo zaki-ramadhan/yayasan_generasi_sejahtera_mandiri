@@ -6,7 +6,11 @@ import { formatRupiah, formatDate } from "@/lib/formatters";
 import { RECENT_TRANSACTIONS, VOLUNTEER_APPLICANTS } from "@/data/adminMockData";
 import { cn } from "@/lib/utils";
 
-export function AdminDashboardView({ userRole }) {
+export function AdminDashboardView({ userRole, stats }) {
+  const transactions = stats?.recentTransactions || RECENT_TRANSACTIONS;
+  const volunteers = stats?.volunteerApplicants || VOLUNTEER_APPLICANTS;
+  const campaigns = stats?.campaigns || CAMPAIGNS.slice(0, 3);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       {/* Left: Recent Transactions / Mutations */}
@@ -36,7 +40,7 @@ export function AdminDashboardView({ userRole }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
-              {RECENT_TRANSACTIONS.map((tx) => (
+              {transactions.map((tx) => (
                 <tr key={tx.id} className="hover:bg-slate-50/80">
                   <td className="py-3 px-3 font-mono text-slate-900">{tx.id}</td>
                   <td className="py-3 px-3">{tx.donor}</td>
@@ -67,10 +71,10 @@ export function AdminDashboardView({ userRole }) {
         <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-950">Review Relawan Pendaftar</h3>
-            <span className="text-xs text-slate-500">{VOLUNTEER_APPLICANTS.length} Orang</span>
+            <span className="text-xs text-slate-500">{volunteers.length} Orang</span>
           </div>
           <div className="space-y-2.5">
-            {VOLUNTEER_APPLICANTS.map((v) => (
+            {volunteers.map((v) => (
               <div key={v.id} className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
                 <div className="flex justify-between items-center">
                   <strong className="text-slate-900">{v.name}</strong>
@@ -97,7 +101,7 @@ export function AdminDashboardView({ userRole }) {
             </Link>
           </div>
           <div className="space-y-3">
-            {CAMPAIGNS.slice(0, 3).map((camp) => {
+            {campaigns.slice(0, 3).map((camp) => {
               const pct = Math.min(Math.round((camp.collectedAmount / camp.targetAmount) * 100), 100);
               return (
                 <div key={camp.id} className="space-y-1">

@@ -4,7 +4,6 @@ import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { PAYMENT_CHANNELS } from "@/data/paymentChannels";
-import { createDonation } from "@/services/donationService";
 import { formatRupiah } from "@/lib/formatters";
 import { DONATION_LIMITS, generateIdempotencyKey } from "@/lib/security";
 import { NominalPresetsPicker } from "@/components/donation/NominalPresetsPicker";
@@ -110,20 +109,31 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
       const idempotencyKey = generateIdempotencyKey();
       const sanitizedPrayer = prayer.trim().replace(/\s+/g, " ");
 
-      const donation = await createDonation({
-        campaignId: campaign?.id || null,
-        campaignTitle: campaign?.title || "Sedekah Umum YGSM",
-        campaignSlug: campaign?.slug || "",
-        donationType: "CAMPAIGN",
-        amount,
-        paymentChannelId: selectedChannelId,
-        donorName: isAnonymous ? "Hamba Allah" : donorName.trim(),
-        donorEmail: donorEmail.trim(),
-        donorPhone: donorPhone.trim(),
-        isAnonymous,
-        prayer: sanitizedPrayer,
-        idempotencyKey,
+      const res = await fetch("/api/donations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaignId: campaign?.id || null,
+          campaignTitle: campaign?.title || "Sedekah Umum YGSM",
+          campaignSlug: campaign?.slug || "",
+          donationType: "CAMPAIGN",
+          amount,
+          paymentChannelId: selectedChannelId,
+          donorName: isAnonymous ? "Hamba Allah" : donorName.trim(),
+          donorEmail: donorEmail.trim(),
+          donorPhone: donorPhone.trim(),
+          isAnonymous,
+          prayer: sanitizedPrayer,
+          idempotencyKey,
+        }),
       });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Gagal memproses donasi.");
+      }
+
+      const donation = json.data;
 
       if (sanitizedPrayer && campaign?.slug && typeof window !== "undefined") {
         try {

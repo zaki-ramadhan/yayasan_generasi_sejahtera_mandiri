@@ -36,6 +36,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { isNavItemActive } from "@/data/navigation";
 
 function subscribeAuth(callback) {
   window.addEventListener("ygsm_auth_change", callback);
@@ -158,7 +159,12 @@ export default function AdminLayout({ children }) {
 
             <Link
               href="/program"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 transition-colors"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors",
+                isNavItemActive("/program", pathname)
+                  ? "bg-primary text-white font-semibold"
+                  : "text-slate-300 hover:text-white hover:bg-slate-900"
+              )}
             >
               <HeartHandshake className="w-4 h-4" />
               <span>Program Donasi</span>
@@ -166,7 +172,12 @@ export default function AdminLayout({ children }) {
 
             <Link
               href="/donasi-rutin"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 transition-colors"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors",
+                isNavItemActive("/donasi-rutin", pathname)
+                  ? "bg-primary text-white font-semibold"
+                  : "text-slate-300 hover:text-white hover:bg-slate-900"
+              )}
             >
               <CalendarHeart className="w-4 h-4" />
               <span>Donasi Rutin</span>
@@ -174,7 +185,12 @@ export default function AdminLayout({ children }) {
 
             <Link
               href="/distribusi"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 transition-colors"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors",
+                isNavItemActive("/distribusi", pathname)
+                  ? "bg-primary text-white font-semibold"
+                  : "text-slate-300 hover:text-white hover:bg-slate-900"
+              )}
             >
               <FileCheck className="w-4 h-4" />
               <span>Rekam Penyaluran</span>
@@ -182,7 +198,12 @@ export default function AdminLayout({ children }) {
 
             <Link
               href="/laporan"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 transition-colors"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors",
+                isNavItemActive("/laporan", pathname)
+                  ? "bg-primary text-white font-semibold"
+                  : "text-slate-300 hover:text-white hover:bg-slate-900"
+              )}
             >
               <FileSpreadsheet className="w-4 h-4" />
               <span>Laporan & Audit KAP</span>

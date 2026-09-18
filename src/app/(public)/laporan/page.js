@@ -30,36 +30,36 @@ export default async function LaporanPage() {
       {/* Ringkasan Metrik Akuntabilitas (Open Ledger Strip) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 border-y border-slate-300 py-4 sm:py-5">
         <div className="py-3 sm:py-0 sm:px-6 first:pl-0 space-y-1">
-          <span className="text-xs text-slate-600 block">Hasil Audit KAP</span>
+          <span className="text-sm font-medium text-slate-700 block">Hasil Audit KAP</span>
           <div className="text-2xl sm:text-3xl font-semibold text-emerald-800 tracking-tight flex items-center gap-1.5">
             <Award className="w-6 h-6 text-emerald-700" />
             Opini WTP
           </div>
-          <span className="text-xs text-slate-600 block pt-0.5">Wajar Tanpa Pengecualian</span>
+          <span className="text-sm text-slate-600 block pt-0.5">Wajar Tanpa Pengecualian</span>
         </div>
 
         <div className="py-3 sm:py-0 sm:px-6 space-y-1">
-          <span className="text-xs text-slate-600 block">Total Dana Dikelola</span>
+          <span className="text-sm font-medium text-slate-700 block">Total Dana Dikelola</span>
           <div className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight">
             {formatRupiah(metrics.totalDonationsAllTime)}
           </div>
-          <span className="text-xs text-slate-600 block pt-0.5">Akumulasi seluruh program</span>
+          <span className="text-sm text-slate-600 block pt-0.5">Akumulasi seluruh program</span>
         </div>
 
         <div className="py-3 sm:py-0 sm:px-6 space-y-1">
-          <span className="text-xs text-slate-600 block">Penerima Manfaat</span>
+          <span className="text-sm font-medium text-slate-700 block">Penerima Manfaat</span>
           <div className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight">
             {formatNumber(metrics.totalBeneficiaries)}+ Jiwa
           </div>
-          <span className="text-xs text-slate-600 block pt-0.5">Santri, yatim & dhuafa</span>
+          <span className="text-sm text-slate-600 block pt-0.5">Santri, yatim & dhuafa</span>
         </div>
 
         <div className="py-3 sm:py-0 sm:px-6 last:pr-0 space-y-1">
-          <span className="text-xs text-slate-600 block">Pesantren Mitra</span>
+          <span className="text-sm font-medium text-slate-700 block">Pesantren Mitra</span>
           <div className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight">
             {metrics.partnerPesantrenCount} Pesantren
           </div>
-          <span className="text-xs text-slate-600 block pt-0.5">Penerima distribusi rutin</span>
+          <span className="text-sm text-slate-600 block pt-0.5">Penerima distribusi rutin</span>
         </div>
       </div>
 

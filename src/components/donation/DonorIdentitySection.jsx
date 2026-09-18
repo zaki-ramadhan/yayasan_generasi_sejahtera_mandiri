@@ -40,7 +40,7 @@ export function DonorIdentitySection({
 
       {!isAnonymous && (
         <div className="space-y-1.5">
-          <label className="text-sm font-normal text-slate-700 block">Nama Lengkap *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Nama Lengkap *</label>
           <Input
             type="text"
             required={!isAnonymous}
@@ -54,7 +54,7 @@ export function DonorIdentitySection({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-normal text-slate-700 block">Nomor WhatsApp *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Nomor WhatsApp *</label>
           <Input
             type="tel"
             inputMode="tel"
@@ -64,11 +64,11 @@ export function DonorIdentitySection({
             placeholder="0812xxxxxxxx"
             className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
           />
-          <span className="text-xs text-slate-500 block font-normal">Untuk pengiriman invoice &amp; bukti donasi</span>
+          <span className="text-sm text-slate-600 block font-normal">Untuk pengiriman invoice &amp; bukti donasi</span>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-normal text-slate-700 block">Email (Opsional)</label>
+          <label className="text-sm font-semibold text-slate-800 block">Email (Opsional)</label>
           <Input
             type="email"
             value={donorEmail}
@@ -82,18 +82,18 @@ export function DonorIdentitySection({
       {/* Doa / Pesan Kebaikan (Maksimal 1 doa per orang) */}
       <div className="space-y-1.5 pt-1">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-normal text-slate-700 block">
+          <label className="text-sm font-semibold text-slate-800 block">
             Doa atau Titipan Harapan (Opsional)
           </label>
           {!hasExistingPrayer && (
-            <span className="text-xs text-slate-500 font-normal">
+            <span className="text-sm text-slate-500 font-normal">
               {prayer.length}/150 karakter
             </span>
           )}
         </div>
 
         {hasExistingPrayer ? (
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-600 font-normal">
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 font-normal">
             Anda telah menitipkan doa untuk program ini sebelumnya (Maks. 1 doa per orang).
           </div>
         ) : (
@@ -108,7 +108,7 @@ export function DonorIdentitySection({
           />
         )}
 
-        <p className="text-xs sm:text-sm text-slate-600 font-normal">
+        <p className="text-sm text-slate-700 font-normal">
           Untaian doa Anda akan ditampilkan di tab doa program untuk diaminkan bersama donatur lainnya.
         </p>
       </div>

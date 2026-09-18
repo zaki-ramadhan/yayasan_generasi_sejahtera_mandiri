@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { getCampaigns } from "@/services/campaignService";
 import { getTransparencyMetrics } from "@/services/reportService";
-import { ARTICLES, FAQS } from "@/data/articles";
+import { getArticles } from "@/services/articleService";
+import { FAQS } from "@/data/articles";
 import { CampaignCard } from "@/components/shared/CampaignCard";
 import { ArticleCard } from "@/components/shared/ArticleCard";
 import { HomeHero } from "@/components/home/HomeHero";
@@ -16,9 +17,10 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const [campaigns, metrics] = await Promise.all([
+  const [campaigns, metrics, articles] = await Promise.all([
     getCampaigns(),
     getTransparencyMetrics(),
+    getArticles({ limit: 8 }),
   ]);
 
   const featuredCampaigns = campaigns.slice(0, 5);
@@ -145,12 +147,9 @@ export default async function HomePage() {
 
             {/* Articles Compact Mini Cards 2-Column Grid (x2 ke samping, max 6 terpopuler) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[...ARTICLES]
-                .sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0))
-                .slice(0, 8)
-                .map((art) => (
-                  <ArticleCard key={art.id} article={art} isCompact={true} />
-                ))}
+              {articles.map((art) => (
+                <ArticleCard key={art.id} article={art} isCompact={true} />
+              ))}
             </div>
           </div>
 

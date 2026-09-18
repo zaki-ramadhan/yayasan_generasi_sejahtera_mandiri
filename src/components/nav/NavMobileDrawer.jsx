@@ -2,20 +2,33 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, LayoutDashboard, ArrowUpRight, User } from "lucide-react";
+import { ChevronDown, LayoutDashboard, ArrowUpRight, User, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PROGRAM_MENU, INFORMASI_MENU } from "@/data/navigation";
+import {
+  PROGRAM_MENU,
+  INFORMASI_MENU,
+  isNavItemActive,
+  isParentMenuActive,
+} from "@/data/navigation";
 import { getRedirectPathForRole } from "@/services/authService";
 import { cn } from "@/lib/utils";
 
 export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
-  const [activeAccordion, setActiveAccordion] = useState(null);
+  const isHomeActive = isNavItemActive("/", pathname);
+  const isTentangKamiActive = isNavItemActive("/tentang-kami", pathname);
+  const isProgramActive = isParentMenuActive(PROGRAM_MENU, pathname);
+  const isArtikelActive = isNavItemActive("/artikel", pathname);
+  const isInformasiActive = isParentMenuActive(INFORMASI_MENU, pathname);
+
+  const [activeAccordion, setActiveAccordion] = useState(() => {
+    if (isProgramActive) return "program";
+    if (isInformasiActive) return "informasi";
+    return null;
+  });
 
   const toggleAccordion = (name) => {
     setActiveAccordion(activeAccordion === name ? null : name);
   };
-
-  const isArtikelActive = pathname === "/artikel" || pathname?.startsWith("/artikel");
 
   return (
     <div className="lg:hidden border-b border-slate-300 bg-white px-4 pt-2 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2">
@@ -26,7 +39,7 @@ export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
           onClick={onClose}
           className={cn(
             "block px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
-            pathname === "/" ? "bg-slate-100 text-primary" : "text-slate-800 hover:bg-slate-50"
+            isHomeActive ? "bg-slate-100 text-primary" : "text-slate-800 hover:bg-slate-50"
           )}
         >
           Home
@@ -38,7 +51,7 @@ export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
           onClick={onClose}
           className={cn(
             "block px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors",
-            pathname === "/tentang-kami" ? "bg-slate-100 text-primary" : "text-slate-800 hover:bg-slate-50"
+            isTentangKamiActive ? "bg-slate-100 text-primary" : "text-slate-800 hover:bg-slate-50"
           )}
         >
           Tentang Kami
@@ -49,29 +62,45 @@ export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
           <button
             type="button"
             onClick={() => toggleAccordion("program")}
-            className="flex items-center justify-between w-full px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50 rounded-lg cursor-pointer"
+            className={cn(
+              "flex items-center justify-between w-full px-3 py-2.5 text-sm font-semibold rounded-lg cursor-pointer transition-colors",
+              isProgramActive ? "bg-slate-100 text-primary" : "text-slate-800 hover:bg-slate-50"
+            )}
           >
             <span>Program</span>
             <ChevronDown
               className={cn(
-                "w-4 h-4 text-slate-500 transition-transform",
+                "w-4 h-4 transition-transform",
+                isProgramActive ? "text-primary" : "text-slate-500",
                 activeAccordion === "program" && "rotate-180"
               )}
             />
           </button>
           {activeAccordion === "program" && (
-            <div className="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg mt-1 border-l-2 border-primary">
-              {PROGRAM_MENU.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={onClose}
-                  className="flex items-center justify-between py-2 px-2.5 text-sm font-medium text-slate-700 hover:text-primary rounded-md"
-                >
-                  <span>{item.label}</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
-                </Link>
-              ))}
+            <div className="pl-3 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg mt-1 border-l-2 border-primary">
+              {PROGRAM_MENU.map((item) => {
+                const isItemActive = isNavItemActive(item.href, pathname);
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={onClose}
+                    className={cn(
+                      "flex items-center justify-between py-2 px-2.5 text-sm rounded-md transition-colors",
+                      isItemActive
+                        ? "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-semibold shadow-xs hover:bg-gradient-to-r hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 hover:text-white cursor-default select-none pointer-events-none"
+                        : "font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100"
+                    )}
+                  >
+                    <span>{item.label}</span>
+                    {isItemActive ? (
+                      <Check className="w-3.5 h-3.5 text-white shrink-0" strokeWidth={2.5} />
+                    ) : (
+                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" strokeWidth={2.5} />
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
@@ -93,29 +122,45 @@ export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
           <button
             type="button"
             onClick={() => toggleAccordion("informasi")}
-            className="flex items-center justify-between w-full px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50 rounded-lg cursor-pointer"
+            className={cn(
+              "flex items-center justify-between w-full px-3 py-2.5 text-sm font-semibold rounded-lg cursor-pointer transition-colors",
+              isInformasiActive ? "bg-slate-100 text-primary" : "text-slate-800 hover:bg-slate-50"
+            )}
           >
             <span>Informasi</span>
             <ChevronDown
               className={cn(
-                "w-4 h-4 text-slate-500 transition-transform",
+                "w-4 h-4 transition-transform",
+                isInformasiActive ? "text-primary" : "text-slate-500",
                 activeAccordion === "informasi" && "rotate-180"
               )}
             />
           </button>
           {activeAccordion === "informasi" && (
-            <div className="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg mt-1 border-l-2 border-primary">
-              {INFORMASI_MENU.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={onClose}
-                  className="flex items-center justify-between py-2 px-2.5 text-sm font-medium text-slate-700 hover:text-primary rounded-md"
-                >
-                  <span>{item.label}</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
-                </Link>
-              ))}
+            <div className="pl-3 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg mt-1 border-l-2 border-primary">
+              {INFORMASI_MENU.map((item) => {
+                const isItemActive = isNavItemActive(item.href, pathname);
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={onClose}
+                    className={cn(
+                      "flex items-center justify-between py-2 px-2.5 text-sm rounded-md transition-colors",
+                      isItemActive
+                        ? "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-semibold shadow-xs hover:bg-gradient-to-r hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 hover:text-white cursor-default select-none pointer-events-none"
+                        : "font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100"
+                    )}
+                  >
+                    <span>{item.label}</span>
+                    {isItemActive ? (
+                      <Check className="w-3.5 h-3.5 text-white shrink-0" strokeWidth={2.5} />
+                    ) : (
+                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" strokeWidth={2.5} />
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>

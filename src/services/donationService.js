@@ -179,3 +179,35 @@ export async function getDonationByInvoiceId(invoiceId) {
 
   return donationStore.get(invoiceId) || null;
 }
+
+export async function getRecentDonations(limit = 10) {
+  try {
+    const dbDonations = await prisma.donation.findMany({
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      include: {
+        campaign: {
+          select: {
+            title: true,
+            slug: true,
+          },
+        },
+      },
+    });
+
+    if (dbDonations && dbDonations.length > 0) {
+      return dbDonations.map((d) => ({
+        id: d.invoiceId,
+        donor: d.isAnonymous ? "Hamba Allah" : d.donorName,
+        amount: d.amount,
+        channel: (d.paymentChannel || "qris").toUpperCase(),
+        date: d.createdAt.toISOString(),
+        status: d.status,
+        campaignTitle: d.campaign?.title || "Sedekah Umum YGSM",
+      }));
+    }
+  } catch (error) {
+    console.warn("Prisma getRecentDonations fallback:", error.message);
+  }
+  return [];
+}

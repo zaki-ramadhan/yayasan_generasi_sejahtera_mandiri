@@ -19,8 +19,8 @@ export function ZakatFidyahTab({
           </p>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-700">Jumlah Hari Hutang Puasa</label>
+        <div className="space-y-1.5">
+          <label className="text-sm font-semibold text-slate-800 block">Jumlah Hari Hutang Puasa</label>
           <Input
             type="number"
             min="1"

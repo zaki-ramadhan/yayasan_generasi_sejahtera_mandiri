@@ -2,7 +2,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { ARTICLES } from "@/data/articles";
+import { getArticleBySlug, getArticles } from "@/services/articleService";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/formatters";
 import { SafeImage } from "@/components/ui/safe-image";
@@ -11,7 +11,7 @@ import { RelatedArticles } from "@/components/modules/RelatedArticles";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const article = ARTICLES.find((a) => a.slug === slug);
+  const article = await getArticleBySlug(slug);
   if (!article) return { title: "Artikel Tidak Ditemukan" };
   return {
     title: `${article.title} | YGSM`,
@@ -21,7 +21,10 @@ export async function generateMetadata({ params }) {
 
 export default async function ArticleDetailPage({ params }) {
   const { slug } = await params;
-  const article = ARTICLES.find((a) => a.slug === slug);
+  const [article, allArticles] = await Promise.all([
+    getArticleBySlug(slug),
+    getArticles(),
+  ]);
 
   if (!article) {
     notFound();
@@ -91,7 +94,7 @@ export default async function ArticleDetailPage({ params }) {
       {/* Multi-Tags */}
       {Array.isArray(article.tags) && article.tags.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap pt-4 border-t border-slate-200">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-1">
+          <span className="text-xs font-medium text-slate-500 mr-1">
             Topik:
           </span>
           {article.tags.map((tag) => (
@@ -109,13 +112,14 @@ export default async function ArticleDetailPage({ params }) {
       {/* Interactive Like & Share Bar */}
       <ArticleActionBar
         articleId={article.id}
+        slug={article.slug}
         initialLikes={article.likeCount || 0}
         initialDislikes={article.dislikeCount || 0}
         title={article.title}
       />
 
       {/* Related Articles Recommendation */}
-      <RelatedArticles currentArticle={article} allArticles={ARTICLES} />
+      <RelatedArticles currentArticle={article} allArticles={allArticles} />
 
       {/* Donation Promo CTA Box (Atmospheric gradient overlay + semi-transparent bg image + 3D CTA button) */}
       <div className="relative overflow-hidden rounded-xl border border-slate-700/70 bg-slate-950 text-white p-5 sm:p-6 shadow-md mt-8">

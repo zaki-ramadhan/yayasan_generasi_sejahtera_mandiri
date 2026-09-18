@@ -24,3 +24,22 @@ export const FOOTER_QUICK_LINKS = [
   { label: "Karier", href: "/karier" },
   { label: "Ketentuan Transaksi", href: "/ketentuan-transaksi" },
 ];
+
+export function isNavItemActive(href, pathname) {
+  if (!pathname || !href) return false;
+  if (href === "/") {
+    return pathname === "/";
+  }
+  if (href === "/program") {
+    return pathname === "/program" || pathname.startsWith("/campaign") || pathname.startsWith("/program/");
+  }
+  if (href === "/artikel") {
+    return pathname === "/artikel" || pathname.startsWith("/artikel/");
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export function isParentMenuActive(menuList, pathname) {
+  if (!Array.isArray(menuList) || !pathname) return false;
+  return menuList.some((item) => isNavItemActive(item.href, pathname));
+}

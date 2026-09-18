@@ -8,14 +8,17 @@ export function RoutineSummaryCard({
   selectedPrograms = [],
   totalPerCommitment = 0,
   isSubmitting = false,
+  campaigns = CAMPAIGNS,
 }) {
+  const campaignList = campaigns && campaigns.length > 0 ? campaigns : CAMPAIGNS;
+
   return (
     <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-5 shadow-xs">
       <div className="border-b border-slate-200 pb-3.5">
         <h3 className="text-base sm:text-lg font-semibold text-slate-950">
           Ringkasan Jadwal Donasi
         </h3>
-        <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+        <p className="text-sm text-slate-600 mt-0.5">
           {selectedPrograms.length} program kebaikan terdaftar
         </p>
       </div>
@@ -23,7 +26,7 @@ export function RoutineSummaryCard({
       {/* Program Breakdown List */}
       <div className="space-y-3">
         {selectedPrograms.map((p, idx) => {
-          const camp = CAMPAIGNS.find((c) => c.id === p.campaignId) || CAMPAIGNS[0];
+          const camp = campaignList.find((c) => c.id === p.campaignId) || campaignList[0] || CAMPAIGNS[0];
           const nominal = p.customAmount
             ? parseInt(p.customAmount.replace(/\D/g, ""), 10) || 0
             : p.amount;
@@ -35,11 +38,11 @@ export function RoutineSummaryCard({
               key={p.id}
               className="flex justify-between items-start pb-3 border-b border-slate-100 last:border-0 last:pb-0 text-sm gap-2"
             >
-              <div className="min-w-0 space-y-0.5">
+              <div className="min-w-0 space-y-1">
                 <span className="font-semibold text-slate-950 line-clamp-1 block text-sm">
                   {idx + 1}. {camp.title}
                 </span>
-                <span className="inline-block text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                <span className="inline-block text-xs font-medium text-slate-700 bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
                   {freqLabel}
                 </span>
               </div>
@@ -61,7 +64,7 @@ export function RoutineSummaryCard({
             {formatRupiah(totalPerCommitment)}
           </span>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-sm text-slate-600">
           * Nominal disesuaikan otomatis dengan jadwal pilihan
         </p>
       </div>
@@ -76,7 +79,7 @@ export function RoutineSummaryCard({
           {isSubmitting ? "Menyimpan Jadwal..." : "Aktifkan Jadwal Donasi"}
         </Button>
 
-        <div className="flex items-start gap-2 text-xs text-slate-600 pt-1">
+        <div className="flex items-start gap-2 text-sm text-slate-700 pt-1">
           <ShieldCheck className="w-4 h-4 text-primary shrink-0 mt-0.5" />
           <span className="leading-relaxed">
             Pengingat resmi dikirim via WhatsApp YGSM tanpa auto-debit paksaan.

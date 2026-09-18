@@ -27,7 +27,7 @@ const SORT_OPTIONS = [
   { value: "dana-terbanyak", label: "Dana Terkumpul Terbanyak" },
 ];
 
-export function ProgramCatalog({ initialCampaigns = [] }) {
+export function ProgramCatalog({ initialCampaigns = [], categories = CATEGORIES }) {
   const searchParams = useSearchParams();
   const [internalCategory, setInternalCategory] = useState(null);
   const selectedCategory = internalCategory ?? (searchParams.get("kategori") || "all");
@@ -43,18 +43,18 @@ export function ProgramCatalog({ initialCampaigns = [] }) {
   // Compute total campaign counts for each category
   const categoryCounts = useMemo(() => {
     const counts = { all: initialCampaigns.length };
-    CATEGORIES.forEach((cat) => {
+    categories.forEach((cat) => {
       if (cat.id !== "all") {
         counts[cat.id] = initialCampaigns.filter(
           (c) =>
             c.categoryId === cat.id ||
-            c.categoryName.toLowerCase().includes(cat.name.toLowerCase()) ||
-            (cat.slug && c.categoryId === cat.slug)
+            c.categoryName?.toLowerCase().includes(cat.name?.toLowerCase()) ||
+            (cat.slug && (c.categoryId === cat.slug || c.categorySlug === cat.slug))
         ).length;
       }
     });
     return counts;
-  }, [initialCampaigns]);
+  }, [initialCampaigns, categories]);
 
   const filteredCampaigns = useMemo(() => {
     let result = [...initialCampaigns];
@@ -135,7 +135,7 @@ export function ProgramCatalog({ initialCampaigns = [] }) {
     <div className="space-y-6">
       {/* Category Tabs with Campaign Counts */}
       <CategoryTabs
-        categories={CATEGORIES}
+        categories={categories}
         counts={categoryCounts}
         selectedCategory={selectedCategory}
         onSelectCategory={handleCategoryChange}

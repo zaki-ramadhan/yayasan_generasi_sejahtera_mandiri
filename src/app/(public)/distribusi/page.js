@@ -1,12 +1,14 @@
 import { DistributionFeed } from "@/components/modules/DistributionFeed";
-import { formatRupiah } from "@/lib/formatters";
+import { getCampaignUpdates } from "@/services/campaignService";
+import { getTransparencyMetrics } from "@/services/reportService";
+import { formatRupiah, formatNumber } from "@/lib/formatters";
 
 export const metadata = {
   title: "Penyaluran & Distribusi Logistik - YGSM",
   description: "Rekam jejak distribusi bantuan dan penyaluran dana amanah umat secara transparan dan akuntabel.",
 };
 
-const DISTRIBUTION_RECORDS = [
+const FALLBACK_DISTRIBUTION_RECORDS = [
   {
     id: "DIST-2026-089",
     title: "Penyaluran 500 Mushaf Al-Qur'an & Kitab Santri Pelosok",
@@ -105,13 +107,33 @@ const DISTRIBUTION_RECORDS = [
   },
 ];
 
-export default function DistribusiPage() {
+export default async function DistribusiPage() {
+  const [updates, metrics] = await Promise.all([
+    getCampaignUpdates(),
+    getTransparencyMetrics(),
+  ]);
+
+  const records = updates && updates.length > 0
+    ? updates.map((u) => ({
+        id: u.id,
+        title: u.title,
+        location: u.location || "Wilayah Binaan YGSM",
+        date: u.date,
+        beneficiaries: `${formatNumber(u.beneficiaryCount || 100)}+ Jiwa`,
+        value: u.spentAmount || 25000000,
+        status: "SELESAI",
+        image: (u.images && u.images[0]) || u.campaign?.bannerUrl || "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=800&auto=format&fit=crop&q=80",
+        pj: "Tim Penyaluran & Logistik YGSM",
+        notes: u.content,
+      }))
+    : FALLBACK_DISTRIBUTION_RECORDS;
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-12">
       {/* Page Header */}
       <div className="max-w-3xl space-y-3">
         <h1 className="text-2xl sm:text-4xl font-bold text-slate-950 tracking-tight">
-          Rekam Jejak Penyaluran & Distribusi
+          Rekam Jejak Penyaluran &amp; Distribusi
         </h1>
         <p className="text-base sm:text-lg text-slate-700 leading-relaxed">
           Setiap rupiah amanah donasi Anda disalurkan secara langsung ke titik-titik penerima manfaat dengan bukti dokumentasi otentik dan berita acara serah terima.
@@ -121,24 +143,24 @@ export default function DistribusiPage() {
       {/* Distribution Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-6 sm:p-8 bg-slate-900 text-white rounded-2xl">
         <div className="space-y-1">
-          <span className="text-xs text-slate-400 uppercase font-semibold">Total Nilai Penyaluran {new Date().getFullYear()}</span>
-          <div className="text-2xl sm:text-3xl font-bold text-white">{formatRupiah(842500000)}</div>
-          <span className="text-xs text-emerald-400">100% tepat sasaran syar&apos;i</span>
+          <span className="text-sm font-medium text-slate-300 block">Total nilai penyaluran akumulasi</span>
+          <div className="text-2xl sm:text-3xl font-bold text-white">{formatRupiah(metrics.totalDonationsAllTime)}</div>
+          <span className="text-sm text-emerald-400">100% tepat sasaran syar&apos;i</span>
         </div>
         <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-slate-800 pt-4 sm:pt-0 sm:pl-6">
-          <span className="text-xs text-slate-400 uppercase font-semibold">Penerima Manfaat</span>
-          <div className="text-2xl sm:text-3xl font-bold text-white">4.820 Jiwa</div>
-          <span className="text-xs text-slate-400">Santri, yatim, dan dhuafa</span>
+          <span className="text-sm font-medium text-slate-300 block">Penerima manfaat</span>
+          <div className="text-2xl sm:text-3xl font-bold text-white">{formatNumber(metrics.totalBeneficiaries)}+ Jiwa</div>
+          <span className="text-sm text-slate-300">Santri, yatim, dan dhuafa</span>
         </div>
         <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-slate-800 pt-4 sm:pt-0 sm:pl-6">
-          <span className="text-xs text-slate-400 uppercase font-semibold">Titik Lokasi Distribusi</span>
-          <div className="text-2xl sm:text-3xl font-bold text-white">28 Wilayah</div>
-          <span className="text-xs text-slate-400">Jawa Barat, Banten, Jateng, Jatim</span>
+          <span className="text-sm font-medium text-slate-300 block">Pesantren mitra binaan</span>
+          <div className="text-2xl sm:text-3xl font-bold text-white">{metrics.partnerPesantrenCount} Pesantren</div>
+          <span className="text-sm text-slate-300">Jawa Barat, Banten, Jateng, Jatim</span>
         </div>
       </div>
 
       {/* Paginated Distribution Feed */}
-      <DistributionFeed records={DISTRIBUTION_RECORDS} />
+      <DistributionFeed records={records} />
     </main>
   );
 }

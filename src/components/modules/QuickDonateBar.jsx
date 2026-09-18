@@ -55,8 +55,8 @@ export function QuickDonateBar({ defaultCampaignSlug = "beasiswa-santri-penghafa
 
       {/* Amount Presets */}
       <div className="space-y-2">
-        <label className="text-sm font-normal text-slate-700 block">
-          Pilihan Nominal
+        <label className="text-sm font-semibold text-slate-800 block">
+          Pilihan nominal donasi
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           {PRESET_AMOUNTS.map((amt) => {
@@ -97,7 +97,7 @@ export function QuickDonateBar({ defaultCampaignSlug = "beasiswa-santri-penghafa
       {/* Custom Nominal Input: Only rendered when isCustomMode is active */}
       {isCustomMode && (
         <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-          <label className="text-sm font-normal text-slate-700 block">
+          <label className="text-sm font-semibold text-slate-800 block">
             Nominal Lainnya (Min. Rp 10.000)
           </label>
           <div className="relative">

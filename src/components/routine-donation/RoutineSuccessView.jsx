@@ -11,9 +11,11 @@ export function RoutineSuccessView({
   fullName,
   whatsapp,
   selectedPrograms,
+  campaigns = CAMPAIGNS,
   onReset,
 }) {
   const router = useRouter();
+  const campaignList = campaigns && campaigns.length > 0 ? campaigns : CAMPAIGNS;
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-16 text-center space-y-6">
@@ -30,12 +32,12 @@ export function RoutineSuccessView({
       </div>
 
       <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-left space-y-4">
-        <h2 className="text-sm font-bold text-slate-900 uppercase">
-          Ringkasan Komitmen Donasi Rutin
+        <h2 className="text-base font-semibold text-slate-900">
+          Ringkasan komitmen donasi rutin
         </h2>
         <div className="space-y-3">
           {selectedPrograms.map((p, idx) => {
-            const camp = CAMPAIGNS.find((c) => c.id === p.campaignId) || CAMPAIGNS[0];
+            const camp = campaignList.find((c) => c.id === p.campaignId) || campaignList[0] || CAMPAIGNS[0];
             const nominal = p.customAmount ? parseInt(p.customAmount.replace(/\D/g, ""), 10) || 0 : p.amount;
             const freqLabel = FREQUENCY_OPTIONS.find((f) => f.value === p.frequency)?.label;
             return (

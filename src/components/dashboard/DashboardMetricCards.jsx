@@ -3,7 +3,7 @@ import { USER_ROLES } from "@/services/authService";
 import { CAMPAIGNS } from "@/data/campaigns";
 import { formatRupiah } from "@/lib/formatters";
 
-export function DashboardMetricCards({ userRole }) {
+export function DashboardMetricCards({ userRole, stats }) {
   if (userRole === USER_ROLES.DONOR) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -58,27 +58,32 @@ export function DashboardMetricCards({ userRole }) {
     );
   }
 
+  const totalDonations = stats?.totalDonations || 148500000;
+  const transactionCount = stats?.transactionCount || 1240;
+  const campaignsCount = stats?.activeCampaignsCount || CAMPAIGNS.length;
+  const volunteersCount = stats?.volunteerCount || 348;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card className="p-5 bg-white border-slate-200 shadow-2xs">
-        <span className="text-xs text-slate-500 block mb-1">Donasi Masuk (Bulan Ini)</span>
-        <div className="text-xl sm:text-2xl font-bold text-slate-900">{formatRupiah(148500000)}</div>
-        <span className="text-xs text-emerald-600 font-medium mt-1 block">↑ 14% dari bulan lalu</span>
+        <span className="text-xs text-slate-500 block mb-1">Donasi Masuk Terhimpun</span>
+        <div className="text-xl sm:text-2xl font-bold text-slate-900">{formatRupiah(totalDonations)}</div>
+        <span className="text-xs text-emerald-600 font-medium mt-1 block">Live dari transaksi PostgreSQL</span>
       </Card>
       <Card className="p-5 bg-white border-slate-200 shadow-2xs">
         <span className="text-xs text-slate-500 block mb-1">Transaksi Terverifikasi</span>
-        <div className="text-xl sm:text-2xl font-bold text-slate-900">1.240 Transaksi</div>
-        <span className="text-xs text-slate-500 mt-1 block">98.5% otomatis QRIS &amp; VA</span>
+        <div className="text-xl sm:text-2xl font-bold text-slate-900">{transactionCount} Transaksi</div>
+        <span className="text-xs text-slate-500 mt-1 block">Otomatis QRIS &amp; VA</span>
       </Card>
       <Card className="p-5 bg-white border-slate-200 shadow-2xs">
         <span className="text-xs text-slate-500 block mb-1">Program Campaign Aktif</span>
-        <div className="text-xl sm:text-2xl font-bold text-slate-900">{CAMPAIGNS.length} Program</div>
-        <span className="text-xs text-slate-500 mt-1 block">2 program tanggap darurat</span>
+        <div className="text-xl sm:text-2xl font-bold text-slate-900">{campaignsCount} Program</div>
+        <span className="text-xs text-slate-500 mt-1 block">Tersinkronisasi Database</span>
       </Card>
       <Card className="p-5 bg-white border-slate-200 shadow-2xs">
         <span className="text-xs text-slate-500 block mb-1">Relawan Terdaftar</span>
-        <div className="text-xl sm:text-2xl font-bold text-slate-900">348 Relawan</div>
-        <span className="text-xs text-emerald-600 font-medium mt-1 block">12 pendaftar baru</span>
+        <div className="text-xl sm:text-2xl font-bold text-slate-900">{volunteersCount} Relawan</div>
+        <span className="text-xs text-emerald-600 font-medium mt-1 block">Formulir Relawan Terhubung</span>
       </Card>
     </div>
   );

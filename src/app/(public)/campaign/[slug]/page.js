@@ -32,6 +32,9 @@ export default async function CampaignDetailPage({ params }) {
 
   const progress = calculateProgress(campaign.collectedAmount, campaign.targetAmount);
   const daysLeft = calculateDaysLeft(campaign.endDate);
+  const prayersCount = (campaign.recentDonors || []).filter(
+    (d) => Boolean(d.prayer && d.prayer.trim())
+  ).length;
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 pb-24 lg:pb-12">
@@ -70,7 +73,7 @@ export default async function CampaignDetailPage({ params }) {
                 value="doa"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors"
               >
-                Doa &amp; Dukungan
+                Doa &amp; Dukungan ({prayersCount})
               </TabsTrigger>
             </TabsList>
 

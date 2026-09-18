@@ -9,8 +9,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { PrayerCard } from "@/components/modules/PrayerCard";
+import { usePrayersSync } from "@/hooks/usePrayersSync";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 const SORT_OPTIONS = [
   { value: "terbaru", label: "Paling Baru" },
@@ -18,43 +18,8 @@ const SORT_OPTIONS = [
 ];
 
 export function CampaignPrayersSidebar({ initialDonors = [], campaignSlug }) {
-  const [donors, setDonors] = useState(() =>
-    initialDonors.map((d) => ({
-      ...d,
-      aminCount: d.aminCount ?? Math.floor(Math.random() * 15 + 2),
-    }))
-  );
-
-  const [aminedIds, setAminedIds] = useState(() => {
-    if (typeof window === "undefined") return new Set();
-    try {
-      const saved = localStorage.getItem("ygsm_amined_prayers");
-      return saved ? new Set(JSON.parse(saved)) : new Set();
-    } catch {
-      return new Set();
-    }
-  });
-
+  const { donors, aminedSet, handleToggleAmin } = usePrayersSync(initialDonors);
   const [sortBy, setSortBy] = useState("terbaru"); // "terbaru" | "terpopuler"
-
-  const handleToggleAmin = (donorId) => {
-    if (aminedIds.has(donorId)) return;
-    const nextSet = new Set(aminedIds);
-    nextSet.add(donorId);
-
-    setDonors((prev) =>
-      prev.map((d) => (d.id === donorId ? { ...d, aminCount: d.aminCount + 1 } : d))
-    );
-    toast.success("Aamiin ya Rabbal 'Alamin. Doa berhasil diaminkan.");
-
-    setAminedIds(nextSet);
-    try {
-      localStorage.setItem("ygsm_amined_prayers", JSON.stringify(Array.from(nextSet)));
-      window.dispatchEvent(new Event("ygsm_prayers_updated"));
-    } catch {
-      // Ignore
-    }
-  };
 
   const prayersOnly = useMemo(() => {
     const list = donors.filter((d) => Boolean(d.prayer && d.prayer.trim()));
@@ -116,7 +81,7 @@ export function CampaignPrayersSidebar({ initialDonors = [], campaignSlug }) {
           <PrayerCard
             key={donor.id}
             donor={donor}
-            isAmined={aminedIds.has(donor.id)}
+            isAmined={aminedSet.has(donor.id)}
             onToggleAmin={handleToggleAmin}
             isCompact={true}
           />

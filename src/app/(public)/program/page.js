@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getCampaigns } from "@/services/campaignService";
+import { getCampaigns, getCategories } from "@/services/campaignService";
 import { ProgramCatalog } from "@/components/modules/ProgramCatalog";
 import { CampaignCardSkeleton } from "@/components/shared/CampaignCardSkeleton";
 
@@ -9,14 +9,17 @@ export const metadata = {
 };
 
 export default async function ProgramPage() {
-  const campaigns = await getCampaigns();
+  const [campaigns, categories] = await Promise.all([
+    getCampaigns(),
+    getCategories(),
+  ]);
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight leading-tight">
-          Katalog Program Donasi & Penyaluran
+          Katalog Program Donasi &amp; Penyaluran
         </h1>
         <p className="text-sm sm:text-base text-slate-800 leading-relaxed max-w-3xl">
           Pilih program yang ingin Anda bantu. Seluruh dana disalurkan secara transparan dan dilaporkan secara berkala kepada donatur.
@@ -33,7 +36,7 @@ export default async function ProgramPage() {
           </div>
         }
       >
-        <ProgramCatalog initialCampaigns={campaigns} />
+        <ProgramCatalog initialCampaigns={campaigns} categories={categories} />
       </Suspense>
     </main>
   );

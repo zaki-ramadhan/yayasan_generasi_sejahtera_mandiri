@@ -24,19 +24,40 @@ export function VolunteerForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!fullName || !phone || !city) {
       toast.error("Mohon lengkapi seluruh kolom yang wajib diisi.");
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      setLoading(true);
+      const res = await fetch("/api/volunteers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName,
+          phone,
+          email,
+          city,
+          interest,
+          motivation,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Gagal mengirim pendaftaran.");
+      }
+
       setIsSubmitted(true);
-      toast.success("Pendaftaran relawan berhasil dikirim!");
-    }, 600);
+      toast.success(json.message || "Pendaftaran relawan berhasil dikirim!");
+    } catch (err) {
+      toast.error(err.message || "Gagal mengirim pendaftaran relawan.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (isSubmitted) {
@@ -58,7 +79,7 @@ export function VolunteerForm() {
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-xl border border-border-subtle space-y-4 shadow-sm">
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-slate-700">Nama Lengkap *</label>
+        <label className="text-sm font-semibold text-slate-800 block">Nama Lengkap *</label>
         <Input
           type="text"
           required
@@ -71,7 +92,7 @@ export function VolunteerForm() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-slate-700">Nomor WhatsApp *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Nomor WhatsApp *</label>
           <Input
             type="tel"
             inputMode="tel"
@@ -84,7 +105,7 @@ export function VolunteerForm() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-slate-700">Email</label>
+          <label className="text-sm font-semibold text-slate-800 block">Email</label>
           <Input
             type="email"
             value={email}
@@ -97,7 +118,7 @@ export function VolunteerForm() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-slate-700">Kota / Kabupaten Domisili *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Kota / Kabupaten Domisili *</label>
           <Input
             type="text"
             required
@@ -109,7 +130,7 @@ export function VolunteerForm() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-slate-700">Peminatan Aksi *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Peminatan Aksi *</label>
           <select
             value={interest}
             onChange={(e) => setInterest(e.target.value)}
@@ -125,7 +146,7 @@ export function VolunteerForm() {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-slate-700">Motivasi & Pengalaman Singkat</label>
+        <label className="text-sm font-semibold text-slate-800 block">Motivasi &amp; Pengalaman Singkat</label>
         <textarea
           rows={3}
           value={motivation}

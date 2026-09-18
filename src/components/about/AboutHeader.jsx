@@ -1,12 +1,31 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Phone, Share2, Check, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ORG_PROFILE } from "@/data/orgProfile";
 
-export function AboutHeader({ copiedProfile, onShareProfile }) {
+export function AboutHeader({ copiedProfile, onShareProfile, volunteerCount = 14 }) {
+  const [internalCopied, setInternalCopied] = useState(false);
+  const isCopied = copiedProfile !== undefined ? copiedProfile : internalCopied;
+  const leadershipCount = ORG_PROFILE.leadership?.length || 4;
+  const totalTeam = leadershipCount + volunteerCount;
+
+  const handleShare = () => {
+    if (onShareProfile) {
+      onShareProfile();
+      return;
+    }
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      setInternalCopied(true);
+      toast.success("Tautan profil yayasan berhasil disalin.");
+      setTimeout(() => setInternalCopied(false), 2500);
+    }
+  };
   return (
     <section className="bg-white rounded-2xl border border-slate-300 overflow-hidden shadow-2xs">
       {/* Cover Banner Image */}
@@ -68,11 +87,11 @@ export function AboutHeader({ copiedProfile, onShareProfile }) {
             <Button
               type="button"
               variant="outline"
-              onClick={onShareProfile}
+              onClick={handleShare}
               className="h-9 sm:h-10 w-9 sm:w-10 p-0 text-slate-700 hover:text-slate-950 bg-white hover:bg-slate-100 border-slate-300 transition-colors shadow-2xs shrink-0 flex items-center justify-center cursor-pointer"
               title="Bagikan Tautan Profil"
             >
-              {copiedProfile ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
+              {isCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
             </Button>
           </div>
         </div>
@@ -112,18 +131,24 @@ export function AboutHeader({ copiedProfile, onShareProfile }) {
                 ))}
               </div>
               <p className="text-xs sm:text-sm text-slate-700 font-medium">
-                <strong className="text-slate-900 font-semibold">+18 pengurus</strong> &amp; relawan aktif
+                <strong className="text-slate-900 font-semibold">+{totalTeam} pengurus</strong> &amp; relawan aktif
               </p>
             </div>
           </div>
 
           {/* Metadata Bar */}
-          <div className="flex flex-wrap items-center gap-y-1.5 gap-x-5 text-sm text-slate-700 pt-2 border-t border-slate-200">
+          <div className="flex flex-wrap items-center gap-y-1.5 gap-x-3 text-xs sm:text-sm text-slate-700 pt-2 border-t border-slate-200">
             <span className="text-slate-800 font-medium">
               Cibinong, Kab. Bogor, Jawa Barat
             </span>
+            <span className="text-slate-300 select-none hidden sm:inline" aria-hidden="true">
+              |
+            </span>
             <span className="text-slate-800 font-medium">
               SK Kemenkumham: {ORG_PROFILE.legal.skKemenkumham}
+            </span>
+            <span className="text-slate-300 select-none hidden sm:inline" aria-hidden="true">
+              |
             </span>
             <span className="text-emerald-700 font-medium">
               Audit KAP: Opini Wajar Tanpa Pengecualian (WTP)

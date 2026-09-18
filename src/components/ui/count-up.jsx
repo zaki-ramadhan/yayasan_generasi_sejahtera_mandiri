@@ -6,7 +6,7 @@ import { formatRupiah, formatNumber } from "@/lib/formatters";
 export function CountUp({
   to,
   from = 0,
-  duration = 2.8,
+  duration = 5,
   delay = 0,
   format = "raw", // "rupiah" | "number" | "raw"
   prefix = "",

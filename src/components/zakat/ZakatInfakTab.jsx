@@ -15,7 +15,7 @@ export function ZakatInfakTab({
       </p>
 
       <div className="space-y-2">
-        <label className="text-xs font-medium text-slate-700 block text-left">Nominal Sedekah (Rp)</label>
+        <label className="text-sm font-semibold text-slate-800 block text-left">Nominal Sedekah (Rp)</label>
         <Input
           type="number"
           value={infakAmount || ""}

@@ -26,8 +26,8 @@ export function ZakatProfesiTab({
         </div>
 
         <div className="space-y-3">
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-700">Penghasilan / Gaji Pokok per Bulan</label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-800 block">Penghasilan / Gaji Pokok per Bulan</label>
             <Input
               type="number"
               value={incomeMonthly || ""}
@@ -36,8 +36,8 @@ export function ZakatProfesiTab({
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-700">Pendapatan Lain / Bonus (Opsional)</label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-800 block">Pendapatan Lain / Bonus (Opsional)</label>
             <Input
               type="number"
               value={otherIncomeMonthly || ""}
@@ -46,8 +46,8 @@ export function ZakatProfesiTab({
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-700">Cicilan / Hutang Kebutuhan Pokok per Bulan</label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-800 block">Cicilan / Hutang Kebutuhan Pokok per Bulan</label>
             <Input
               type="number"
               value={debtMonthly || ""}

@@ -26,8 +26,8 @@ export function ZakatMaalTab({
         </div>
 
         <div className="space-y-3">
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-700">Saldo Tabungan &amp; Deposito</label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-800 block">Saldo Tabungan &amp; Deposito</label>
             <Input
               type="number"
               value={savingsTotal || ""}
@@ -36,8 +36,8 @@ export function ZakatMaalTab({
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-700">Simpanan Emas / Logam Mulia (Gram)</label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-800 block">Simpanan Emas / Logam Mulia (Gram)</label>
             <Input
               type="number"
               value={goldGrams || ""}
@@ -47,8 +47,8 @@ export function ZakatMaalTab({
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-700">Hutang Jatuh Tempo yang Harus Dibayar</label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-800 block">Hutang Jatuh Tempo yang Harus Dibayar</label>
             <Input
               type="number"
               value={shortDebt || ""}

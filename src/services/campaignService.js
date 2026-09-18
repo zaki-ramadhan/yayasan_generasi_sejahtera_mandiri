@@ -167,3 +167,73 @@ export async function getCampaignBySlug(slug) {
   }
   return CAMPAIGNS.find((c) => c.slug === slug) || null;
 }
+
+export async function getCategories() {
+  try {
+    const dbCats = await prisma.category.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        _count: {
+          select: { campaigns: true },
+        },
+      },
+    });
+    if (dbCats && dbCats.length > 0) {
+      return [
+        { id: "all", name: "Semua Program", slug: "all", count: 0 },
+        ...dbCats.map((c) => ({
+          id: c.id,
+          name: c.name,
+          slug: c.slug,
+          count: c._count?.campaigns || 0,
+        })),
+      ];
+    }
+  } catch (error) {
+    console.warn("Prisma getCategories fallback:", error.message);
+  }
+  return [
+    { id: "all", name: "Semua Program", slug: "semua" },
+    { id: "pendidikan", name: "Pendidikan & Santri", slug: "pendidikan" },
+    { id: "bencana", name: "Tanggap Bencana", slug: "bencana" },
+    { id: "zakat", name: "ZISWAF", slug: "zakat" },
+    { id: "yatim", name: "Kemandirian Yatim", slug: "yatim" },
+    { id: "ekonomi", name: "Pemberdayaan Umat", slug: "ekonomi" },
+  ];
+}
+
+export async function getCampaignUpdates() {
+  try {
+    const updates = await prisma.campaignUpdate.findMany({
+      orderBy: { date: "desc" },
+      include: {
+        campaign: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            bannerUrl: true,
+          },
+        },
+      },
+    });
+    if (updates && updates.length > 0) {
+      return updates.map((u) => ({
+        id: u.id,
+        title: u.title,
+        content: u.content,
+        date: u.date instanceof Date ? u.date.toISOString().split("T")[0] : u.date,
+        images: u.images || [],
+        imageCaptions: u.imageCaptions || [],
+        spentAmount: u.spentAmount || 0,
+        beneficiaryCount: u.beneficiaryCount || 0,
+        location: u.location || "Wilayah Binaan YGSM",
+        spentBreakdown: u.spentBreakdown || [],
+        campaign: u.campaign,
+      }));
+    }
+  } catch (error) {
+    console.warn("Prisma getCampaignUpdates fallback:", error.message);
+  }
+  return [];
+}

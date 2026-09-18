@@ -1,15 +1,14 @@
-import { ShieldCheck, CheckCircle2, Phone, Mail, Clock, MapPin } from "lucide-react";
+import { CheckCircle2, Phone, Mail, Clock, MapPin } from "lucide-react";
 import { ORG_PROFILE } from "@/data/orgProfile";
 
 export function AboutSidebarInfo() {
   const whatsappUrl = `https://wa.me/${ORG_PROFILE.contacts.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Assalamu'alaikum YGSM, mohon info program yayasan.")}`;
 
   return (
-    <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-6 shadow-2xs">
+    <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4 shadow-2xs">
       {/* 1. Legalitas & Akreditasi */}
       <div className="space-y-3.5">
         <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
-          <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0" />
           <h3 className="font-semibold text-slate-950 text-base">
             Legalitas &amp; Sertifikasi
           </h3>

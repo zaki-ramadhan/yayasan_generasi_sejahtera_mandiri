@@ -38,6 +38,7 @@ function getServerSnapshot() {
 
 export function ArticleActionBar({
 	articleId,
+	slug,
 	initialLikes = 0,
 	initialDislikes = 0,
 	title = "",
@@ -48,6 +49,7 @@ export function ArticleActionBar({
 	const [likes, setLikes] = useState(initialLikes);
 	const [dislikes, setDislikes] = useState(initialDislikes);
 	const [copied, setCopied] = useState(false);
+	const targetSlug = slug || articleId;
 
 	const storedLikesRaw = useSyncExternalStore(subscribeReactions, getLikesSnapshot, getServerSnapshot);
 	const storedDislikesRaw = useSyncExternalStore(subscribeReactions, getDislikesSnapshot, getServerSnapshot);
@@ -55,20 +57,20 @@ export function ArticleActionBar({
 	const hasLiked = useMemo(() => {
 		try {
 			const arr = JSON.parse(storedLikesRaw);
-			return Array.isArray(arr) && arr.includes(articleId);
+			return Array.isArray(arr) && (arr.includes(articleId) || arr.includes(targetSlug));
 		} catch {
 			return false;
 		}
-	}, [storedLikesRaw, articleId]);
+	}, [storedLikesRaw, articleId, targetSlug]);
 
 	const hasDisliked = useMemo(() => {
 		try {
 			const arr = JSON.parse(storedDislikesRaw);
-			return Array.isArray(arr) && arr.includes(articleId);
+			return Array.isArray(arr) && (arr.includes(articleId) || arr.includes(targetSlug));
 		} catch {
 			return false;
 		}
-	}, [storedDislikesRaw, articleId]);
+	}, [storedDislikesRaw, articleId, targetSlug]);
 
 	const handleToggleLike = () => {
 		try {
@@ -81,11 +83,11 @@ export function ArticleActionBar({
 
 			const nextLiked = !hasLiked;
 			const updatedLikes = nextLiked
-				? [...storedLikes, articleId]
-				: storedLikes.filter((id) => id !== articleId);
+				? [...storedLikes, targetSlug]
+				: storedLikes.filter((id) => id !== targetSlug && id !== articleId);
 
 			const updatedDislikes = hasDisliked
-				? storedDislikes.filter((id) => id !== articleId)
+				? storedDislikes.filter((id) => id !== targetSlug && id !== articleId)
 				: storedDislikes;
 
 			localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(updatedLikes));
@@ -102,11 +104,19 @@ export function ArticleActionBar({
 				setDislikes((prev) => Math.max(0, prev - 1));
 			}
 
+			if (nextLiked && targetSlug) {
+				fetch("/api/articles/reaction", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ slug: targetSlug, type: "like" }),
+				}).catch(() => {});
+			}
+
 			window.dispatchEvent(
 				new CustomEvent(SYNC_EVENT, {
 					detail: {
 						sourceId: instanceId,
-						articleId,
+						articleId: targetSlug,
 						hasLiked: nextLiked,
 						likeDelta,
 						hasDisliked: false,
@@ -130,11 +140,11 @@ export function ArticleActionBar({
 
 			const nextDisliked = !hasDisliked;
 			const updatedDislikes = nextDisliked
-				? [...storedDislikes, articleId]
-				: storedDislikes.filter((id) => id !== articleId);
+				? [...storedDislikes, targetSlug]
+				: storedDislikes.filter((id) => id !== targetSlug && id !== articleId);
 
 			const updatedLikes = hasLiked
-				? storedLikes.filter((id) => id !== articleId)
+				? storedLikes.filter((id) => id !== targetSlug && id !== articleId)
 				: storedLikes;
 
 			localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(updatedLikes));
@@ -151,11 +161,19 @@ export function ArticleActionBar({
 				setLikes((prev) => Math.max(0, prev - 1));
 			}
 
+			if (nextDisliked && targetSlug) {
+				fetch("/api/articles/reaction", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ slug: targetSlug, type: "dislike" }),
+				}).catch(() => {});
+			}
+
 			window.dispatchEvent(
 				new CustomEvent(SYNC_EVENT, {
 					detail: {
 						sourceId: instanceId,
-						articleId,
+						articleId: targetSlug,
 						hasDisliked: nextDisliked,
 						dislikeDelta,
 						hasLiked: false,

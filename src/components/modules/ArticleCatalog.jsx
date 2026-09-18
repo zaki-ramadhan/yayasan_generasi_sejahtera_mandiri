@@ -24,7 +24,7 @@ const SORT_OPTIONS = [
   { value: "a-z", label: "Judul (A-Z)" },
 ];
 
-export function ArticleCatalog({ initialArticles = [] }) {
+export function ArticleCatalog({ initialArticles = [], categories = ARTICLE_CATEGORIES }) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("terbaru");
@@ -37,13 +37,13 @@ export function ArticleCatalog({ initialArticles = [] }) {
   // Calculate dynamic article counts per category
   const categoryCounts = useMemo(() => {
     const counts = { all: initialArticles.length };
-    ARTICLE_CATEGORIES.forEach((cat) => {
+    categories.forEach((cat) => {
       if (cat.id !== "all") {
-        counts[cat.id] = initialArticles.filter((a) => a.category === cat.id).length;
+        counts[cat.id] = initialArticles.filter((a) => a.category === cat.id || a.category === cat.name).length;
       }
     });
     return counts;
-  }, [initialArticles]);
+  }, [initialArticles, categories]);
 
   const filteredArticles = useMemo(() => {
     let result = [...initialArticles];
@@ -107,7 +107,7 @@ export function ArticleCatalog({ initialArticles = [] }) {
     <div className="space-y-6">
       {/* Category Tabs with Dynamic Article Counts */}
       <CategoryTabs
-        categories={ARTICLE_CATEGORIES}
+        categories={categories}
         counts={categoryCounts}
         selectedCategory={selectedCategory}
         onSelectCategory={handleCategoryChange}

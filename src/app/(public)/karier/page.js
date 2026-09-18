@@ -96,7 +96,7 @@ export default function KarierPage() {
             <HeartHandshake className="w-5 h-5" />
           </div>
           <h2 className="text-base font-bold text-slate-950">Lingkungan Berkah &amp; Syar&apos;i</h2>
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-sm text-slate-700 leading-relaxed">
             Bekerja sekaligus bernilai ibadah dengan kultur kerja saling mengingatkan dalam kebaikan dan ketaatan.
           </p>
         </div>
@@ -106,7 +106,7 @@ export default function KarierPage() {
             <ShieldCheck className="w-5 h-5" />
           </div>
           <h2 className="text-base font-bold text-slate-950">Pengembangan Kompetensi</h2>
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-sm text-slate-700 leading-relaxed">
             Pelatihan manajemen ZISWAF bersertifikasi amil, akuntansi syariah PSAK 109, dan kepemimpinan sosial.
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function KarierPage() {
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <h2 className="text-base font-bold text-slate-950">Dampak Nyata Lapangan</h2>
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-sm text-slate-700 leading-relaxed">
             Menyaksikan langsung santri yatim yang terbantu hingga mampu menghafal 30 juz dan mandiri berwirausaha.
           </p>
         </div>
@@ -136,16 +136,16 @@ export default function KarierPage() {
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <span className="text-xs font-semibold text-primary block mb-1">
+                  <span className="text-sm font-semibold text-primary block mb-1">
                     {job.department}
                   </span>
                   <h3 className="text-lg font-bold text-slate-950">{job.title}</h3>
                 </div>
                 <Button
                   onClick={() => setSelectedJob(job)}
-                  className="h-10 px-5 bg-primary hover:bg-primary-hover text-white font-semibold rounded-lg text-xs shrink-0 self-start sm:self-auto cursor-pointer"
+                  className="h-10 px-5 bg-primary hover:bg-primary-hover text-white font-semibold rounded-lg text-sm shrink-0 self-start sm:self-auto cursor-pointer"
                 >
-                  Lamar Posisi Ini <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  Lamar Posisi Ini <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Button>
               </div>
 
@@ -153,13 +153,13 @@ export default function KarierPage() {
                 {job.description}
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 border-t border-slate-100 pt-3">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 border-t border-slate-100 pt-3">
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  <MapPin className="w-4 h-4 text-slate-400" />
                   {job.location}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                  <Clock className="w-4 h-4 text-slate-400" />
                   {job.type}
                 </span>
               </div>
@@ -179,8 +179,8 @@ export default function KarierPage() {
 
           <form onSubmit={handleApply} className="space-y-4 pt-2">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                Nama Lengkap <span className="text-rose-500">*</span>
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                Nama lengkap <span className="text-rose-500">*</span>
               </label>
               <Input
                 type="text"
@@ -192,8 +192,8 @@ export default function KarierPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                Email Aktif <span className="text-rose-500">*</span>
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                Email aktif <span className="text-rose-500">*</span>
               </label>
               <Input
                 type="email"
@@ -205,7 +205,7 @@ export default function KarierPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
                 Nomor WhatsApp <span className="text-rose-500">*</span>
               </label>
               <Input
@@ -218,7 +218,7 @@ export default function KarierPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
                 Tautan CV / Portofolio (Google Drive / LinkedIn)
               </label>
               <Input

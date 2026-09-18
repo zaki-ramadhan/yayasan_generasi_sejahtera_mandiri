@@ -20,8 +20,8 @@ export function DonationCheckoutSummary({
         {/* Campaign Info Section */}
         {campaign && (
           <div className="space-y-3 pb-4 border-b border-slate-200">
-            <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider block">
-              Program yang Didukung
+            <span className="text-xs font-medium text-slate-500 block">
+              Program yang didukung
             </span>
             <div className="flex gap-3.5 items-center">
               {campaign.bannerUrl && (
@@ -51,7 +51,7 @@ export function DonationCheckoutSummary({
         <div className="space-y-3">
           <div className="border-b border-slate-200 pb-2.5">
             <h3 className="text-base sm:text-lg font-semibold text-slate-950">Ringkasan Pembayaran</h3>
-            <p className="text-xs text-slate-600 mt-0.5">Pastikan rincian donasi Anda telah sesuai</p>
+            <p className="text-sm text-slate-600 mt-0.5">Pastikan rincian donasi Anda telah sesuai</p>
           </div>
 
           <div className="space-y-2.5 text-sm">
@@ -83,13 +83,17 @@ export function DonationCheckoutSummary({
           <Button
             type="submit"
             isLoading={isSubmitting}
-            disabled={isSubmitting || amount < DONATION_LIMITS.MIN_AMOUNT}
-            className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary-hover text-white rounded-lg shadow-xs cursor-pointer"
+            disabled={isSubmitting || !amount || amount <= 0 || amount < DONATION_LIMITS.MIN_AMOUNT}
+            className="w-full h-12 rounded-lg text-base font-semibold text-white bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700 border-t border-t-blue-400 border-x border-x-blue-600 border-b-2 border-b-blue-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_6px_rgba(29,78,216,0.25)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
           >
-            {isSubmitting ? "Memproses Transaksi..." : `Lanjut Pembayaran (${formatRupiah(totalPayment)})`}
+            {isSubmitting
+              ? "Memproses Transaksi..."
+              : amount >= DONATION_LIMITS.MIN_AMOUNT
+              ? `Lanjut Pembayaran (${formatRupiah(totalPayment)})`
+              : "Lanjut Pembayaran"}
           </Button>
 
-          <div className="flex items-center justify-center gap-1.5 text-xs text-slate-600 text-center pt-0.5">
+          <div className="flex items-center justify-center gap-1.5 text-sm text-slate-600 text-center pt-0.5">
             <Lock className="w-3.5 h-3.5 text-primary shrink-0" />
             <span>Enkripsi data aman &amp; verifikasi otomatis</span>
           </div>

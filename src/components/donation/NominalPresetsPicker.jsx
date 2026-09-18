@@ -61,22 +61,22 @@ export function NominalPresetsPicker({
 
       {/* Custom Input: Only rendered when isCustomMode is active */}
       {isCustomMode && (
-        <div className="space-y-1.5 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
-          <label className="text-sm font-normal text-slate-700 block">
-            Masukkan nominal yang diinginkan (Min. {formatRupiah(DONATION_LIMITS.MIN_AMOUNT)})
+        <div className="space-y-2 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
+          <label className="text-sm font-semibold text-slate-800 block">
+            Nominal Lainnya (Min. {formatRupiah(DONATION_LIMITS.MIN_AMOUNT)})
           </label>
           <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-normal text-slate-500">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-normal text-slate-500 pointer-events-none select-none z-10">
               Rp
             </span>
-            <Input
+            <input
               type="text"
               inputMode="numeric"
               autoFocus
               value={customAmountInput ? formatNumber(Number(customAmountInput)) : ""}
               onChange={onCustomInputChange}
               placeholder="0"
-              className="pl-4 h-12 text-base font-semibold text-slate-950 border-slate-300 focus:ring-primary"
+              className="w-full h-11 pl-10 pr-3 rounded-lg border border-slate-300 text-base font-normal text-slate-950 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             />
           </div>
         </div>

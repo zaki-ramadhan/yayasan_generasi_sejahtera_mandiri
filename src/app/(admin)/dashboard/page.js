@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import {
   DEMO_USERS,
   USER_ROLES,
@@ -33,10 +33,23 @@ export default function AdminDashboardPage() {
   const currentUser = userJson ? JSON.parse(userJson) : DEMO_USERS[0];
   const userRole = currentUser?.role || USER_ROLES.SUPER_ADMIN;
 
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/dashboard/stats")
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          setStats(res.data);
+        }
+      })
+      .catch((err) => console.warn("Failed to fetch dashboard stats:", err));
+  }, []);
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <DashboardHeader currentUser={currentUser} userRole={userRole} />
-      <DashboardMetricCards userRole={userRole} />
+      <DashboardMetricCards userRole={userRole} stats={stats} />
 
       {/* Role-Specific Workflows & Panels */}
       {userRole === USER_ROLES.DONOR ? (
@@ -44,7 +57,7 @@ export default function AdminDashboardPage() {
       ) : userRole === USER_ROLES.VOLUNTEER ? (
         <VolunteerDashboardView />
       ) : (
-        <AdminDashboardView userRole={userRole} />
+        <AdminDashboardView userRole={userRole} stats={stats} />
       )}
     </div>
   );
