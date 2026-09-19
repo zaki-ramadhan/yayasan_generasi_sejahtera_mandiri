@@ -164,7 +164,6 @@ export async function getCampaignBySlug(slug) {
         donations: {
           where: { status: "PAID" },
           orderBy: { paidAt: "desc" },
-          take: 50,
         },
       },
     });

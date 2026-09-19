@@ -127,11 +127,19 @@ export function formatDate(dateInput, options = {}) {
   const date = new Date(dateInput);
   if (isNaN(date.getTime())) return "-";
 
-  const { month = "short", withTime = false, withDay = false } = options;
-  const dayName = ID_DAYS[date.getDay()];
-  const day = date.getDate();
-  const monthIdx = date.getMonth();
-  const year = date.getFullYear();
+  const {
+    month = "short",
+    withTime = false,
+    withDay = false,
+    withSeconds = false,
+  } = options;
+
+  // Convert consistently to WIB (UTC+7)
+  const wibTime = new Date(date.getTime() + (7 * 60 + date.getTimezoneOffset()) * 60000);
+  const dayName = ID_DAYS[wibTime.getDay()];
+  const day = wibTime.getDate();
+  const monthIdx = wibTime.getMonth();
+  const year = wibTime.getFullYear();
 
   const monthName = month === "long" ? ID_MONTHS_LONG[monthIdx] : ID_MONTHS_SHORT[monthIdx];
   let formatted = `${day} ${monthName} ${year}`;
@@ -141,9 +149,14 @@ export function formatDate(dateInput, options = {}) {
   }
 
   if (withTime) {
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    formatted += `, ${hours}:${minutes} WIB`;
+    const hours = String(wibTime.getHours()).padStart(2, "0");
+    const minutes = String(wibTime.getMinutes()).padStart(2, "0");
+    if (withSeconds) {
+      const seconds = String(wibTime.getSeconds()).padStart(2, "0");
+      formatted += `, ${hours}:${minutes}:${seconds} WIB`;
+    } else {
+      formatted += `, ${hours}:${minutes} WIB`;
+    }
   }
 
   return formatted;

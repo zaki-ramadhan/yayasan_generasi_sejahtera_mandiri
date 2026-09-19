@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, ChevronDown, User } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronUp, User } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/formatters";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ export function CampaignTransactionsList({
   donors = [],
   totalDonorsCount = 0,
 }) {
-  const [visibleCount, setVisibleCount] = useState(8);
+  const [visibleCount, setVisibleCount] = useState(15);
 
   // Urutkan donatur berdasarkan tanggal terbaru
   const sortedDonors = [...donors].sort(
@@ -37,7 +37,7 @@ export function CampaignTransactionsList({
             Riwayat Transaksi Donasi
           </h3>
           <p className="text-sm text-slate-600">
-            Catatan donasi masuk yang telah berhasil terverifikasi oleh sistem.
+            Catatan mutasi donasi masuk yang telah berhasil terverifikasi oleh sistem.
           </p>
         </div>
         <span className="text-xs sm:text-sm font-medium text-slate-700 bg-slate-100 px-3 py-1 rounded-full self-start sm:self-auto border border-slate-200">
@@ -45,8 +45,8 @@ export function CampaignTransactionsList({
         </span>
       </div>
 
-      {/* Transaction List */}
-      <div className="divide-y divide-slate-100">
+      {/* Transaction List Container (Scrollable Max Height) */}
+      <div className="max-h-[500px] sm:max-h-[620px] overflow-y-auto pr-1 sm:pr-2 focus:outline-none divide-y divide-slate-100">
         {visibleDonors.map((item, index) => {
           const isAnon = !item.name || item.name.toLowerCase().includes("hamba allah");
           const initial = isAnon ? "HA" : item.name.slice(0, 2).toUpperCase();
@@ -54,7 +54,7 @@ export function CampaignTransactionsList({
           return (
             <div
               key={item.id || `tx-${index}`}
-              className="py-3.5 first:pt-2 last:pb-1 flex items-center justify-between gap-3"
+              className="py-3.5 first:pt-2 last:pb-1 flex items-start sm:items-center justify-between gap-3"
             >
               {/* Left: Avatar & Donor Info */}
               <div className="flex items-center gap-3 min-w-0">
@@ -82,13 +82,19 @@ export function CampaignTransactionsList({
                 </div>
               </div>
 
-              {/* Right: Donation Amount & Date */}
+              {/* Right: Donation Amount & Full Date Details */}
               <div className="text-right shrink-0">
                 <span className="text-sm sm:text-base font-semibold text-slate-950 block">
                   {formatRupiah(item.amount)}
                 </span>
                 <span className="text-xs text-slate-500 block mt-0.5 font-normal">
-                  {item.date ? formatDate(item.date) : "Baru saja"}
+                  {item.date
+                    ? formatDate(item.date, {
+                        withDay: true,
+                        withTime: true,
+                        withSeconds: true,
+                      })
+                    : "Baru saja"}
                 </span>
               </div>
             </div>
@@ -96,21 +102,34 @@ export function CampaignTransactionsList({
         })}
       </div>
 
-      {/* Load More Button */}
-      {hasMore && (
+      {/* Toggle View All / View Less Button */}
+      {hasMore ? (
         <div className="pt-2 text-center">
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setVisibleCount((prev) => prev + 6)}
+            onClick={() => setVisibleCount(sortedDonors.length)}
             className="text-xs sm:text-sm font-medium text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer rounded-lg px-4 py-2"
           >
-            <span>Tampilkan Lebih Banyak</span>
+            <span>Tampilkan Semua ({sortedDonors.length} Donasi)</span>
             <ChevronDown className="w-4 h-4 ml-1.5" />
           </Button>
         </div>
-      )}
+      ) : sortedDonors.length > 15 ? (
+        <div className="pt-2 text-center">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setVisibleCount(15)}
+            className="text-xs sm:text-sm font-medium text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer rounded-lg px-4 py-2"
+          >
+            <span>Tampilkan Lebih Sedikit (15 Terbaru)</span>
+            <ChevronUp className="w-4 h-4 ml-1.5" />
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
