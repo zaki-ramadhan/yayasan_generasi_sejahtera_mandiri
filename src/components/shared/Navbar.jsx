@@ -54,28 +54,28 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-15">
+        <div className="flex items-center justify-between h-12 sm:h-13">
           {/* Brand Logo & Text */}
           <Link
             href="/"
             className="flex items-center gap-2 sm:gap-2.5 select-none focus:outline-none"
             title="Beranda Yayasan Generasi Sejahtera Mandiri"
           >
-            <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-lg overflow-hidden shrink-0 border border-slate-300 shadow-2xs bg-white flex items-center justify-center p-0.5">
+            <div className="relative w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-md overflow-hidden shrink-0 border border-slate-300 shadow-2xs bg-white flex items-center justify-center p-0.5">
               <Image
                 src="/logo_yayasan_GSM.png"
                 alt="Logo Yayasan Generasi Sejahtera Mandiri"
-                width={36}
-                height={36}
-                className="w-full h-full object-contain rounded-md select-none pointer-events-none"
+                width={32}
+                height={32}
+                className="w-full h-full object-contain rounded-sm select-none pointer-events-none"
                 priority
               />
             </div>
             <div className="flex flex-col leading-tight select-none">
-              <span className="font-semibold text-[11px] sm:text-xs text-slate-950 tracking-tight">
+              <span className="font-semibold text-[11px] sm:text-[11.5px] text-slate-950 tracking-tight">
                 Yayasan Generasi
               </span>
-              <span className="font-semibold text-[11px] sm:text-xs text-slate-700 tracking-tight">
+              <span className="font-semibold text-[11px] sm:text-[11.5px] text-slate-700 tracking-tight">
                 Sejahtera Mandiri
               </span>
             </div>

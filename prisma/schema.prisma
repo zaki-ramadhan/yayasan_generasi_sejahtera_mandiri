@@ -152,3 +152,18 @@ model User {
   @@index([role])
 }
 
+model InstagramPost {
+  id           String   @id @default(cuid())
+  caption      String
+  imageUrl     String
+  altText      String?
+  postUrl      String   @default("https://www.instagram.com")
+  likeCount    Int      @default(0)
+  commentCount Int      @default(0)
+  postedAt     DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([postedAt])
+}
+
+

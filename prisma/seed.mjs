@@ -5,6 +5,7 @@ import { CATEGORIES } from "../src/data/categories.js";
 import { CAMPAIGNS } from "../src/data/campaigns.js";
 import { AUDIT_REPORTS } from "../src/data/reports.js";
 import { ARTICLES } from "../src/data/articles.js";
+import { INSTAGRAM_POSTS } from "../src/data/instagramPosts.js";
 
 const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaPg({ connectionString });
@@ -183,6 +184,31 @@ async function main() {
         likeCount: art.likeCount || 0,
         dislikeCount: art.dislikeCount || 0,
         publishedAt: new Date(art.publishedAt),
+      },
+    });
+  }
+
+  // 5. Seed Instagram Posts
+  console.log("📸 Menanam data 12 Postingan Dokumentasi Instagram...");
+  for (const ig of INSTAGRAM_POSTS) {
+    await prisma.instagramPost.upsert({
+      where: { id: ig.id },
+      update: {
+        caption: ig.caption,
+        imageUrl: ig.imageUrl,
+        altText: ig.alt,
+        postUrl: ig.postUrl || "https://www.instagram.com",
+        likeCount: ig.likes || 0,
+        commentCount: ig.comments || 0,
+      },
+      create: {
+        id: ig.id,
+        caption: ig.caption,
+        imageUrl: ig.imageUrl,
+        altText: ig.alt,
+        postUrl: ig.postUrl || "https://www.instagram.com",
+        likeCount: ig.likes || 0,
+        commentCount: ig.comments || 0,
       },
     });
   }

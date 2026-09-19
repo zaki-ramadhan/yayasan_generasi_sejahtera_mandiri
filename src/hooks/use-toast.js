@@ -3,7 +3,8 @@
 import * as React from "react";
 
 const TOAST_LIMIT = 3;
-const TOAST_REMOVE_DELAY = 4000;
+const TOAST_EXIT_ANIMATION_DELAY = 350; // Delay for smooth exit animation before removal
+const DEFAULT_TOAST_DURATION = 4000; // Auto-dismiss after 4 seconds
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -32,7 +33,7 @@ const addToRemoveQueue = (toastId) => {
       type: actionTypes.REMOVE_TOAST,
       toastId: toastId,
     });
-  }, TOAST_REMOVE_DELAY);
+  }, TOAST_EXIT_ANIMATION_DELAY);
 
   toastTimeouts.set(toastId, timeout);
 };
@@ -101,7 +102,7 @@ function dispatch(action) {
   });
 }
 
-function toast({ ...props }) {
+function toast({ duration = DEFAULT_TOAST_DURATION, ...props }) {
   const id = genId();
 
   const update = (props) =>
@@ -109,6 +110,7 @@ function toast({ ...props }) {
       type: actionTypes.UPDATE_TOAST,
       toast: { ...props, id },
     });
+
   const dismiss = () =>
     dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
 
@@ -123,6 +125,13 @@ function toast({ ...props }) {
       },
     },
   });
+
+  // Auto-dismiss after specified duration
+  if (duration > 0 && duration !== Infinity) {
+    setTimeout(() => {
+      dismiss();
+    }, duration);
+  }
 
   return {
     id: id,

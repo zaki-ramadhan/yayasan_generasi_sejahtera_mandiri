@@ -2,10 +2,12 @@ import Link from "next/link";
 import { getCampaigns } from "@/services/campaignService";
 import { getTransparencyMetrics } from "@/services/reportService";
 import { getArticles } from "@/services/articleService";
+import { getInstagramPosts, getInstagramAccount } from "@/services/instagramService";
 import { FAQS } from "@/data/articles";
 import { CampaignCard } from "@/components/shared/CampaignCard";
 import { ArticleCard } from "@/components/shared/ArticleCard";
 import { HomeHero } from "@/components/home/HomeHero";
+import { HomeInstagramFeed } from "@/components/home/HomeInstagramFeed";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { formatNumber, formatRupiah, formatDate, getCompactRupiahParts } from "@/lib/formatters";
@@ -16,12 +18,14 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const [campaigns, metrics, articles] = await Promise.all([
+  const [campaigns, metrics, articles, instagramPosts] = await Promise.all([
     getCampaigns(),
     getTransparencyMetrics(),
     getArticles({ limit: 8 }),
+    getInstagramPosts(12),
   ]);
 
+  const instagramAccount = getInstagramAccount();
   const featuredCampaigns = campaigns.slice(0, 5);
   const compactDonations = getCompactRupiahParts(metrics.totalDonationsAllTime, 1);
 
@@ -130,7 +134,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. ARTIKEL & FAQ (Editorial Layout, No Stacked Card Boxes) */}
+      {/* 4. DOKUMENTASI MEDIA SOSIAL (INSTAGRAM FEED) */}
+      <HomeInstagramFeed posts={instagramPosts} account={instagramAccount} />
+
+      {/* 5. ARTIKEL & FAQ (Editorial Layout, No Stacked Card Boxes) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           {/* Left: Articles as Editorial Digest */}
