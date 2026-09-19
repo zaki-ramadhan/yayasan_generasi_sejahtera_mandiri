@@ -102,12 +102,14 @@ export function CurvedLoop({
     dirRef.current = velRef.current > 0 ? "right" : "left";
   };
 
-  const cursorStyle = interactive ? (dragRef.current ? "grabbing" : "grab") : "auto";
-
   return (
     <div
-      className={cn("flex items-center justify-center w-full", containerClassName)}
-      style={{ visibility: ready ? "visible" : "hidden", cursor: cursorStyle }}
+      className={cn(
+        "flex items-center justify-center w-full",
+        interactive && "cursor-grab active:cursor-grabbing select-none",
+        containerClassName
+      )}
+      style={{ visibility: ready ? "visible" : "hidden" }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}

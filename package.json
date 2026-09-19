@@ -2,11 +2,13 @@
   "name": "yayasan_generasi_sejahtera_mandiri",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
@@ -41,6 +43,6 @@
     "tailwindcss": "^4"
   },
   "prisma": {
-    "seed": "node prisma/seed.mjs"
+    "seed": "node prisma/seed.js"
   }
 }
