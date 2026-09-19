@@ -76,7 +76,7 @@ export function CampaignTransactionsList({
                       Terverifikasi
                     </span>
                   </div>
-                  <span className="text-xs text-slate-500 block mt-0.5 font-normal truncate">
+                  <span className="text-sm text-slate-600 block mt-0.5 font-normal truncate">
                     {item.email || (isAnon ? "hamba.allah***@gmail.com" : "donatur@ygsm.id")}
                   </span>
                 </div>
@@ -87,7 +87,7 @@ export function CampaignTransactionsList({
                 <span className="text-sm sm:text-base font-semibold text-slate-950 block">
                   {formatRupiah(item.amount)}
                 </span>
-                <span className="text-xs text-slate-500 block mt-0.5 font-normal">
+                <span className="text-sm text-slate-600 block mt-0.5 font-normal">
                   {item.date
                     ? formatDate(item.date, {
                         withDay: true,
