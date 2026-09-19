@@ -7,6 +7,7 @@ import { PAYMENT_CHANNELS } from "@/data/paymentChannels";
 import { formatRupiah } from "@/lib/formatters";
 import { DONATION_LIMITS, generateIdempotencyKey } from "@/lib/security";
 import { getStoredUser } from "@/services/authService";
+import { saveDonationDraft, loadDonationDraft, clearDonationDraft } from "@/lib/donationDraft";
 import { NominalPresetsPicker } from "@/components/donation/NominalPresetsPicker";
 import { PaymentChannelPicker } from "@/components/donation/PaymentChannelPicker";
 import { DonorIdentitySection } from "@/components/donation/DonorIdentitySection";
@@ -45,27 +46,65 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
   useEffect(() => {
     const user = getStoredUser();
     if (!user) {
+      // Simpan draft sebelum redirect agar form bisa di-restore setelah login
       const currentUrl =
         typeof window !== "undefined"
           ? window.location.pathname + window.location.search
           : `/campaign/${campaign?.slug}/donate`;
+      saveDonationDraft(campaign?.slug, {
+        amount,
+        isCustomMode,
+        customAmountInput,
+        isAnonymous,
+        donorName,
+        donorPhone,
+        donorEmail,
+        prayer,
+        selectedChannelId,
+      });
       router.replace(
         `/login?redirect=${encodeURIComponent(currentUrl)}&reason=donation_requires_login`
       );
       return;
     }
 
-    setIsAuthChecking(false);
+    // Cek apakah ada draft yang disimpan (user baru kembali dari login)
+    const draft = loadDonationDraft(campaign?.slug);
+    if (draft) {
+      if (draft.amount && draft.amount > 0) {
+        setAmount(draft.amount);
+        setIsCustomMode(draft.isCustomMode ?? false);
+        setCustomAmountInput(draft.customAmountInput ?? "");
+      }
+      if (draft.isAnonymous !== undefined) setIsAnonymous(draft.isAnonymous);
+      if (draft.prayer) setPrayer(draft.prayer);
+      if (draft.selectedChannelId) setSelectedChannelId(draft.selectedChannelId);
+      // Identitas donatur dari draft hanya jika user belum ada datanya
+      if (draft.donorPhone) setDonorPhone(draft.donorPhone);
+      clearDonationDraft();
+    } else {
+      // Isi dari profil user jika tidak ada draft
+      if (user.name && user.name !== "Pengguna Google" && user.name !== "Pengguna Facebook") {
+        setDonorName(user.name);
+      }
+      if (user.email && !user.email.endsWith("@google.user") && !user.email.endsWith("@facebook.user")) {
+        setDonorEmail(user.email);
+      }
+      if (user.phone && user.phone !== "-") {
+        setDonorPhone(user.phone);
+      }
+    }
+
+    // Selalu isi nama & email dari profil user (lebih terpercaya dari draft)
     if (user.name && user.name !== "Pengguna Google" && user.name !== "Pengguna Facebook") {
       setDonorName(user.name);
     }
     if (user.email && !user.email.endsWith("@google.user") && !user.email.endsWith("@facebook.user")) {
       setDonorEmail(user.email);
     }
-    if (user.phone && user.phone !== "-") {
-      setDonorPhone(user.phone);
-    }
-  }, [campaign?.slug, router]);
+
+    setIsAuthChecking(false);
+  }, [campaign?.slug, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const prayersRaw = useSyncExternalStore(subscribePrayers, getPrayersSnapshot, getPrayersServerSnapshot);
   let hasExistingPrayer = false;
@@ -183,6 +222,7 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
         }
       }
 
+      clearDonationDraft();
       toast.success("Tagihan donasi berhasil dibuat!");
       router.push(`/invoice/${donation.invoiceId}`);
     } catch (err) {
