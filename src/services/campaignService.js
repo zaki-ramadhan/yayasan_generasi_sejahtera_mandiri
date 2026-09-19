@@ -164,6 +164,7 @@ export async function getCampaignBySlug(slug) {
         donations: {
           where: { status: "PAID" },
           orderBy: { paidAt: "desc" },
+          take: 30, // Batasi 30 donasi mutasi awal untuk efisiensi render SSR
         },
       },
     });
@@ -174,6 +175,75 @@ export async function getCampaignBySlug(slug) {
     console.warn("Prisma getCampaignBySlug fallback:", error.message);
   }
   return CAMPAIGNS.find((c) => c.slug === slug) || null;
+}
+
+export async function getCampaignDonationsPaginated({ campaignSlug, skip = 0, limit = 20 }) {
+  if (!campaignSlug) return { donations: [], totalCount: 0, hasMore: false };
+
+  try {
+    const campaign = await prisma.campaign.findUnique({
+      where: { slug: campaignSlug },
+      select: { id: true, donorCount: true },
+    });
+
+    if (!campaign) {
+      return { donations: [], totalCount: 0, hasMore: false };
+    }
+
+    const [dbDonations, totalCount] = await Promise.all([
+      prisma.donation.findMany({
+        where: {
+          campaignId: campaign.id,
+          status: "PAID",
+        },
+        orderBy: { paidAt: "desc" },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          donorName: true,
+          donorEmail: true,
+          donorAvatar: true,
+          isAnonymous: true,
+          amount: true,
+          paidAt: true,
+          createdAt: true,
+          prayer: true,
+        },
+      }),
+      prisma.donation.count({
+        where: {
+          campaignId: campaign.id,
+          status: "PAID",
+        },
+      }),
+    ]);
+
+    const formattedDonations = dbDonations.map((d) => ({
+      id: d.id,
+      name: d.isAnonymous ? "Hamba Allah" : d.donorName,
+      amount: Number(d.amount || 0),
+      email: d.isAnonymous
+        ? "hamba.allah***@gmail.com"
+        : (d.donorEmail || (d.donorName ? `${d.donorName.toLowerCase().replace(/[^a-z0-9]/g, ".")}@gmail.com` : "donatur@ygsm.id")),
+      avatar: d.isAnonymous ? null : (d.donorAvatar || null),
+      date: d.paidAt
+        ? (d.paidAt instanceof Date ? d.paidAt.toISOString() : d.paidAt)
+        : (d.createdAt instanceof Date ? d.createdAt.toISOString() : d.createdAt),
+      prayer: d.prayer || "",
+      aminCount: 0,
+      isAnonymous: Boolean(d.isAnonymous),
+    }));
+
+    return {
+      donations: formattedDonations,
+      totalCount,
+      hasMore: skip + formattedDonations.length < totalCount,
+    };
+  } catch (error) {
+    console.warn("Prisma getCampaignDonationsPaginated fallback:", error.message);
+    return { donations: [], totalCount: 0, hasMore: false };
+  }
 }
 
 export async function getCampaignDonationStats(slug) {
@@ -190,10 +260,27 @@ export async function getCampaignDonationStats(slug) {
     });
 
     if (campaign) {
+      const ninetyDaysAgo = new Date();
+      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+      ninetyDaysAgo.setHours(0, 0, 0, 0);
+
+      // Hitung total akumulasi sebelum 90 hari terakhir via aggregation O(1)
+      const priorAggregate = await prisma.donation.aggregate({
+        where: {
+          campaignId: campaign.id,
+          status: "PAID",
+          paidAt: { lt: ninetyDaysAgo },
+        },
+        _sum: { amount: true },
+      });
+
+      const priorTotal = Number(priorAggregate._sum.amount || 0);
+
       const paidDonations = await prisma.donation.findMany({
         where: {
           campaignId: campaign.id,
           status: "PAID",
+          paidAt: { gte: ninetyDaysAgo },
         },
         select: {
           amount: true,
@@ -205,31 +292,40 @@ export async function getCampaignDonationStats(slug) {
         },
       });
 
-      if (paidDonations.length > 0) {
-        const dateMap = new Map();
-        paidDonations.forEach((d) => {
-          const rawDate = d.paidAt || d.createdAt;
-          const dateKey = (rawDate instanceof Date ? rawDate : new Date(rawDate)).toISOString().split("T")[0];
-          const existing = dateMap.get(dateKey) || { dailyAmount: 0, donationsCount: 0 };
-          existing.dailyAmount += Number(d.amount || 0);
-          existing.donationsCount += 1;
-          dateMap.set(dateKey, existing);
-        });
+      const dateMap = new Map();
+      paidDonations.forEach((d) => {
+        const rawDate = d.paidAt || d.createdAt;
+        const dateKey = (rawDate instanceof Date ? rawDate : new Date(rawDate)).toISOString().split("T")[0];
+        const existing = dateMap.get(dateKey) || { dailyAmount: 0, donationsCount: 0 };
+        existing.dailyAmount += Number(d.amount || 0);
+        existing.donationsCount += 1;
+        dateMap.set(dateKey, existing);
+      });
 
-        const sortedDates = Array.from(dateMap.keys()).sort();
-        let runningTotal = 0;
+      const sortedDates = Array.from(dateMap.keys()).sort();
+      let runningTotal = priorTotal;
 
-        return sortedDates.map((date) => {
-          const info = dateMap.get(date);
-          runningTotal += info.dailyAmount;
-          return {
-            date,
-            dailyAmount: info.dailyAmount,
-            cumulativeAmount: runningTotal,
-            donationsCount: info.donationsCount,
-          };
+      const result = sortedDates.map((date) => {
+        const info = dateMap.get(date);
+        runningTotal += info.dailyAmount;
+        return {
+          date,
+          dailyAmount: info.dailyAmount,
+          cumulativeAmount: runningTotal,
+          donationsCount: info.donationsCount,
+        };
+      });
+
+      if (priorTotal > 0 && result.length > 0 && result[0].date > ninetyDaysAgo.toISOString().split("T")[0]) {
+        result.unshift({
+          date: ninetyDaysAgo.toISOString().split("T")[0],
+          dailyAmount: 0,
+          cumulativeAmount: priorTotal,
+          donationsCount: 0,
         });
       }
+
+      return result;
     }
   } catch (error) {
     console.warn("Prisma getCampaignDonationStats fallback:", error.message);

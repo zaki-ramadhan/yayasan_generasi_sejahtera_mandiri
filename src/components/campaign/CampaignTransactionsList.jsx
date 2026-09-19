@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, ChevronDown, ChevronUp, User } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronUp, Loader2, User } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/formatters";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -9,18 +9,47 @@ import { Button } from "@/components/ui/button";
 export function CampaignTransactionsList({
   donors = [],
   totalDonorsCount = 0,
+  campaignSlug = "",
 }) {
+  const [donorList, setDonorList] = useState(donors);
   const [visibleCount, setVisibleCount] = useState(15);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Urutkan donatur berdasarkan tanggal terbaru
-  const sortedDonors = [...donors].sort(
+  const sortedDonors = [...donorList].sort(
     (a, b) => new Date(b.date || 0) - new Date(a.date || 0)
   );
 
   const visibleDonors = sortedDonors.slice(0, visibleCount);
-  const hasMore = sortedDonors.length > visibleCount;
+  const hasLocalMore = sortedDonors.length > visibleCount;
+  const canFetchRemote = Boolean(campaignSlug && donorList.length < totalDonorsCount);
 
-  if (!donors || donors.length === 0) {
+  const handleFetchMore = async () => {
+    if (isLoadingMore || !campaignSlug) return;
+    setIsLoadingMore(true);
+    try {
+      const res = await fetch(
+        `/api/donations?campaignSlug=${encodeURIComponent(campaignSlug)}&skip=${donorList.length}&limit=30`
+      );
+      const json = await res.json();
+      if (json?.success && Array.isArray(json?.data?.donations)) {
+        const newItems = json.data.donations;
+        setDonorList((prev) => {
+          const existingIds = new Set(prev.map((d) => d.id));
+          const filtered = newItems.filter((item) => !existingIds.has(item.id));
+          const updated = [...prev, ...filtered];
+          setVisibleCount(updated.length);
+          return updated;
+        });
+      }
+    } catch (err) {
+      console.warn("Gagal memuat riwayat donasi tambahan:", err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  if (!donorList || donorList.length === 0) {
     return (
       <div className="py-8 text-center text-slate-500 text-sm">
         Belum ada riwayat transaksi donasi yang tercatat.
@@ -41,7 +70,7 @@ export function CampaignTransactionsList({
           </p>
         </div>
         <span className="text-xs sm:text-sm font-medium text-slate-700 bg-slate-100 px-3 py-1 rounded-full self-start sm:self-auto border border-slate-200">
-          {totalDonorsCount || donors.length} Donasi Masuk
+          {totalDonorsCount || donorList.length} Donasi Masuk
         </span>
       </div>
 
@@ -102,9 +131,9 @@ export function CampaignTransactionsList({
         })}
       </div>
 
-      {/* Toggle View All / View Less Button */}
-      {hasMore ? (
-        <div className="pt-2 text-center">
+      {/* Action Buttons: Local Expand or Remote Pagination */}
+      <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
+        {hasLocalMore && (
           <Button
             type="button"
             variant="outline"
@@ -112,24 +141,54 @@ export function CampaignTransactionsList({
             onClick={() => setVisibleCount(sortedDonors.length)}
             className="text-xs sm:text-sm font-medium text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer rounded-lg px-4 py-2"
           >
-            <span>Tampilkan Semua ({sortedDonors.length} Donasi)</span>
+            <span>Tampilkan Semua ({sortedDonors.length} Donasi Terunduh)</span>
             <ChevronDown className="w-4 h-4 ml-1.5" />
           </Button>
-        </div>
-      ) : sortedDonors.length > 15 ? (
-        <div className="pt-2 text-center">
+        )}
+
+        {canFetchRemote && (
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setVisibleCount(15)}
-            className="text-xs sm:text-sm font-medium text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer rounded-lg px-4 py-2"
+            disabled={isLoadingMore}
+            onClick={handleFetchMore}
+            className="text-xs sm:text-sm font-medium text-primary border-primary/30 hover:bg-primary/5 cursor-pointer rounded-lg px-4 py-2"
           >
-            <span>Tampilkan Lebih Sedikit (15 Terbaru)</span>
-            <ChevronUp className="w-4 h-4 ml-1.5" />
+            {isLoadingMore ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-primary" />
+                <span>Memuat Riwayat Tambahan...</span>
+              </>
+            ) : (
+              <>
+                <span>Muat Donasi Berikutnya (+30)</span>
+                <ChevronDown className="w-4 h-4 ml-1.5" />
+              </>
+            )}
           </Button>
-        </div>
-      ) : null}
+        )}
+
+        {sortedDonors.length > 15 && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setVisibleCount(15)}
+            className="text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-100 cursor-pointer rounded-lg px-3 py-2"
+          >
+            <span>Persempit ke 15 Terbaru</span>
+            <ChevronUp className="w-4 h-4 ml-1" />
+          </Button>
+        )}
+      </div>
+
+      {!canFetchRemote && totalDonorsCount > 15 && (
+        <p className="text-center text-xs text-slate-600 pt-1">
+          Seluruh {totalDonorsCount} riwayat transaksi mutasi telah berhasil dimuat.
+        </p>
+      )}
     </div>
   );
 }
+

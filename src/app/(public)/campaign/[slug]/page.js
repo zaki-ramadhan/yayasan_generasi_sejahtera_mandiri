@@ -12,6 +12,7 @@ import { CampaignCTA } from "@/components/campaign/CampaignCTA";
 import { CampaignSidebarDonate } from "@/components/campaign/CampaignSidebarDonate";
 import { CampaignStickyMobileBar } from "@/components/campaign/CampaignStickyMobileBar";
 import { CampaignDonationGrowthChart } from "@/components/campaign/CampaignDonationGrowthChart";
+import { CampaignTransactionsList } from "@/components/campaign/CampaignTransactionsList";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -44,9 +45,9 @@ export default async function CampaignDetailPage({ params }) {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 pb-24 lg:pb-12">
       {/* Breadcrumb */}
       <nav className="text-sm sm:text-base text-slate-800 flex items-center gap-2 flex-wrap font-normal">
-        <Link href="/" className="hover:text-primary transition-colors">Beranda</Link>
+        <Link href="/" className="hover:text-primary hover:underline transition-colors">Beranda</Link>
         <span className="text-slate-400">/</span>
-        <Link href="/program" className="hover:text-primary transition-colors">Program</Link>
+        <Link href="/program" className="hover:text-primary hover:underline transition-colors">Program</Link>
         <span className="text-slate-400">/</span>
         <span className="text-slate-950 font-medium truncate max-w-sm sm:max-w-md">{campaign.title}</span>
       </nav>
@@ -59,19 +60,19 @@ export default async function CampaignDetailPage({ params }) {
           <CampaignHeader campaign={campaign} progress={progress} />
 
           {/* Tabs: Seamless Editorial Layout */}
-          <Tabs defaultValue="cerita" className="w-full">
+          <Tabs defaultValue="detail" className="w-full">
             <TabsList className="w-full justify-start border-b border-slate-300 pb-0 rounded-none bg-transparent h-auto p-0 gap-6 overflow-x-auto flex-nowrap">
               <TabsTrigger
-                value="cerita"
+                value="detail"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors shrink-0"
               >
-                Cerita Program
+                Detail Program
               </TabsTrigger>
               <TabsTrigger
                 value="penyaluran"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors shrink-0"
               >
-                Kabar Penyaluran ({campaign.updates?.length || 0})
+                Laporan Penyaluran ({campaign.updates?.length || 0})
               </TabsTrigger>
               <TabsTrigger
                 value="doa"
@@ -80,14 +81,14 @@ export default async function CampaignDetailPage({ params }) {
                 Doa &amp; Dukungan ({prayersCount})
               </TabsTrigger>
               <TabsTrigger
-                value="statistik"
+                value="riwayat"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors shrink-0"
               >
-                Tren Donasi
+                Riwayat Donasi ({campaign.donorCount || 0})
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="cerita" className="mt-4 focus:outline-none">
+            <TabsContent value="detail" className="mt-4 focus:outline-none">
               <CampaignStory story={campaign.story} />
             </TabsContent>
 
@@ -103,10 +104,15 @@ export default async function CampaignDetailPage({ params }) {
               />
             </TabsContent>
 
-            <TabsContent value="statistik" className="mt-4 focus:outline-none">
+            <TabsContent value="riwayat" className="mt-4 focus:outline-none space-y-6">
               <CampaignDonationGrowthChart
                 initialData={donationStats}
                 campaign={campaign}
+              />
+              <CampaignTransactionsList
+                donors={campaign.recentDonors || []}
+                totalDonorsCount={campaign.donorCount || 0}
+                campaignSlug={campaign.slug}
               />
             </TabsContent>
           </Tabs>

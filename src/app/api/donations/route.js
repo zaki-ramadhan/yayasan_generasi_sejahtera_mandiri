@@ -1,10 +1,23 @@
 import { NextResponse } from "next/server";
 import { createDonation, getRecentDonations } from "@/services/donationService";
+import { getCampaignDonationsPaginated } from "@/services/campaignService";
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit"), 10) : 10;
+    const campaignSlug = searchParams.get("campaignSlug");
+    const limit = searchParams.get("limit")
+      ? Math.min(parseInt(searchParams.get("limit"), 10) || 20, 100)
+      : 20;
+    const skip = searchParams.get("skip")
+      ? Math.max(parseInt(searchParams.get("skip"), 10) || 0, 0)
+      : 0;
+
+    if (campaignSlug) {
+      const result = await getCampaignDonationsPaginated({ campaignSlug, skip, limit });
+      return NextResponse.json({ success: true, data: result });
+    }
+
     const donations = await getRecentDonations(limit);
     return NextResponse.json({ success: true, data: donations });
   } catch (error) {

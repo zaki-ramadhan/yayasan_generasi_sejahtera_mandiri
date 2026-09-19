@@ -82,6 +82,7 @@ model Donation {
   @@index([invoiceId])
   @@index([campaignId])
   @@index([status])
+  @@index([campaignId, status, paidAt(sort: Desc)])
 }
 
 model AuditReport {

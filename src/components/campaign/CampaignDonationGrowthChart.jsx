@@ -21,9 +21,9 @@ import { formatRupiah, formatCompactNumber } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 const TIME_RANGE_OPTIONS = [
-  { value: "all", label: "Semua Riwayat" },
   { value: "30d", label: "30 Hari Terakhir" },
   { value: "7d", label: "7 Hari Terakhir" },
+  { value: "90d", label: "90 Hari Terakhir" },
 ];
 
 const chartConfig = {
@@ -49,9 +49,9 @@ export function CampaignDonationGrowthChart({
   initialData = [],
   campaign = {},
 }) {
-  const [timeRange, setTimeRange] = React.useState("all");
+  const [timeRange, setTimeRange] = React.useState("30d");
 
-  // Generate runtun tanggal harian kontinu (tanpa bolong) untuk semua rentang waktu
+  // Generate runtun tanggal harian kontinu (tanpa bolong) untuk rentang waktu terpilih
   const chartData = React.useMemo(() => {
     // 1. Map transaksi riil per tanggal
     const transactionMap = new Map();
@@ -74,35 +74,11 @@ export function CampaignDonationGrowthChart({
 
     if (timeRange === "7d") {
       startDate.setDate(today.getDate() - 6);
-    } else if (timeRange === "30d") {
-      startDate.setDate(today.getDate() - 29);
+    } else if (timeRange === "90d") {
+      startDate.setDate(today.getDate() - 89);
     } else {
-      // 'all' -> Dari tanggal program dibuat atau transaksi pertama
-      let earliestDate = null;
-      if (campaign?.createdAt) {
-        earliestDate = new Date(campaign.createdAt);
-        earliestDate.setHours(0, 0, 0, 0);
-      }
-      if (initialData.length > 0 && initialData[0]?.date) {
-        const firstTx = new Date(initialData[0].date);
-        firstTx.setHours(0, 0, 0, 0);
-        if (!earliestDate || firstTx < earliestDate) {
-          earliestDate = firstTx;
-        }
-      }
-
-      if (earliestDate && !isNaN(earliestDate.getTime())) {
-        startDate = earliestDate;
-      } else {
-        startDate.setDate(today.getDate() - 29);
-      }
-
-      // Jika program baru berumur < 7 hari, tampilkan minimal rentang 7 hari agar grafik proporsional
-      const diffDays = Math.round((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-      if (diffDays < 6) {
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - 6);
-      }
+      // Default: '30d'
+      startDate.setDate(today.getDate() - 29);
     }
 
     // 3. Hitung akumulasi dana yang terkumpul SEBELUM startDate
