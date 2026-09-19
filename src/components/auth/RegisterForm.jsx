@@ -1,19 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SocialAuthButton } from "@/components/auth/SocialAuthButton";
+import { SocialAuthGroup } from "@/components/auth/SocialAuthGroup";
 import { AuthFormHeader } from "@/components/auth/AuthFormHeader";
 import { AuthDivider } from "@/components/auth/AuthDivider";
-import { USER_ROLES, loginUser, getRedirectPathForRole } from "@/services/authService";
+import { USER_ROLES, loginUser, getRedirectPathForRole, simulateSocialAuth, redirectToGoogleOAuth } from "@/services/authService";
 import { cn } from "@/lib/utils";
 
 export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -21,6 +22,26 @@ export function RegisterForm() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isFacebookLoading, setIsFacebookLoading] = useState(false);
+  const handledErrorRef = useRef(false);
+
+  useEffect(() => {
+    if (handledErrorRef.current) return;
+    const errorParam = searchParams.get("error");
+    if (errorParam) {
+      handledErrorRef.current = true;
+      const errorMessages = {
+        access_denied: "Persetujuan akun Google dibatalkan.",
+        no_code_provided: "Kode autentikasi Google tidak ditemukan.",
+        oauth_credentials_missing: "Kredensial GOOGLE_CLIENT_SECRET belum lengkap di .env.",
+        token_exchange_failed: "Gagal menukar token dengan Google. Pastikan Client Secret valid.",
+        userinfo_fetch_failed: "Gagal mengambil data profil dari Google.",
+        no_email_provided: "Akun Google tidak menyediakan alamat email.",
+        internal_oauth_error: "Terjadi kesalahan internal pada server autentikasi.",
+      };
+      toast.error(errorMessages[errorParam] || `Gagal registrasi: ${errorParam}`);
+    }
+  }, [searchParams]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -98,23 +119,17 @@ export function RegisterForm() {
 
   const handleGoogleSignUp = () => {
     setIsGoogleLoading(true);
-    setTimeout(() => {
-      const googleUser = {
-        id: `USR-GGL-${Date.now()}`,
-        name: "H. Hendra Wijaya",
-        username: "hendra_wijaya",
-        email: "hendra.donatur@gmail.com",
-        role: USER_ROLES.DONOR,
-        title: "Donatur Terdaftar (Google)",
-        phone: "0818-9988-7766",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
-        initials: "HW",
-      };
+    redirectToGoogleOAuth("/");
+  };
 
-      loginUser(googleUser);
-      setIsGoogleLoading(false);
-      toast.success(`Berhasil mendaftar dengan Google: ${googleUser.email}`);
-      router.push(getRedirectPathForRole(googleUser.role));
+  const handleFacebookSignUp = () => {
+    setIsFacebookLoading(true);
+    setTimeout(() => {
+      const fbUser = simulateSocialAuth("facebook");
+      loginUser(fbUser);
+      setIsFacebookLoading(false);
+      toast.success(`Berhasil mendaftar dengan Facebook: ${fbUser.name}`);
+      router.push(getRedirectPathForRole(fbUser.role));
     }, 700);
   };
 
@@ -126,12 +141,13 @@ export function RegisterForm() {
         subtitle="Lengkapi formulir di bawah ini untuk mengakses kemudahan berdonasi."
       />
 
-      {/* Google Sign-up Option */}
-      <SocialAuthButton
-        onClick={handleGoogleSignUp}
-        isLoading={isGoogleLoading}
+      {/* Social Sign-up Options (Google & Facebook) */}
+      <SocialAuthGroup
+        onGoogleClick={handleGoogleSignUp}
+        onFacebookClick={handleFacebookSignUp}
+        isGoogleLoading={isGoogleLoading}
+        isFacebookLoading={isFacebookLoading}
         disabled={isLoading}
-        text="Daftar dengan Google"
       />
 
       {/* Centered Divider */}

@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,7 +59,7 @@ export default function RootLayout({ children }) {
         className="min-h-full flex flex-col bg-surface text-slate-900 font-sans"
         suppressHydrationWarning
       >
-        <Toaster richColors position="top-center" closeButton duration={3500} />
+        <Toaster />
         {children}
       </body>
     </html>

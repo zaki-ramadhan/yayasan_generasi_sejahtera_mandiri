@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { QRCodeSVG } from "qrcode.react";
 import {
   Clock,

@@ -24,7 +24,7 @@ export function CampaignCard({ campaign, highlightQuery = "", className }) {
         />
         {campaign.categoryName && (
           <div className="absolute top-2.5 left-0 z-10 drop-shadow-xs">
-            <RibbonBadge variant="primary" size="card">
+            <RibbonBadge variant="dark" size="card">
               {campaign.categoryName}
             </RibbonBadge>
           </div>

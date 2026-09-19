@@ -169,30 +169,58 @@ export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
       {/* Mobile Auth Button */}
       <div className="pt-3 border-t border-slate-200">
         {currentUser ? (
-          <div className="space-y-2">
-            <Link
-              href={getRedirectPathForRole(currentUser.role)}
-              onClick={onClose}
-              className="flex items-center justify-center gap-2 w-full h-10 rounded-md font-medium bg-slate-900 text-white text-sm"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              Dashboard {currentUser.role}
-            </Link>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-slate-900 border border-slate-200 shrink-0 flex items-center justify-center">
+                {currentUser.avatar ? (
+                  <img
+                    src={currentUser.avatar}
+                    alt={currentUser.name || "User Avatar"}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <span className="font-bold text-sm text-white">
+                    {currentUser.initials || "U"}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="block text-sm font-bold text-slate-900 truncate" title={currentUser.name}>
+                  {currentUser.name}
+                </span>
+                <span className="block text-xs text-slate-500 truncate font-mono">
+                  {currentUser.email || "Donatur Terdaftar"}
+                </span>
+              </div>
+            </div>
+
+            {currentUser.role !== "DONOR" && (
+              <Link
+                href="/dashboard"
+                onClick={onClose}
+                className="flex items-center justify-center gap-2 w-full h-10 rounded-lg font-medium bg-slate-900 text-white text-sm"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Portal Dashboard Yayasan</span>
+              </Link>
+            )}
+
             <button
               type="button"
               onClick={() => {
                 onLogout();
                 onClose();
               }}
-              className="w-full h-10 rounded-md font-medium border border-rose-200 text-rose-700 hover:bg-rose-50 text-sm cursor-pointer"
+              className="w-full h-10 rounded-lg font-semibold border border-rose-200 text-rose-600 hover:bg-rose-50 text-sm cursor-pointer flex items-center justify-center gap-2 transition-colors"
             >
-              Keluar (Logout)
+              <span>Keluar (Logout)</span>
             </button>
           </div>
         ) : (
           <Link href="/login" onClick={onClose} className="w-full block">
             <Button
-              className="w-full h-10 rounded-lg font-semibold bg-primary hover:bg-primary-hover text-white justify-center text-sm shadow-2xs cursor-pointer flex items-center gap-2"
+              className="w-full h-10 rounded-lg font-semibold bg-slate-900 hover:bg-slate-800 text-white justify-center text-sm shadow-2xs cursor-pointer flex items-center gap-2"
             >
               <User className="w-4 h-4 text-white" />
               <span>Masuk / Login Akun</span>

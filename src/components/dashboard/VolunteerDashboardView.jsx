@@ -1,5 +1,5 @@
 import { Check, Upload } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 
 export function VolunteerDashboardView() {

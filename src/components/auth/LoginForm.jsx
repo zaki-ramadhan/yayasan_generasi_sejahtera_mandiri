@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SocialAuthButton } from "@/components/auth/SocialAuthButton";
+import { SocialAuthGroup } from "@/components/auth/SocialAuthGroup";
 import { AuthFormHeader } from "@/components/auth/AuthFormHeader";
 import { AuthDivider } from "@/components/auth/AuthDivider";
 import { AuthPasswordInput } from "@/components/auth/AuthPasswordInput";
@@ -18,18 +18,41 @@ import {
   findUserByIdentifier,
   getRememberedIdentifier,
   setRememberedIdentifier,
+  simulateSocialAuth,
+  redirectToGoogleOAuth,
 } from "@/services/authService";
 import { cn } from "@/lib/utils";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [identifier, setIdentifier] = useState(() => (typeof window !== "undefined" ? getRememberedIdentifier() : ""));
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(() => (typeof window !== "undefined" ? Boolean(getRememberedIdentifier()) : false));
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isFacebookLoading, setIsFacebookLoading] = useState(false);
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
+  const handledErrorRef = useRef(false);
+
+  useEffect(() => {
+    if (handledErrorRef.current) return;
+    const errorParam = searchParams.get("error");
+    if (errorParam) {
+      handledErrorRef.current = true;
+      const errorMessages = {
+        access_denied: "Persetujuan akun Google dibatalkan.",
+        no_code_provided: "Kode autentikasi Google tidak ditemukan.",
+        oauth_credentials_missing: "Kredensial GOOGLE_CLIENT_SECRET belum lengkap di .env.",
+        token_exchange_failed: "Gagal menukar token dengan Google. Pastikan Client Secret valid.",
+        userinfo_fetch_failed: "Gagal mengambil data profil dari Google.",
+        no_email_provided: "Akun Google tidak menyediakan alamat email.",
+        internal_oauth_error: "Terjadi kesalahan internal pada server autentikasi.",
+      };
+      toast.error(errorMessages[errorParam] || `Gagal login: ${errorParam}`);
+    }
+  }, [searchParams]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -93,23 +116,17 @@ export function LoginForm() {
 
   const handleGoogleLogin = () => {
     setIsGoogleLoading(true);
-    setTimeout(() => {
-      const googleUser = {
-        id: `USR-GGL-${Date.now()}`,
-        name: "H. Hendra Wijaya",
-        username: "hendra_wijaya",
-        email: "hendra.donatur@gmail.com",
-        role: USER_ROLES.DONOR,
-        title: "Donatur Terdaftar (Google)",
-        phone: "0818-9988-7766",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
-        initials: "HW",
-      };
+    redirectToGoogleOAuth("/");
+  };
 
-      loginUser(googleUser);
-      setIsGoogleLoading(false);
-      toast.success(`Berhasil masuk dengan Google: ${googleUser.email}`);
-      router.push(getRedirectPathForRole(googleUser.role));
+  const handleFacebookLogin = () => {
+    setIsFacebookLoading(true);
+    setTimeout(() => {
+      const fbUser = simulateSocialAuth("facebook");
+      loginUser(fbUser);
+      setIsFacebookLoading(false);
+      toast.success(`Berhasil masuk dengan Facebook: ${fbUser.name}`);
+      router.push(getRedirectPathForRole(fbUser.role));
     }, 700);
   };
 
@@ -121,12 +138,13 @@ export function LoginForm() {
         subtitle="Masukkan nama pengguna/email dan kata sandi Anda untuk melanjutkan."
       />
 
-      {/* Google Login Option */}
-      <SocialAuthButton
-        onClick={handleGoogleLogin}
-        isLoading={isGoogleLoading}
+      {/* Social Login Options (Google & Facebook) */}
+      <SocialAuthGroup
+        onGoogleClick={handleGoogleLogin}
+        onFacebookClick={handleFacebookLogin}
+        isGoogleLoading={isGoogleLoading}
+        isFacebookLoading={isFacebookLoading}
         disabled={isLoading}
-        text="Masuk dengan Google"
       />
 
       {/* Centered Divider */}

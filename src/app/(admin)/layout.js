@@ -104,12 +104,21 @@ export default function AdminLayout({ children }) {
           {/* User Profile Card */}
           <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center shrink-0">
-                {currentUser?.initials || "U"}
-              </div>
+              {currentUser?.avatar ? (
+                <img
+                  src={currentUser.avatar}
+                  alt={currentUser.name || "User"}
+                  className="w-9 h-9 rounded-full object-cover border border-slate-700 bg-slate-800 shrink-0"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center shrink-0">
+                  {currentUser?.initials || "U"}
+                </div>
+              )}
               <div className="min-w-0">
                 <span className="text-xs font-bold text-white block truncate">
-                  {currentUser?.name || "Admin"}
+                  {currentUser?.name || "Pengguna"}
                 </span>
                 <span className="text-[10px] text-primary-light font-medium block truncate">
                   {ROLE_LABELS[userRole] || userRole}

@@ -11,7 +11,7 @@ import {
 	MessageCircle,
 	Image as ImageIcon,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { SafeImage } from "@/components/ui/safe-image";
 import { HighlightText } from "@/components/shared/HighlightText";

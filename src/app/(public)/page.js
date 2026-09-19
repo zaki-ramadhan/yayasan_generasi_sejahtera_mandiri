@@ -8,7 +8,6 @@ import { ArticleCard } from "@/components/shared/ArticleCard";
 import { HomeHero } from "@/components/home/HomeHero";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { CountUp } from "@/components/ui/count-up";
 import { formatNumber, formatRupiah, formatDate, getCompactRupiahParts } from "@/lib/formatters";
 
 export const metadata = {
@@ -94,12 +93,12 @@ export default async function HomePage() {
             <div className="py-4 sm:py-0 sm:px-6 first:pl-0 space-y-1.5" title={compactDonations.fullFormatted}>
               <span className="text-sm sm:text-base font-medium text-slate-700 block">Total Dana Tersalurkan</span>
               <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-950 tracking-tight whitespace-nowrap">
-                <CountUp
-                  to={compactDonations.value}
-                  prefix={compactDonations.prefix}
-                  suffix={compactDonations.unit}
-                  decimals={compactDonations.decimals}
-                />
+                {compactDonations.prefix}
+                {compactDonations.value.toLocaleString("id-ID", {
+                  minimumFractionDigits: compactDonations.decimals,
+                  maximumFractionDigits: compactDonations.decimals,
+                })}{" "}
+                {compactDonations.unit}
               </div>
               <span className="text-sm sm:text-base text-slate-700 block">Akumulasi seluruh program</span>
             </div>
@@ -107,7 +106,7 @@ export default async function HomePage() {
             <div className="py-4 sm:py-0 sm:px-6 space-y-1.5">
               <span className="text-sm sm:text-base font-medium text-slate-700 block">Penerima Manfaat</span>
               <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-950 tracking-tight">
-                <CountUp to={metrics.totalBeneficiaries} format="number" suffix="+ Jiwa" />
+                {metrics.totalBeneficiaries.toLocaleString("id-ID")}+ Jiwa
               </div>
               <span className="text-sm sm:text-base text-slate-700 block">Santri, yatim &amp; dhuafa</span>
             </div>
@@ -115,7 +114,7 @@ export default async function HomePage() {
             <div className="py-4 sm:py-0 sm:px-6 space-y-1.5">
               <span className="text-sm sm:text-base font-medium text-slate-700 block">Pesantren Mitra</span>
               <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-950 tracking-tight">
-                <CountUp to={metrics.partnerPesantrenCount} format="number" suffix=" Pondok" />
+                {metrics.partnerPesantrenCount.toLocaleString("id-ID")} Pondok
               </div>
               <span className="text-sm sm:text-base text-slate-700 block">Tersebar di pelosok daerah</span>
             </div>

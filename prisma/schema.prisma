@@ -132,3 +132,23 @@ model Article {
 
   @@index([category])
 }
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  username     String?  @unique
+  passwordHash String?
+  phone        String?
+  role         String   @default("DONOR") // SUPER_ADMIN, ADMIN, FINANCE, VOLUNTEER, DONOR
+  title        String?  @default("Donatur Terdaftar")
+  avatar       String?
+  provider     String   @default("CREDENTIALS") // CREDENTIALS, GOOGLE, FACEBOOK
+  providerId   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+

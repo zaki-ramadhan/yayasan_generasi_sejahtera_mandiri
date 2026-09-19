@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { getStoredUser, logoutUser } from "@/services/authService";
+import { toast } from "@/hooks/use-toast";
 import { NavDesktopMenu } from "@/components/nav/NavDesktopMenu";
 import { NavUserDropdown } from "@/components/nav/NavUserDropdown";
 import { NavMobileDrawer } from "@/components/nav/NavMobileDrawer";
@@ -35,8 +36,18 @@ export function Navbar() {
   const userJson = useSyncExternalStore(subscribeAuth, getAuthSnapshot, getAuthServerSnapshot);
   const currentUser = userJson ? JSON.parse(userJson) : null;
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const justLoggedInName = sessionStorage.getItem("ygsm_just_logged_in");
+    if (justLoggedInName) {
+      sessionStorage.removeItem("ygsm_just_logged_in");
+      toast.success(`Selamat datang, ${justLoggedInName}! Berhasil masuk ke akun.`);
+    }
+  }, [currentUser]);
+
   const handleLogout = () => {
     logoutUser();
+    toast.info("Anda telah keluar dari akun.");
     router.push("/");
   };
 

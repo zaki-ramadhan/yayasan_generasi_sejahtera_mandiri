@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { RoutineDonationHero } from "@/components/routine-donation/RoutineDonationHero";
 import { RoutineDonorIdentity } from "@/components/routine-donation/RoutineDonorIdentity";
 import { RoutineProgramItem } from "@/components/routine-donation/RoutineProgramItem";

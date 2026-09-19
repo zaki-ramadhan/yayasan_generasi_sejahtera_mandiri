@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Plus, Download } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { formatRupiah, formatDate } from "@/lib/formatters";
 import { RECENT_TRANSACTIONS, DONOR_ROUTINE_SCHEDULES } from "@/data/adminMockData";

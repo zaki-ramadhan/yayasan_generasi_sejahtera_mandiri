@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AuthSplitLayout } from "@/components/auth/AuthSplitLayout";
 import { LoginForm } from "@/components/auth/LoginForm";
 
@@ -9,7 +10,9 @@ export const metadata = {
 export default function LoginPage() {
   return (
     <AuthSplitLayout mode="login">
-      <LoginForm />
+      <Suspense fallback={<div className="h-64 flex items-center justify-center text-slate-400 text-sm">Memuat formulir...</div>}>
+        <LoginForm />
+      </Suspense>
     </AuthSplitLayout>
   );
 }

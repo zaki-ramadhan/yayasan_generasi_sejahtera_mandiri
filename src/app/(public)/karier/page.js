@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Briefcase, MapPin, Clock, ArrowRight, CheckCircle2, HeartHandshake, ShieldCheck } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
