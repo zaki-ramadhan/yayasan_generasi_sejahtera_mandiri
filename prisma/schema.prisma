@@ -70,6 +70,7 @@ model Donation {
   donorName      String
   donorEmail     String?
   donorPhone     String
+  donorAvatar    String?
   isAnonymous    Boolean   @default(false)
   prayer         String?
   status         String    @default("PENDING") // PENDING, PAID, EXPIRED, CANCELLED

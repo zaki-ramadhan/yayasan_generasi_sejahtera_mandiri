@@ -3,8 +3,30 @@ import { CAMPAIGNS } from "@/data/campaigns";
 
 function formatCampaignFromDb(c) {
   if (!c) return null;
+  const paidDonations = (c.donations || []).map((d) => ({
+    id: d.id,
+    name: d.isAnonymous ? "Hamba Allah" : d.donorName,
+    amount: Number(d.amount || 0),
+    email: d.isAnonymous
+      ? "hamba.allah***@gmail.com"
+      : (d.donorEmail || (d.donorName ? `${d.donorName.toLowerCase().replace(/[^a-z0-9]/g, ".")}@gmail.com` : "donatur@ygsm.id")),
+    avatar: d.isAnonymous ? null : (d.donorAvatar || null),
+    date: d.paidAt
+      ? d.paidAt instanceof Date
+        ? d.paidAt.toISOString()
+        : d.paidAt
+      : d.createdAt instanceof Date
+      ? d.createdAt.toISOString()
+      : d.createdAt,
+    prayer: d.prayer || "",
+    aminCount: 0,
+    isAnonymous: Boolean(d.isAnonymous),
+  }));
+
   return {
     ...c,
+    collectedAmount: Number(c.collectedAmount || 0),
+    donorCount: Number(c.donorCount || 0),
     endDate: c.endDate instanceof Date ? c.endDate.toISOString() : c.endDate,
     createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : c.createdAt,
     updatedAt: c.updatedAt instanceof Date ? c.updatedAt.toISOString() : c.updatedAt,
@@ -14,20 +36,7 @@ function formatCampaignFromDb(c) {
       ...u,
       date: u.date instanceof Date ? u.date.toISOString().split("T")[0] : u.date,
     })),
-    recentDonors: (c.donations || []).map((d) => ({
-      id: d.id,
-      name: d.isAnonymous ? "Hamba Allah" : d.donorName,
-      amount: d.amount,
-      date: d.paidAt
-        ? d.paidAt instanceof Date
-          ? d.paidAt.toISOString()
-          : d.paidAt
-        : d.createdAt instanceof Date
-        ? d.createdAt.toISOString()
-        : d.createdAt,
-      prayer: d.prayer || "",
-      aminCount: 0,
-    })),
+    recentDonors: paidDonations,
   };
 }
 
@@ -154,8 +163,8 @@ export async function getCampaignBySlug(slug) {
         updates: { orderBy: { date: "desc" } },
         donations: {
           where: { status: "PAID" },
-          orderBy: { createdAt: "desc" },
-          take: 20,
+          orderBy: { paidAt: "desc" },
+          take: 50,
         },
       },
     });
@@ -193,14 +202,15 @@ export async function getCampaignDonationStats(slug) {
           createdAt: true,
         },
         orderBy: {
-          createdAt: "asc",
+          paidAt: "asc",
         },
       });
 
       if (paidDonations.length > 0) {
         const dateMap = new Map();
         paidDonations.forEach((d) => {
-          const dateKey = (d.paidAt || d.createdAt).toISOString().split("T")[0];
+          const rawDate = d.paidAt || d.createdAt;
+          const dateKey = (rawDate instanceof Date ? rawDate : new Date(rawDate)).toISOString().split("T")[0];
           const existing = dateMap.get(dateKey) || { dailyAmount: 0, donationsCount: 0 };
           existing.dailyAmount += Number(d.amount || 0);
           existing.donationsCount += 1;
@@ -228,15 +238,53 @@ export async function getCampaignDonationStats(slug) {
 
   // Fallback from static data donors if DB is unavailable
   const camp = CAMPAIGNS.find((c) => c.slug === slug);
-  if (camp && Array.isArray(camp.recentDonors) && camp.recentDonors.length > 0) {
+  if (camp) {
+    const totalCollected = Number(camp.collectedAmount || 0);
+    const recentDonors = Array.isArray(camp.recentDonors) ? camp.recentDonors : [];
+    const recentTotal = recentDonors.reduce((acc, d) => acc + Number(d.amount || 0), 0);
+    const priorTotal = Math.max(0, totalCollected - recentTotal);
+
     const dateMap = new Map();
-    camp.recentDonors.forEach((d) => {
+    recentDonors.forEach((d) => {
       const dateKey = d.date ? d.date.split("T")[0] : new Date().toISOString().split("T")[0];
       const existing = dateMap.get(dateKey) || { dailyAmount: 0, donationsCount: 0 };
       existing.dailyAmount += Number(d.amount || 0);
       existing.donationsCount += 1;
       dateMap.set(dateKey, existing);
     });
+
+    if (priorTotal > 0) {
+      // Distribute priorTotal smoothly across past 25 days
+      const today = new Date();
+      const numDays = 25;
+      const priorDates = [];
+      for (let i = numDays; i >= 3; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const dk = d.toISOString().split("T")[0];
+        if (!dateMap.has(dk)) {
+          priorDates.push(dk);
+        }
+      }
+
+      const count = priorDates.length;
+      if (count > 0) {
+        let allocated = 0;
+        priorDates.forEach((dk, idx) => {
+          const isLast = idx === count - 1;
+          const share = isLast
+            ? (priorTotal - allocated)
+            : Math.round(priorTotal / count);
+          allocated += share;
+
+          const donorBatch = Math.max(1, Math.round(share / 150000));
+          dateMap.set(dk, {
+            dailyAmount: Math.max(0, share),
+            donationsCount: donorBatch,
+          });
+        });
+      }
+    }
 
     const sortedDates = Array.from(dateMap.keys()).sort();
     let runningTotal = 0;
