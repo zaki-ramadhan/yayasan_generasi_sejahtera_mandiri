@@ -4,7 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { CATEGORIES } from "../src/data/categories.js";
 import { CAMPAIGNS } from "../src/data/campaigns.js";
 import { AUDIT_REPORTS } from "../src/data/reports.js";
-import { ARTICLES } from "../src/data/articles.js";
+import { ARTICLES, validateArticleCategories } from "../src/data/articles.js";
 import { INSTAGRAM_POSTS } from "../src/data/instagramPosts.js";
 
 const connectionString = process.env.DATABASE_URL;
@@ -275,11 +275,13 @@ async function main() {
   // 4. Seed Articles
   console.log("📰 Menanam data Artikel & Literasi...");
   for (const art of ARTICLES) {
+    const validCategories = validateArticleCategories(art.categories || [art.category]);
     await prisma.article.upsert({
       where: { slug: art.slug },
       update: {
         title: art.title,
-        category: art.category,
+        category: validCategories[0],
+        categories: validCategories,
         tags: art.tags || [],
         excerpt: art.excerpt,
         content: art.content,
@@ -295,7 +297,8 @@ async function main() {
         id: art.id,
         title: art.title,
         slug: art.slug,
-        category: art.category,
+        category: validCategories[0],
+        categories: validCategories,
         tags: art.tags || [],
         excerpt: art.excerpt,
         content: art.content,

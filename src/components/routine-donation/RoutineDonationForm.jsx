@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { DONATION_LIMITS } from "@/lib/security";
+import { formatRupiah } from "@/lib/formatters";
+import { getStoredUser } from "@/services/authService";
 import { RoutineDonationHero } from "@/components/routine-donation/RoutineDonationHero";
 import { RoutineDonorIdentity } from "@/components/routine-donation/RoutineDonorIdentity";
 import { RoutineProgramItem } from "@/components/routine-donation/RoutineProgramItem";
@@ -19,12 +22,28 @@ export function RoutineDonationForm({ campaigns = [] }) {
 
   const defaultCampaignId = campaigns[0]?.id || "camp-001";
 
+  // Pre-fill user data from session if authenticated
+  useEffect(() => {
+    const user = getStoredUser();
+    if (!user) return;
+
+    queueMicrotask(() => {
+      if (user.name && user.name !== "Pengguna Google" && user.name !== "Pengguna Facebook") {
+        setFullName(user.name);
+      }
+      if (user.phone && user.phone !== "-") {
+        setWhatsapp(user.phone);
+      }
+    });
+  }, []);
+
   // Multi-program state (max 3)
   const [selectedPrograms, setSelectedPrograms] = useState([
     {
       id: 1,
       campaignId: defaultCampaignId,
       frequency: "DAILY_SUBUH",
+      routineType: "REMINDER_ONLY",
       amount: 25000,
       customAmount: "",
     },
@@ -43,6 +62,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
         id: (prev[prev.length - 1]?.id || 0) + 1,
         campaignId: nextCampaign ? nextCampaign.id : defaultCampaignId,
         frequency: "DAILY_SUBUH",
+        routineType: "REMINDER_ONLY",
         amount: 25000,
         customAmount: "",
       },
@@ -72,14 +92,41 @@ export function RoutineDonationForm({ campaigns = [] }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!isAnonymous && !fullName.trim()) {
-      toast.error("Mohon isi nama lengkap Anda.");
+
+    // 1. Validasi Identitas
+    if (!isAnonymous && (!fullName || fullName.trim().length < 2)) {
+      toast.error("Mohon masukkan nama lengkap Anda atau pilih opsi Hamba Allah.");
       return;
     }
-    if (!whatsapp.trim() || whatsapp.length < 9) {
-      toast.error("Mohon masukkan nomor WhatsApp yang aktif untuk menerima pengingat.");
+
+    const cleanWa = whatsapp.replace(/\D/g, "");
+    if (!cleanWa || cleanWa.length < 9 || cleanWa.length > 15) {
+      toast.error("Mohon masukkan nomor WhatsApp yang aktif (9-15 digit) untuk menerima pengingat.");
       return;
     }
+
+    // 2. Validasi Tiap Program
+    for (let i = 0; i < selectedPrograms.length; i++) {
+      const p = selectedPrograms[i];
+      const nominal = p.customAmount
+        ? parseInt(p.customAmount.replace(/\D/g, ""), 10) || 0
+        : p.amount;
+
+      if (!nominal || nominal < DONATION_LIMITS.MIN_AMOUNT) {
+        toast.error(
+          `Nominal Program ${i + 1} minimal ${formatRupiah(DONATION_LIMITS.MIN_AMOUNT)}`
+        );
+        return;
+      }
+
+      if (nominal > DONATION_LIMITS.MAX_AMOUNT) {
+        toast.error(
+          `Nominal Program ${i + 1} maksimal ${formatRupiah(DONATION_LIMITS.MAX_AMOUNT)}`
+        );
+        return;
+      }
+    }
+
     if (totalPerCommitment <= 0) {
       toast.error("Mohon tentukan nominal donasi rutin yang valid.");
       return;
@@ -90,7 +137,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
       setIsSubmitting(false);
       setIsSubmitted(true);
       toast.success("Jadwal donasi rutin Anda berhasil diaktifkan!");
-    }, 800);
+    }, 600);
   };
 
   if (isSubmitted) {
@@ -104,78 +151,79 @@ export function RoutineDonationForm({ campaigns = [] }) {
         campaigns={campaigns}
         onReset={() => {
           setIsSubmitted(false);
-          setFullName("");
-          setWhatsapp("");
         }}
       />
     );
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
       <RoutineDonationHero />
 
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-          {/* Left Column (7 Cols): Donor Identity & Program Selection */}
-          <div className="lg:col-span-7 space-y-6">
-            <RoutineDonorIdentity
-              salutation={salutation}
-              setSalutation={setSalutation}
-              fullName={fullName}
-              setFullName={setFullName}
-              whatsapp={whatsapp}
-              setWhatsapp={setWhatsapp}
-              isAnonymous={isAnonymous}
-              setIsAnonymous={setIsAnonymous}
-            />
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        {/* Left Column (7 Cols): Donor Identity & Program Selection */}
+        <div className="lg:col-span-7 space-y-6">
+          <RoutineDonorIdentity
+            salutation={salutation}
+            setSalutation={setSalutation}
+            fullName={fullName}
+            setFullName={setFullName}
+            whatsapp={whatsapp}
+            setWhatsapp={setWhatsapp}
+            isAnonymous={isAnonymous}
+            setIsAnonymous={setIsAnonymous}
+          />
 
-            {/* Selected Programs Selection List */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-1">
-                <h2 className="text-base sm:text-lg font-semibold text-slate-950">
-                  Daftar Program Pilihan
-                </h2>
-                <span className="text-xs text-slate-500 font-normal">
-                  {selectedPrograms.length} dari 3 program
+          {/* Step 2: Selected Programs Selection List */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold shrink-0">
+                  2
                 </span>
+                <h2 className="text-base sm:text-lg font-semibold text-slate-950">
+                  Program Kebaikan &amp; Frekuensi
+                </h2>
               </div>
-
-              {selectedPrograms.map((item, index) => (
-                <RoutineProgramItem
-                  key={item.id}
-                  item={item}
-                  index={index}
-                  totalItems={selectedPrograms.length}
-                  campaigns={campaigns}
-                  onRemove={handleRemoveProgram}
-                  onChange={handleProgramChange}
-                />
-              ))}
-
-              {/* Add program button (max 3) */}
-              {selectedPrograms.length < 3 && (
-                <button
-                  type="button"
-                  onClick={handleAddProgram}
-                  className="w-full py-3 px-4 rounded-xl border border-dashed border-slate-300 hover:border-primary text-slate-700 hover:text-primary bg-white hover:bg-slate-50 font-medium text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>+ Tambah Program Kebaikan Lain (Maks. 3)</span>
-                </button>
-              )}
+              <span className="text-sm text-slate-600 font-normal">
+                {selectedPrograms.length} dari 3 program
+              </span>
             </div>
-          </div>
 
-          {/* Right Column (5 Cols): Sticky Order Summary & Submit Button */}
-          <div className="lg:col-span-5 lg:sticky lg:top-20">
-            <RoutineSummaryCard
-              selectedPrograms={selectedPrograms}
-              totalPerCommitment={totalPerCommitment}
-              isSubmitting={isSubmitting}
-              campaigns={campaigns}
-            />
+            {selectedPrograms.map((item, index) => (
+              <RoutineProgramItem
+                key={item.id}
+                item={item}
+                index={index}
+                totalItems={selectedPrograms.length}
+                campaigns={campaigns}
+                onRemove={handleRemoveProgram}
+                onChange={handleProgramChange}
+              />
+            ))}
+
+            {/* Add program button (max 3) */}
+            {selectedPrograms.length < 3 && (
+              <button
+                type="button"
+                onClick={handleAddProgram}
+                className="w-full h-11 px-4 rounded-lg border border-dashed border-slate-300 hover:border-primary text-slate-700 hover:text-primary bg-white hover:bg-slate-50 font-medium text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah Program Lain (Maks. 3)</span>
+              </button>
+            )}
           </div>
+        </div>
+
+        {/* Right Column (5 Cols): Sticky Order Summary & Submit Button */}
+        <div className="lg:col-span-5 lg:sticky lg:top-24">
+          <RoutineSummaryCard
+            selectedPrograms={selectedPrograms}
+            totalPerCommitment={totalPerCommitment}
+            isSubmitting={isSubmitting}
+            campaigns={campaigns}
+          />
         </div>
       </form>
     </main>

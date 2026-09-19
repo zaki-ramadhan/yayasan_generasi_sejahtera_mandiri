@@ -12,6 +12,35 @@ export const ARTICLE_CATEGORIES = [
   { id: "Kemanusiaan", name: "Kemanusiaan" },
 ];
 
+/**
+ * Validasi batasan kategori artikel:
+ * - Minimal 1 kategori
+ * - Maksimal 3 kategori berbeda
+ * @param {string[]|string} categories
+ * @returns {string[]} Array kategori unik (1-3 kategori)
+ */
+export function validateArticleCategories(categories) {
+  const rawList = Array.isArray(categories)
+    ? categories
+    : typeof categories === "string" && categories.trim()
+    ? [categories.trim()]
+    : [];
+
+  const uniqueList = Array.from(
+    new Set(rawList.map((c) => (typeof c === "string" ? c.trim() : "")).filter(Boolean))
+  );
+
+  if (uniqueList.length < 1) {
+    throw new Error("Artikel wajib memiliki minimal 1 kategori. Tidak boleh kosong.");
+  }
+
+  if (uniqueList.length > 3) {
+    throw new Error("Artikel hanya boleh memiliki maksimal 3 kategori berbeda.");
+  }
+
+  return uniqueList;
+}
+
 export const ARTICLES = [
   {
     id: "art-1",

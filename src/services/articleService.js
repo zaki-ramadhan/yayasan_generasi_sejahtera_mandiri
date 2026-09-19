@@ -1,10 +1,18 @@
 import prisma from "@/lib/prisma";
-import { ARTICLES, ARTICLE_CATEGORIES } from "@/data/articles";
+import { ARTICLES, ARTICLE_CATEGORIES, validateArticleCategories } from "@/data/articles";
+
+export { validateArticleCategories };
 
 function formatArticleFromDb(a) {
   if (!a) return null;
+  const categoriesList = Array.isArray(a.categories) && a.categories.length > 0
+    ? a.categories
+    : (a.category ? [a.category] : ["Umum"]);
+
   return {
     ...a,
+    category: categoriesList[0] || a.category || "Umum",
+    categories: categoriesList.slice(0, 3),
     publishedAt: a.publishedAt instanceof Date ? a.publishedAt.toISOString() : a.publishedAt,
     tags: Array.isArray(a.tags) ? a.tags : [],
   };
@@ -15,7 +23,10 @@ export async function getArticles({ category = "all", search = "", limit } = {})
     const where = {};
 
     if (category && category !== "all" && category !== "Semua Kategori") {
-      where.category = { equals: category, mode: "insensitive" };
+      where.OR = [
+        { category: { equals: category, mode: "insensitive" } },
+        { categories: { has: category } },
+      ];
     }
 
     if (search && search.trim().length >= 2) {

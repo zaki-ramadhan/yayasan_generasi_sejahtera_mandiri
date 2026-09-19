@@ -121,6 +121,7 @@ model Article {
   title          String
   slug           String   @unique
   category       String
+  categories     String[] @default([])
   tags           String[] @default([])
   excerpt        String
   content        String
