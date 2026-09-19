@@ -50,9 +50,15 @@ export function RoutineSummaryCard({
                     {camp.title}
                   </span>
                 </div>
-                <span className="font-medium text-slate-950 shrink-0 text-sm sm:text-base">
-                  {formatRupiah(nominal)}
-                </span>
+                {isReminderOnly ? (
+                  <span className="text-xs sm:text-sm font-medium text-slate-500 shrink-0">
+                    Fleksibel (Saat Diingatkan)
+                  </span>
+                ) : (
+                  <span className="font-medium text-slate-950 shrink-0 text-sm sm:text-base">
+                    {formatRupiah(nominal)}
+                  </span>
+                )}
               </div>
 
               {/* Frequency with Bell in Circle Shape (No Badge / Chip / Card) */}
@@ -78,11 +84,11 @@ export function RoutineSummaryCard({
         <div className="flex justify-between items-baseline text-base font-medium text-slate-950">
           <span>Total per Siklus</span>
           <span className="text-primary text-xl sm:text-2xl font-bold tracking-tight">
-            {formatRupiah(totalPerCommitment)}
+            {totalPerCommitment > 0 ? formatRupiah(totalPerCommitment) : "Fleksibel"}
           </span>
         </div>
-        <p className="text-sm text-slate-600 font-normal">
-          * Nominal disesuaikan otomatis dengan jadwal frekuensi pilihan
+        <p className="mt-2 text-sm text-slate-600 italic font-normal">
+          *Nominal disesuaikan otomatis dengan jadwal frekuensi pilihan
         </p>
       </div>
 
@@ -91,14 +97,19 @@ export function RoutineSummaryCard({
         <Button
           type="submit"
           isLoading={isSubmitting}
-          disabled={isSubmitting || totalPerCommitment <= 0}
+          disabled={
+            isSubmitting ||
+            selectedPrograms.length === 0 ||
+            (selectedPrograms.some((p) => (p.routineType || "REMINDER_ONLY") === "AUTO_DONATION") &&
+              totalPerCommitment <= 0)
+          }
           className="w-full h-12 rounded-lg text-base font-semibold text-white bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700 border-t border-t-blue-400 border-x border-x-blue-600 border-b-2 border-b-blue-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_6px_rgba(29,78,216,0.25)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
         >
           {isSubmitting
             ? "Menyimpan Jadwal..."
             : totalPerCommitment > 0
             ? `Aktifkan Jadwal (${formatRupiah(totalPerCommitment)})`
-            : "Aktifkan Jadwal Donasi"}
+            : "Aktifkan Pengingat Donasi Rutin"}
         </Button>
 
       </div>

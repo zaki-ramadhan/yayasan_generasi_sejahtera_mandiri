@@ -44,8 +44,13 @@ export function RoutineDonationForm({ campaigns = [] }) {
       campaignId: defaultCampaignId,
       frequency: "DAILY_SUBUH",
       routineType: "REMINDER_ONLY",
+      hasCustomPeriod: false,
+      startDate: "",
+      endDate: "",
+      reminderTime: "05:00",
       amount: 25000,
       customAmount: "",
+      paymentChannelId: "qris",
     },
   ]);
 
@@ -63,8 +68,13 @@ export function RoutineDonationForm({ campaigns = [] }) {
         campaignId: nextCampaign ? nextCampaign.id : defaultCampaignId,
         frequency: "DAILY_SUBUH",
         routineType: "REMINDER_ONLY",
+        hasCustomPeriod: false,
+        startDate: "",
+        endDate: "",
+        reminderTime: "05:00",
         amount: 25000,
         customAmount: "",
+        paymentChannelId: "qris",
       },
     ]);
   };
@@ -84,6 +94,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
   };
 
   const totalPerCommitment = selectedPrograms.reduce((sum, item) => {
+    if (item.routineType === "REMINDER_ONLY") return sum;
     const val = item.customAmount
       ? parseInt(item.customAmount.replace(/\D/g, ""), 10) || 0
       : item.amount;
@@ -108,27 +119,36 @@ export function RoutineDonationForm({ campaigns = [] }) {
     // 2. Validasi Tiap Program
     for (let i = 0; i < selectedPrograms.length; i++) {
       const p = selectedPrograms[i];
-      const nominal = p.customAmount
-        ? parseInt(p.customAmount.replace(/\D/g, ""), 10) || 0
-        : p.amount;
 
-      if (!nominal || nominal < DONATION_LIMITS.MIN_AMOUNT) {
-        toast.error(
-          `Nominal Program ${i + 1} minimal ${formatRupiah(DONATION_LIMITS.MIN_AMOUNT)}`
-        );
+      if (p.hasCustomPeriod && p.startDate && p.endDate && p.startDate > p.endDate) {
+        toast.error(`Tanggal mulai tidak boleh lebih lambat dari tanggal berakhir pada Program ${i + 1}.`);
         return;
       }
 
-      if (nominal > DONATION_LIMITS.MAX_AMOUNT) {
-        toast.error(
-          `Nominal Program ${i + 1} maksimal ${formatRupiah(DONATION_LIMITS.MAX_AMOUNT)}`
-        );
-        return;
+      if (p.routineType === "AUTO_DONATION") {
+        const nominal = p.customAmount
+          ? parseInt(p.customAmount.replace(/\D/g, ""), 10) || 0
+          : p.amount;
+
+        if (!nominal || nominal < DONATION_LIMITS.MIN_AMOUNT) {
+          toast.error(
+            `Nominal Program ${i + 1} minimal ${formatRupiah(DONATION_LIMITS.MIN_AMOUNT)}`
+          );
+          return;
+        }
+
+        if (nominal > DONATION_LIMITS.MAX_AMOUNT) {
+          toast.error(
+            `Nominal Program ${i + 1} maksimal ${formatRupiah(DONATION_LIMITS.MAX_AMOUNT)}`
+          );
+          return;
+        }
       }
     }
 
-    if (totalPerCommitment <= 0) {
-      toast.error("Mohon tentukan nominal donasi rutin yang valid.");
+    const hasAutoDonation = selectedPrograms.some((p) => p.routineType === "AUTO_DONATION");
+    if (hasAutoDonation && totalPerCommitment <= 0) {
+      toast.error("Mohon tentukan nominal donasi otomatis yang valid.");
       return;
     }
 

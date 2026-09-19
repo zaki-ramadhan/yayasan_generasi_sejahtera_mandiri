@@ -2,20 +2,35 @@ import { formatRupiah } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 export function PaymentChannelPicker({
-  channels,
+  channels = [],
   selectedChannelId,
   onSelectChannel,
+  showHeader = true,
+  stepNumber = 2,
+  title = "Pilih Metode Pembayaran",
+  containerCard = true,
+  className = "",
 }) {
   return (
-    <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4 shadow-xs">
-      <div className="flex items-center gap-2.5 pb-2 border-b border-slate-200">
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold shrink-0">
-          2
-        </span>
-        <h2 className="text-base sm:text-lg font-semibold text-slate-950">
-          Pilih Metode Pembayaran
-        </h2>
-      </div>
+    <div
+      className={cn(
+        containerCard && "bg-white p-5 sm:p-6 rounded-xl border border-slate-300 shadow-xs",
+        "space-y-3 sm:space-y-4",
+        className
+      )}
+    >
+      {showHeader && (
+        <div className="flex items-center gap-2.5">
+          {stepNumber !== null && (
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold shrink-0">
+              {stepNumber}
+            </span>
+          )}
+          <h2 className="text-sm sm:text-base font-semibold text-slate-900">
+            {title}
+          </h2>
+        </div>
+      )}
 
       <div className="space-y-2.5">
         {channels.map((channel) => {

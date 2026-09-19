@@ -1,4 +1,5 @@
-import { Info } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, Info } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -9,20 +10,29 @@ import {
 export function RoutineDonationHero() {
   return (
     <div className="space-y-4">
-      {/* Header Section */}
-      <div className="space-y-1.5 border-b border-slate-300 pb-4">
-        <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight">
-          Atur Jadwal Donasi Rutin
-        </h1>
-        <p className="text-sm sm:text-base text-slate-700">
-          Atur pengingat WhatsApp atau jadwal sedekah rutin berkala untuk program kebaikan pilihan Anda.
-        </p>
+      {/* Back button & Title (Unified with donate/page.js) */}
+      <div className="space-y-3">
+        <Link
+          href="/program"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-primary hover:underline transition-colors py-0.5 group"
+        >
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+          <span>Kembali ke Katalog Program</span>
+        </Link>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight">
+            Atur Jadwal Donasi Rutin
+          </h1>
+          <p className="text-sm sm:text-base text-slate-600 mt-1">
+            Atur pengingat WhatsApp atau jadwal sedekah rutin berkala untuk program kebaikan pilihan Anda.
+          </p>
+        </div>
       </div>
 
       {/* Info Accordion */}
       <Accordion type="single" collapsible className="bg-sky-50/80 border border-sky-200 rounded-xl px-4">
         <AccordionItem value="cara-kerja" className="border-none">
-          <AccordionTrigger className="text-sm font-semibold text-sky-950 py-3 hover:no-underline">
+          <AccordionTrigger className="text-sm font-semibold text-sky-950 py-3 hover:no-underline cursor-pointer">
             <span className="flex items-center gap-2 text-left">
               <Info className="w-4 h-4 text-sky-600 shrink-0" />
               <span>Panduan: Cara Kerja Donasi Rutin</span>

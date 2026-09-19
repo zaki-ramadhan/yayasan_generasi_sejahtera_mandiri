@@ -67,9 +67,15 @@ export function RoutineSuccessView({
                       {camp.title}
                     </span>
                   </div>
-                  <span className="font-medium text-slate-950 shrink-0 text-sm sm:text-base">
-                    {formatRupiah(nominal)}
-                  </span>
+                  {isReminderOnly ? (
+                    <span className="text-xs sm:text-sm font-medium text-slate-500 shrink-0">
+                      Fleksibel (Saat Diingatkan)
+                    </span>
+                  ) : (
+                    <span className="font-medium text-slate-950 shrink-0 text-sm sm:text-base">
+                      {formatRupiah(nominal)}
+                    </span>
+                  )}
                 </div>
 
                 {/* Frequency with Bell in Circle Shape (No Badge / Chip / Card) */}

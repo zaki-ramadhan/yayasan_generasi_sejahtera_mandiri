@@ -6,6 +6,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { CAMPAIGNS } from "@/data/campaigns";
+import { PAYMENT_CHANNELS } from "@/data/paymentChannels";
+import { PaymentChannelPicker } from "@/components/donation/PaymentChannelPicker";
 import { formatRupiah, formatNumber } from "@/lib/formatters";
 import { DONATION_LIMITS } from "@/lib/security";
 import { cn } from "@/lib/utils";
@@ -43,6 +45,7 @@ export function RoutineProgramItem({
   const selectedCampaign = campaignList.find((c) => c.id === item.campaignId) || campaignList[0];
   const selectedFreq = FREQUENCY_OPTIONS.find((f) => f.value === item.frequency) || FREQUENCY_OPTIONS[0];
   const currentRoutineType = item.routineType || "REMINDER_ONLY";
+  const isAutoDonation = currentRoutineType === "AUTO_DONATION";
 
   return (
     <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4 shadow-xs relative">
@@ -54,7 +57,7 @@ export function RoutineProgramItem({
           <button
             type="button"
             onClick={() => onRemove(item.id)}
-            className="text-sm text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+            className="text-sm text-rose-600 hover:text-rose-800 font-medium flex items-center gap-1.5 cursor-pointer transition-colors"
           >
             <Trash2 className="w-4 h-4 shrink-0" /> Hapus Program
           </button>
@@ -170,7 +173,7 @@ export function RoutineProgramItem({
                 )}
               >
                 <div className="flex items-center justify-between w-full mb-1">
-                  <span className="text-xs sm:text-sm font-semibold text-slate-900">
+                  <span className="text-sm font-semibold text-slate-900">
                     {opt.title}
                   </span>
                   <div
@@ -182,7 +185,7 @@ export function RoutineProgramItem({
                     {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                   </div>
                 </div>
-                <p className="text-xs text-slate-500 font-normal leading-relaxed">
+                <p className="mt-1 text-sm text-slate-600 font-normal leading-relaxed">
                   {opt.desc}
                 </p>
               </button>
@@ -191,77 +194,174 @@ export function RoutineProgramItem({
         </div>
       </div>
 
-      {/* Amount Picker (Grid 3x2: 5 Presets + 1 Lainnya) */}
-      <div className="space-y-2">
+      {/* Dropdown Toggle Atur Masa Berlaku (Opsional) */}
+      <div className="space-y-2 pt-2 border-t border-slate-100">
+        <button
+          type="button"
+          onClick={() => onChange(item.id, "hasCustomPeriod", !item.hasCustomPeriod)}
+          className="flex items-center justify-between w-full py-1 text-sm font-semibold text-slate-800 hover:text-primary transition-colors cursor-pointer select-none"
+        >
+          <span>Atur masa berlaku (opsional)</span>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 text-slate-500 transition-transform duration-200",
+              item.hasCustomPeriod && "rotate-180"
+            )}
+          />
+        </button>
+
+        {item.hasCustomPeriod && (
+          <div className="space-y-2 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-xs sm:text-sm font-medium text-slate-700 block">
+                  Tanggal Mulai
+                </label>
+                <input
+                  type="date"
+                  value={item.startDate || ""}
+                  onChange={(e) => onChange(item.id, "startDate", e.target.value)}
+                  className="w-full h-11 px-3 rounded-lg border border-slate-300 text-sm font-normal text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors bg-white cursor-pointer"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs sm:text-sm font-medium text-slate-700 block">
+                  Tanggal Berakhir
+                </label>
+                <input
+                  type="date"
+                  value={item.endDate || ""}
+                  min={item.startDate || ""}
+                  onChange={(e) => onChange(item.id, "endDate", e.target.value)}
+                  className="w-full h-11 px-3 rounded-lg border border-slate-300 text-sm font-normal text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors bg-white cursor-pointer"
+                />
+              </div>
+            </div>
+            <p className="mt-1 text-sm text-slate-600 italic font-normal">
+              *Jadwal donasi rutin akan otomatis berakhir setelah tanggal batas selesai terlewati.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Jam Pengingat (24 Jam Format WIB) */}
+      <div className="space-y-1.5 pt-2 border-t border-slate-100">
         <label className="text-sm font-semibold text-slate-800 block">
-          Nominal donasi
+          Jam pengingat
         </label>
-        <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
-          {PRESET_AMOUNTS.map((amt) => {
-            const isSelected = !item.isCustom && item.amount === amt;
-            return (
+        <div className="relative max-w-xs">
+          <input
+            type="time"
+            step="60"
+            value={item.reminderTime || "05:00"}
+            onChange={(e) => onChange(item.id, "reminderTime", e.target.value)}
+            className="w-full h-11 px-3.5 pr-12 rounded-lg border border-slate-300 text-sm sm:text-base font-normal text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors bg-white cursor-pointer"
+          />
+          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500 pointer-events-none select-none">
+            WIB
+          </span>
+        </div>
+        <p className="mt-1 text-sm text-slate-600 italic font-normal">
+          *Pengingat atau notifikasi tagihan akan dikirimkan otomatis pada jam yang dipilih (Format 24 Jam WIB).
+        </p>
+      </div>
+
+      {/* KONDISIONAL: Opsi 2 (Donasi Otomatis) -> Tampilkan Nominal & Metode Pembayaran */}
+      {isAutoDonation ? (
+        <div className="space-y-4 pt-2 border-t border-slate-100 animate-in fade-in slide-in-from-top-1 duration-150">
+          {/* Amount Picker (Grid 3x2: 5 Presets + 1 Lainnya) */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-800 block">
+              Nominal donasi
+            </label>
+            <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+              {PRESET_AMOUNTS.map((amt) => {
+                const isSelected = !item.isCustom && item.amount === amt;
+                return (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => {
+                      onChange(item.id, "amount", amt);
+                      onChange(item.id, "isCustom", false);
+                      onChange(item.id, "customAmount", "");
+                    }}
+                    className={cn(
+                      "py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg text-sm sm:text-base border transition-all text-center cursor-pointer min-h-[44px] sm:min-h-[46px] flex items-center justify-center",
+                      isSelected
+                        ? "bg-blue-50 text-blue-950 border-blue-600 ring-1 ring-blue-600 font-semibold shadow-2xs"
+                        : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50 font-medium"
+                    )}
+                  >
+                    {formatRupiah(amt)}
+                  </button>
+                );
+              })}
+
               <button
-                key={amt}
                 type="button"
                 onClick={() => {
-                  onChange(item.id, "amount", amt);
-                  onChange(item.id, "isCustom", false);
-                  onChange(item.id, "customAmount", "");
+                  onChange(item.id, "isCustom", true);
                 }}
                 className={cn(
                   "py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg text-sm sm:text-base border transition-all text-center cursor-pointer min-h-[44px] sm:min-h-[46px] flex items-center justify-center",
-                  isSelected
+                  item.isCustom
                     ? "bg-blue-50 text-blue-950 border-blue-600 ring-1 ring-blue-600 font-semibold shadow-2xs"
                     : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50 font-medium"
                 )}
               >
-                {formatRupiah(amt)}
+                Lainnya
               </button>
-            );
-          })}
-
-          <button
-            type="button"
-            onClick={() => {
-              onChange(item.id, "isCustom", true);
-            }}
-            className={cn(
-              "py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg text-sm sm:text-base border transition-all text-center cursor-pointer min-h-[44px] sm:min-h-[46px] flex items-center justify-center",
-              item.isCustom
-                ? "bg-blue-50 text-blue-950 border-blue-600 ring-1 ring-blue-600 font-semibold shadow-2xs"
-                : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50 font-medium"
-            )}
-          >
-            Lainnya
-          </button>
-        </div>
-
-        {item.isCustom && (
-          <div className="space-y-1.5 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
-            <label className="text-sm font-semibold text-slate-800 block">
-              Nominal Lainnya (Min. {formatRupiah(DONATION_LIMITS.MIN_AMOUNT)})
-            </label>
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-normal text-slate-500 pointer-events-none select-none z-10">
-                Rp
-              </span>
-              <input
-                type="text"
-                inputMode="numeric"
-                autoFocus
-                placeholder="0"
-                value={item.customAmount ? formatNumber(Number(item.customAmount)) : ""}
-                onChange={(e) => {
-                  const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
-                  onChange(item.id, "customAmount", raw);
-                  onChange(item.id, "amount", raw ? parseInt(raw, 10) : 0);
-                }}
-                className="w-full h-11 pl-10 pr-3 rounded-lg border border-slate-300 text-base font-normal text-slate-950 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-              />
             </div>
+
+            {item.isCustom && (
+              <div className="space-y-1.5 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                <label className="text-sm font-semibold text-slate-800 block">
+                  Nominal Lainnya (Min. {formatRupiah(DONATION_LIMITS.MIN_AMOUNT)})
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-normal text-slate-500 pointer-events-none select-none z-10">
+                    Rp
+                  </span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoFocus
+                    placeholder="0"
+                    value={item.customAmount ? formatNumber(Number(item.customAmount)) : ""}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+                      onChange(item.id, "customAmount", raw);
+                      onChange(item.id, "amount", raw ? parseInt(raw, 10) : 0);
+                    }}
+                    className="w-full h-11 pl-10 pr-3 rounded-lg border border-slate-300 text-base font-normal text-slate-950 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+
+          {/* Metode Pembayaran Tagihan Otomatis */}
+          <div className="pt-2 border-t border-slate-100">
+            <PaymentChannelPicker
+              channels={PAYMENT_CHANNELS}
+              selectedChannelId={item.paymentChannelId || "qris"}
+              onSelectChannel={(channelId) => onChange(item.id, "paymentChannelId", channelId)}
+              containerCard={false}
+              stepNumber={null}
+              title="Metode pembayaran tagihan otomatis"
+            />
+          </div>
+        </div>
+      ) : (
+        /* KONDISIONAL: Opsi 1 (Pengingat WA Saja) -> Info Fleksibel */
+        <div className="rounded-lg bg-blue-50/70 border border-blue-200/80 p-4 text-sm text-slate-700 space-y-1 pt-2 mt-2">
+          <p className="font-semibold text-blue-950">Mode Pengingat WhatsApp Aktif</p>
+          <p className="text-sm text-slate-600 font-normal leading-relaxed">
+            Sistem hanya akan mengirimkan pesan pengingat ke nomor WhatsApp Anda setiap jadwal tiba. Anda dapat menentukan nominal dan menunaikan donasi melalui tautan aman yang dikirimkan.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
