@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getCampaignBySlug } from "@/services/campaignService";
+import { getCampaignBySlug, getCampaignDonationStats } from "@/services/campaignService";
 import { calculateProgress, calculateDaysLeft } from "@/lib/formatters";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CampaignPrayersFeed } from "@/components/modules/CampaignPrayersFeed";
@@ -11,6 +11,7 @@ import { CampaignUpdatesFeed } from "@/components/campaign/CampaignUpdatesFeed";
 import { CampaignCTA } from "@/components/campaign/CampaignCTA";
 import { CampaignSidebarDonate } from "@/components/campaign/CampaignSidebarDonate";
 import { CampaignStickyMobileBar } from "@/components/campaign/CampaignStickyMobileBar";
+import { CampaignDonationGrowthChart } from "@/components/campaign/CampaignDonationGrowthChart";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -24,7 +25,10 @@ export async function generateMetadata({ params }) {
 
 export default async function CampaignDetailPage({ params }) {
   const { slug } = await params;
-  const campaign = await getCampaignBySlug(slug);
+  const [campaign, donationStats] = await Promise.all([
+    getCampaignBySlug(slug),
+    getCampaignDonationStats(slug),
+  ]);
 
   if (!campaign) {
     notFound();
@@ -55,41 +59,54 @@ export default async function CampaignDetailPage({ params }) {
           <CampaignHeader campaign={campaign} progress={progress} />
 
           {/* Tabs: Seamless Editorial Layout */}
-          <Tabs defaultValue="cerita" className="w-full space-y-6">
-            <TabsList className="w-full justify-start border-b border-slate-300 pb-0 rounded-none bg-transparent h-auto p-0 gap-6">
+          <Tabs defaultValue="cerita" className="w-full">
+            <TabsList className="w-full justify-start border-b border-slate-300 pb-0 rounded-none bg-transparent h-auto p-0 gap-6 overflow-x-auto flex-nowrap">
               <TabsTrigger
                 value="cerita"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors shrink-0"
               >
                 Cerita Program
               </TabsTrigger>
               <TabsTrigger
                 value="penyaluran"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors shrink-0"
               >
                 Kabar Penyaluran ({campaign.updates?.length || 0})
               </TabsTrigger>
               <TabsTrigger
                 value="doa"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors shrink-0"
               >
                 Doa &amp; Dukungan ({prayersCount})
               </TabsTrigger>
+              <TabsTrigger
+                value="statistik"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-semibold pb-3 px-1 text-sm sm:text-base text-slate-700 hover:text-slate-950 transition-colors shrink-0"
+              >
+                Tren Donasi
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="cerita">
+            <TabsContent value="cerita" className="mt-4 focus:outline-none">
               <CampaignStory story={campaign.story} />
             </TabsContent>
 
-            <TabsContent value="penyaluran">
+            <TabsContent value="penyaluran" className="mt-4 focus:outline-none">
               <CampaignUpdatesFeed updates={campaign.updates} />
             </TabsContent>
 
-            <TabsContent value="doa" className="pt-2 focus:outline-none">
+            <TabsContent value="doa" className="mt-4 focus:outline-none">
               <CampaignPrayersFeed
                 initialDonors={campaign.recentDonors || []}
                 campaignSlug={campaign.slug}
                 campaignTitle={campaign.title}
+              />
+            </TabsContent>
+
+            <TabsContent value="statistik" className="mt-4 focus:outline-none">
+              <CampaignDonationGrowthChart
+                initialData={donationStats}
+                campaign={campaign}
               />
             </TabsContent>
           </Tabs>

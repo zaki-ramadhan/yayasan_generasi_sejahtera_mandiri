@@ -20,7 +20,7 @@ export function DonationCheckoutSummary({
         {/* Campaign Info Section */}
         {campaign && (
           <div className="space-y-3 pb-4 border-b border-slate-200">
-            <span className="text-xs font-medium text-slate-500 block">
+            <span className="text-xs sm:text-sm text-slate-600 block font-normal">
               Program yang didukung
             </span>
             <div className="flex gap-3.5 items-center">

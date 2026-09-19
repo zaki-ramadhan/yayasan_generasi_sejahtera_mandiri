@@ -8,7 +8,7 @@ import { CampaignPrayersSidebar } from "@/components/modules/CampaignPrayersSide
 export function CampaignSidebarDonate({ campaign, progress, daysLeft }) {
   return (
     <div className="lg:col-span-4 hidden lg:block sticky top-24 space-y-4">
-      <div className="p-6 sm:p-7 bg-white rounded-xl border border-slate-300 space-y-6 shadow-xs">
+      <div className="p-6 sm:p-7 bg-white rounded-xl border border-slate-300 space-y-3 shadow-xs">
         <div className="space-y-2.5">
           <span className="text-sm sm:text-base text-slate-700 block font-normal">Dana Terkumpul</span>
           <div className="text-3xl font-semibold text-slate-950 tracking-tight">
@@ -41,7 +41,7 @@ export function CampaignSidebarDonate({ campaign, progress, daysLeft }) {
           </Button>
         </Link>
 
-        <div className="text-sm text-slate-700 text-center flex items-center justify-center gap-1.5 pt-1">
+        <div className="text-sm text-slate-700 text-center flex items-center justify-center gap-1.5">
           <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
           <span>Pembayaran aman &amp; terverifikasi otomatis</span>
         </div>

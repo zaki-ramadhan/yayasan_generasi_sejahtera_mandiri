@@ -39,14 +39,14 @@ export function CampaignPrayersFeed({ initialDonors = [], campaignSlug, campaign
   const visiblePrayers = prayersOnly.slice(0, visibleCount);
 
   return (
-    <div className="space-y-4 pt-1">
+    <div className="space-y-4">
       {/* Control Header: Title & Custom Dropdown Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
         <div>
           <h3 className="font-semibold text-slate-950 text-base sm:text-lg">
             Doa &amp; Dukungan Kebaikan
           </h3>
-          <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+          <p className="text-sm sm:text-base text-slate-600 mt-0.5">
             Untaian doa tulus dari para donatur untuk mustahik dan sesama.
           </p>
         </div>

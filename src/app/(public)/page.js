@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCampaigns } from "@/services/campaignService";
+import { getCampaigns, getQuickDonateTargetSlug } from "@/services/campaignService";
 import { getTransparencyMetrics } from "@/services/reportService";
 import { getArticles } from "@/services/articleService";
 import { getInstagramPosts, getInstagramAccount } from "@/services/instagramService";
@@ -8,6 +8,7 @@ import { CampaignCard } from "@/components/shared/CampaignCard";
 import { ArticleCard } from "@/components/shared/ArticleCard";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeInstagramFeed } from "@/components/home/HomeInstagramFeed";
+import { HomeCtaSection } from "@/components/home/HomeCtaSection";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { formatNumber, formatRupiah, formatDate, getCompactRupiahParts } from "@/lib/formatters";
@@ -18,33 +19,32 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const [campaigns, metrics, articles, instagramPosts] = await Promise.all([
+  const [campaigns, metrics, articles, instagramPosts, instagramAccount] = await Promise.all([
     getCampaigns(),
     getTransparencyMetrics(),
     getArticles({ limit: 8 }),
-    getInstagramPosts(12),
+    getInstagramPosts(18),
+    getInstagramAccount(),
   ]);
 
-  const instagramAccount = getInstagramAccount();
   const featuredCampaigns = campaigns.slice(0, 5);
   const compactDonations = getCompactRupiahParts(metrics.totalDonationsAllTime, 1);
+  const quickDonateTargetSlug = getQuickDonateTargetSlug(campaigns);
 
   return (
     <div className="space-y-10 sm:space-y-12 pb-14">
       {/* 1. HERO SECTION WITH BACKGROUND IMAGE SLIDER & SOFT OVERLAY */}
-      <HomeHero defaultCampaignSlug={campaigns[0]?.slug} />
+      <HomeHero defaultCampaignSlug={quickDonateTargetSlug} />
 
       {/* 2. PROGRAM DONASI AKTIF */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
-        <div className="border-b border-slate-300 pb-3.5 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-          <div className="space-y-1 max-w-2xl">
-            <h2 className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight">
-              Program Donasi Pilihan
-            </h2>
-            <p className="text-sm sm:text-base text-slate-700">
-              Salurkan kepedulian Anda untuk program pendidikan, kemanusiaan, dan pemberdayaan umat.
-            </p>
-          </div>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="text-center max-w-2xl mx-auto space-y-1.5">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight">
+            Program Donasi Pilihan
+          </h2>
+          <p className="text-sm sm:text-base text-slate-700">
+            Salurkan kepedulian Anda untuk program pendidikan, kemanusiaan, dan pemberdayaan umat.
+          </p>
         </div>
 
         {/* Campaign Cards Grid (Top 5 Pilihan - Sisa Card Terpusat di Tengah) */}
@@ -54,7 +54,7 @@ export default async function HomePage() {
               key={camp.id}
               className="w-full sm:w-[calc(50%-12px)] lg:w-[calc((100%-48px)/3)] flex"
             >
-              <CampaignCard campaign={camp} />
+              <CampaignCard campaign={camp} showDescription={false} />
             </div>
           ))}
         </div>
@@ -186,6 +186,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* 6. CALL TO ACTION AJAKAN DONASI (STANDAR SECTION DENGAN BG SAMAR) */}
+      <HomeCtaSection defaultCampaignSlug={campaigns[0]?.slug} />
     </div>
   );
 }

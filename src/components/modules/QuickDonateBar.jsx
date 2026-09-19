@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { formatRupiah, formatNumber } from "@/lib/formatters";
+import { getStoredUser } from "@/services/authService";
 import { cn } from "@/lib/utils";
 
 const PRESET_AMOUNTS = [25000, 50000, 100000];
@@ -38,27 +40,38 @@ export function QuickDonateBar({ defaultCampaignSlug = "beasiswa-santri-penghafa
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
     if (finalAmount < 10000) return;
-    router.push(`/campaign/${defaultCampaignSlug}/donate?amount=${finalAmount}`);
+
+    const user = getStoredUser();
+    const targetUrl = `/campaign/${defaultCampaignSlug}/donate?amount=${finalAmount}`;
+
+    if (!user) {
+      router.push(
+        `/login?redirect=${encodeURIComponent(targetUrl)}&reason=donation_requires_login`
+      );
+      return;
+    }
+
+    router.push(targetUrl);
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-xl border border-slate-300 p-6 sm:p-7 space-y-5 shadow-md"
+      className="relative bg-white rounded-xl border border-slate-300 p-6 sm:p-7 space-y-5 shadow-md"
     >
-      <div className="border-b border-slate-200 pb-3">
-        <h2 className="text-base font-semibold text-slate-950">
-          Formulir Donasi Cepat
-        </h2>
-        <p className="text-sm text-slate-700">Pilih atau tentukan nominal sedekah</p>
+      {/* Header Form: Teks dan Aset 3D Sejajar dalam satu parent */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-0.5 min-w-0">
+          <h2 className="text-base font-semibold text-slate-950">
+            Formulir Donasi Cepat
+          </h2>
+          <p className="text-sm text-slate-700">Pilih atau tentukan nominal sedekah</p>
+        </div>
       </div>
 
       {/* Amount Presets */}
       <div className="space-y-2">
-        <label className="text-sm font-semibold text-slate-800 block">
-          Pilihan nominal donasi
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 gap-2.5">
           {PRESET_AMOUNTS.map((amt) => {
             const isSelected = !isCustomMode && selectedAmount === amt;
             return (
@@ -67,7 +80,7 @@ export function QuickDonateBar({ defaultCampaignSlug = "beasiswa-santri-penghafa
                 type="button"
                 onClick={() => handlePresetSelect(amt)}
                 className={cn(
-                  "py-2.5 px-3 rounded-lg text-sm border transition-all text-center cursor-pointer min-h-[42px] flex items-center justify-center",
+                  "py-2.5 px-3 rounded-lg text-sm border transition-all text-center cursor-pointer min-h-[56px] flex items-center justify-center",
                   isSelected
                     ? "bg-blue-50 text-blue-950 border-blue-600 ring-1 ring-blue-600 font-semibold shadow-2xs"
                     : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50 font-medium"

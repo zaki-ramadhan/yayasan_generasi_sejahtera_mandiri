@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { getStoredUser } from "@/services/authService";
 import { ZakatProfesiTab } from "@/components/zakat/ZakatProfesiTab";
 import { ZakatMaalTab } from "@/components/zakat/ZakatMaalTab";
 import { ZakatFidyahTab } from "@/components/zakat/ZakatFidyahTab";
@@ -58,9 +59,17 @@ export function ZakatCalculator() {
 
   const handlePay = (amt, zakatType) => {
     if (amt <= 0) return;
-    router.push(
-      `/campaign/zakat-penghasilan-pemberdayaan-mustahik/donate?amount=${amt}&type=${zakatType}`
-    );
+    const targetUrl = `/campaign/zakat-penghasilan-pemberdayaan-mustahik/donate?amount=${amt}&type=${zakatType}`;
+    const user = getStoredUser();
+
+    if (!user) {
+      router.push(
+        `/login?redirect=${encodeURIComponent(targetUrl)}&reason=donation_requires_login`
+      );
+      return;
+    }
+
+    router.push(targetUrl);
   };
 
   return (

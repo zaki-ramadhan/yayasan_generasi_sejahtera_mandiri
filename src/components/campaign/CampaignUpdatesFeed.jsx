@@ -11,7 +11,7 @@ export function CampaignUpdatesFeed({ updates = [] }) {
   }
 
   return (
-    <div className="pt-2 max-h-[580px] sm:max-h-[620px] overflow-y-auto pr-2 focus:outline-none">
+    <div className="max-h-[580px] sm:max-h-[620px] overflow-y-auto pr-2 focus:outline-none">
       <div className="divide-y divide-slate-200">
         {updates.map((upd) => (
           <div key={upd.id} className="py-5 first:pt-0 last:pb-0 space-y-2">

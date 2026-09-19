@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Info } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,10 @@ export function RegisterForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isFacebookLoading, setIsFacebookLoading] = useState(false);
   const handledErrorRef = useRef(false);
+
+  const redirectUrl = searchParams.get("redirect") || searchParams.get("callbackUrl");
+  const reasonParam = searchParams.get("reason");
+  const isDonationRedirect = reasonParam === "donation_requires_login" || reasonParam === "auth_required";
 
   useEffect(() => {
     if (handledErrorRef.current) return;
@@ -113,13 +118,13 @@ export function RegisterForm() {
       loginUser(newUser);
       setIsLoading(false);
       toast.success("Pendaftaran berhasil! Selamat datang di Yayasan Generasi Sejahtera Mandiri.");
-      router.push(getRedirectPathForRole(newUser.role));
+      router.push(redirectUrl || getRedirectPathForRole(newUser.role));
     }, 700);
   };
 
   const handleGoogleSignUp = () => {
     setIsGoogleLoading(true);
-    redirectToGoogleOAuth("/");
+    redirectToGoogleOAuth(redirectUrl || "/");
   };
 
   const handleFacebookSignUp = () => {
@@ -129,7 +134,7 @@ export function RegisterForm() {
       loginUser(fbUser);
       setIsFacebookLoading(false);
       toast.success(`Berhasil mendaftar dengan Facebook: ${fbUser.name}`);
-      router.push(getRedirectPathForRole(fbUser.role));
+      router.push(redirectUrl || getRedirectPathForRole(fbUser.role));
     }, 700);
   };
 
@@ -138,8 +143,21 @@ export function RegisterForm() {
       {/* Header */}
       <AuthFormHeader
         title="Daftar Akun Baru"
-        subtitle="Lengkapi formulir di bawah ini untuk mengakses kemudahan berdonasi."
+        subtitle="Lengkapi formulir singkat di bawah ini untuk membuat akun donatur."
       />
+
+      {/* Donation Auth Notice Banner */}
+      {isDonationRedirect && (
+        <div className="p-3.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-950 text-sm flex items-start gap-2.5 shadow-xs">
+          <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <p className="font-semibold text-amber-900">Perlu Pendaftaran Akun</p>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              Daftar akun gratis sekarang untuk melanjutkan donasi dan mencatat e-Kwitansi resmi.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Social Sign-up Options (Google & Facebook) */}
       <SocialAuthGroup
@@ -272,7 +290,16 @@ export function RegisterForm() {
       {/* Switch to Login */}
       <div className="pt-4 border-t border-slate-200 text-center text-sm text-slate-600">
         <span>Sudah memiliki akun? </span>
-        <Link href="/login" className="font-semibold text-primary hover:underline">
+        <Link
+          href={
+            redirectUrl
+              ? `/login?redirect=${encodeURIComponent(redirectUrl)}${
+                  reasonParam ? `&reason=${encodeURIComponent(reasonParam)}` : ""
+                }`
+              : "/login"
+          }
+          className="font-semibold text-primary hover:underline"
+        >
           Masuk di sini
         </Link>
       </div>

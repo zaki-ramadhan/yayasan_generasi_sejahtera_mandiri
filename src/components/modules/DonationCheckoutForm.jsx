@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { PAYMENT_CHANNELS } from "@/data/paymentChannels";
 import { formatRupiah } from "@/lib/formatters";
 import { DONATION_LIMITS, generateIdempotencyKey } from "@/lib/security";
+import { getStoredUser } from "@/services/authService";
 import { NominalPresetsPicker } from "@/components/donation/NominalPresetsPicker";
 import { PaymentChannelPicker } from "@/components/donation/PaymentChannelPicker";
 import { DonorIdentitySection } from "@/components/donation/DonorIdentitySection";
@@ -26,6 +27,7 @@ function getPrayersServerSnapshot() {
 
 export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
   const router = useRouter();
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const isPresetInitial = NOMINAL_PRESETS.includes(initialAmount);
   const [isCustomMode, setIsCustomMode] = useState(!isPresetInitial);
   const [amount, setAmount] = useState(initialAmount);
@@ -40,6 +42,31 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
   const [selectedChannelId, setSelectedChannelId] = useState("qris");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    const user = getStoredUser();
+    if (!user) {
+      const currentUrl =
+        typeof window !== "undefined"
+          ? window.location.pathname + window.location.search
+          : `/campaign/${campaign?.slug}/donate`;
+      router.replace(
+        `/login?redirect=${encodeURIComponent(currentUrl)}&reason=donation_requires_login`
+      );
+      return;
+    }
+
+    setIsAuthChecking(false);
+    if (user.name && user.name !== "Pengguna Google" && user.name !== "Pengguna Facebook") {
+      setDonorName(user.name);
+    }
+    if (user.email && !user.email.endsWith("@google.user") && !user.email.endsWith("@facebook.user")) {
+      setDonorEmail(user.email);
+    }
+    if (user.phone && user.phone !== "-") {
+      setDonorPhone(user.phone);
+    }
+  }, [campaign?.slug, router]);
+
   const prayersRaw = useSyncExternalStore(subscribePrayers, getPrayersSnapshot, getPrayersServerSnapshot);
   let hasExistingPrayer = false;
   try {
@@ -47,6 +74,15 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
     hasExistingPrayer = Boolean(campaign?.slug && Array.isArray(storedPrayers) && storedPrayers.includes(campaign.slug));
   } catch {
     hasExistingPrayer = false;
+  }
+
+  if (isAuthChecking) {
+    return (
+      <div className="bg-white rounded-xl border border-slate-300 p-10 text-center space-y-3 max-w-lg mx-auto">
+        <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-sm font-medium text-slate-700">Memverifikasi sesi masuk donatur...</p>
+      </div>
+    );
   }
 
   const handlePresetClick = (val) => {

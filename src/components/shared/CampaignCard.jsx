@@ -8,7 +8,12 @@ import { RibbonBadge } from "@/components/ui/ribbon-badge";
 import { HighlightText } from "@/components/shared/HighlightText";
 import { cn } from "@/lib/utils";
 
-export function CampaignCard({ campaign, highlightQuery = "", className }) {
+export function CampaignCard({
+  campaign,
+  highlightQuery = "",
+  showDescription = true,
+  className,
+}) {
   const progress = calculateProgress(campaign.collectedAmount, campaign.targetAmount);
   const daysLeft = calculateDaysLeft(campaign.endDate);
   const totalDonors = campaign.donorCount || 0;
@@ -16,7 +21,7 @@ export function CampaignCard({ campaign, highlightQuery = "", className }) {
   return (
     <div className={cn("flex flex-col h-full w-full rounded-xl border border-slate-300 bg-white hover:border-slate-400 transition-colors overflow-hidden", className)}>
       {/* Visual Header / Thumbnail with SafeImage & Category RibbonBadge */}
-      <div className="relative aspect-video w-full bg-slate-100 overflow-hidden border-b border-slate-200">
+      <Link href={`/campaign/${campaign.slug}`} className="block relative aspect-video w-full bg-slate-100 overflow-hidden border-b border-slate-200 group">
         <SafeImage
           src={campaign.bannerUrl}
           alt={campaign.title}
@@ -29,13 +34,15 @@ export function CampaignCard({ campaign, highlightQuery = "", className }) {
             </RibbonBadge>
           </div>
         )}
-      </div>
+      </Link>
 
       {/* Content Area */}
       <div className="flex flex-col flex-1 p-4 sm:p-5 space-y-2.5">
         {/* Title (Uniform 2-line height) */}
         <h3 className="text-base sm:text-lg font-semibold text-slate-950 leading-snug line-clamp-2 min-h-[2.6rem] flex items-start">
-          <HighlightText text={campaign.title} highlight={highlightQuery} />
+          <Link href={`/campaign/${campaign.slug}`} className="hover:text-primary transition-colors">
+            <HighlightText text={campaign.title} highlight={highlightQuery} />
+          </Link>
         </h3>
 
         {/* Location */}
@@ -46,8 +53,8 @@ export function CampaignCard({ campaign, highlightQuery = "", className }) {
           </div>
         )}
 
-        {/* Excerpt */}
-        {campaign.excerpt && (
+        {/* Excerpt (Optional) */}
+        {showDescription && campaign.excerpt && (
           <p className="text-sm sm:text-base text-slate-700 line-clamp-2 leading-relaxed">
             {campaign.excerpt}
           </p>
@@ -78,7 +85,7 @@ export function CampaignCard({ campaign, highlightQuery = "", className }) {
           <div className="flex items-center gap-1.5 min-w-0">
             <Users className="w-4 h-4 text-slate-600 shrink-0" />
             <span className="text-sm text-slate-800 font-medium truncate">
-              <strong className="text-slate-950 font-bold">{totalDonors}</strong> donasi
+              <strong className="text-slate-950 font-bold">{totalDonors}</strong> donatur
             </span>
           </div>
 
@@ -87,7 +94,7 @@ export function CampaignCard({ campaign, highlightQuery = "", className }) {
               <Clock className="w-4 h-4 text-slate-700 shrink-0 stroke-[2]" />
               <span>{daysLeft > 0 ? `${daysLeft} hr` : "Selesai"}</span>
             </span>
-            <Link href={`/campaign/${campaign.slug}/donate`}>
+            <Link href={`/campaign/${campaign.slug}`}>
               <Button
                 size="sm"
                 className="h-8.5 px-4 rounded-md text-sm font-semibold bg-primary hover:bg-primary-hover text-white shadow-none cursor-pointer"

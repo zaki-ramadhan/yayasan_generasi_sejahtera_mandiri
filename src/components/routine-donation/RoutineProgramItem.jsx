@@ -48,12 +48,12 @@ export function RoutineProgramItem({
           value={item.campaignId}
           onValueChange={(val) => onChange(item.id, "campaignId", val)}
         >
-          <SelectTrigger className="h-11 text-sm text-slate-900 border-slate-300">
+          <SelectTrigger className="h-9 text-xs sm:text-sm text-slate-800 border-slate-300 rounded-lg shadow-2xs font-medium">
             <SelectValue placeholder="-- Silakan Pilih Program --" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg border-slate-200">
             {campaignList.map((camp) => (
-              <SelectItem key={camp.id} value={camp.id} className="text-sm">
+              <SelectItem key={camp.id} value={camp.id} className="text-xs sm:text-sm">
                 {camp.title} ({camp.categoryName || "Program Umum"})
               </SelectItem>
             ))}
@@ -70,12 +70,12 @@ export function RoutineProgramItem({
           value={item.frequency}
           onValueChange={(val) => onChange(item.id, "frequency", val)}
         >
-          <SelectTrigger className="h-11 text-sm text-slate-900 border-slate-300">
+          <SelectTrigger className="h-9 text-xs sm:text-sm text-slate-800 border-slate-300 rounded-lg shadow-2xs font-medium">
             <SelectValue placeholder="Pilih frekuensi..." />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg border-slate-200">
             {FREQUENCY_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value} className="text-sm">
+              <SelectItem key={opt.value} value={opt.value} className="text-xs sm:text-sm">
                 {opt.label}
               </SelectItem>
             ))}

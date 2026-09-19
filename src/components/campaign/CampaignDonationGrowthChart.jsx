@@ -1,0 +1,341 @@
+"use client";
+
+import * as React from "react";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { ChevronDown, Check } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { formatRupiah, formatCompactNumber } from "@/lib/formatters";
+import { cn } from "@/lib/utils";
+
+const TIME_RANGE_OPTIONS = [
+  { value: "all", label: "Semua Riwayat" },
+  { value: "30d", label: "30 Hari Terakhir" },
+  { value: "7d", label: "7 Hari Terakhir" },
+];
+
+const chartConfig = {
+  cumulativeAmount: {
+    label: "Total Terkumpul",
+    color: "#2563eb",
+  },
+  dailyAmount: {
+    label: "Donasi Harian",
+    color: "#10b981",
+  },
+};
+
+function toDateKey(date) {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function CampaignDonationGrowthChart({
+  initialData = [],
+  campaign = {},
+}) {
+  const [timeRange, setTimeRange] = React.useState("all");
+
+  // Generate runtun tanggal harian kontinu (tanpa bolong) untuk semua rentang waktu
+  const chartData = React.useMemo(() => {
+    // 1. Map transaksi riil per tanggal
+    const transactionMap = new Map();
+    if (Array.isArray(initialData)) {
+      initialData.forEach((item) => {
+        if (item?.date) {
+          transactionMap.set(item.date, {
+            dailyAmount: Number(item.dailyAmount || 0),
+            donationsCount: Number(item.donationsCount || 0),
+          });
+        }
+      });
+    }
+
+    // 2. Tentukan rentang tanggal (startDate sampai today)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let startDate = new Date(today);
+
+    if (timeRange === "7d") {
+      startDate.setDate(today.getDate() - 6);
+    } else if (timeRange === "30d") {
+      startDate.setDate(today.getDate() - 29);
+    } else {
+      // 'all' -> Dari tanggal program dibuat atau transaksi pertama
+      let earliestDate = null;
+      if (campaign?.createdAt) {
+        earliestDate = new Date(campaign.createdAt);
+        earliestDate.setHours(0, 0, 0, 0);
+      }
+      if (initialData.length > 0 && initialData[0]?.date) {
+        const firstTx = new Date(initialData[0].date);
+        firstTx.setHours(0, 0, 0, 0);
+        if (!earliestDate || firstTx < earliestDate) {
+          earliestDate = firstTx;
+        }
+      }
+
+      if (earliestDate && !isNaN(earliestDate.getTime())) {
+        startDate = earliestDate;
+      } else {
+        startDate.setDate(today.getDate() - 29);
+      }
+
+      // Jika program baru berumur < 7 hari, tampilkan minimal rentang 7 hari agar grafik proporsional
+      const diffDays = Math.round((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      if (diffDays < 6) {
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 6);
+      }
+    }
+
+    // 3. Hitung akumulasi dana yang terkumpul SEBELUM startDate
+    const startKey = toDateKey(startDate);
+    let totalBeforeStart = 0;
+    if (Array.isArray(initialData)) {
+      initialData.forEach((item) => {
+        if (item?.date && item.date < startKey) {
+          totalBeforeStart += Number(item.dailyAmount || 0);
+        }
+      });
+    }
+
+    // 4. Generate setiap hari secara sekuensial dari startDate hingga today
+    const continuousSeries = [];
+    let runningCumulative = totalBeforeStart;
+    const cursor = new Date(startDate);
+
+    while (cursor <= today) {
+      const dateKey = toDateKey(cursor);
+      const tx = transactionMap.get(dateKey);
+
+      const daily = tx ? tx.dailyAmount : 0;
+      const count = tx ? tx.donationsCount : 0;
+      runningCumulative += daily;
+
+      continuousSeries.push({
+        date: dateKey,
+        dailyAmount: daily,
+        cumulativeAmount: runningCumulative,
+        donationsCount: count,
+      });
+
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    // Fallback bila DB belum ada transaksi tetapi program sudah memiliki collectedAmount (misal data seed)
+    if (
+      transactionMap.size === 0 &&
+      Number(campaign?.collectedAmount || 0) > 0 &&
+      continuousSeries.length > 0
+    ) {
+      const total = Number(campaign.collectedAmount);
+      const totalDonors = Number(campaign.donorCount || 1);
+      continuousSeries[continuousSeries.length - 1].cumulativeAmount = total;
+      continuousSeries[continuousSeries.length - 1].dailyAmount = total;
+      continuousSeries[continuousSeries.length - 1].donationsCount = totalDonors;
+    }
+
+    return continuousSeries;
+  }, [initialData, campaign, timeRange]);
+
+  // Kalkulasi ringkasan metrik periode terpilih
+  const summaryMetrics = React.useMemo(() => {
+    const totalPeriod = chartData.reduce((acc, curr) => acc + (curr.dailyAmount || 0), 0);
+    const totalTransactions = chartData.reduce((acc, curr) => acc + (curr.donationsCount || 0), 0);
+    const avgPerDay = chartData.length > 0 ? Math.round(totalPeriod / chartData.length) : 0;
+    const latestCumulative = chartData[chartData.length - 1]?.cumulativeAmount || campaign.collectedAmount || 0;
+
+    return {
+      totalPeriod,
+      totalTransactions,
+      avgPerDay,
+      latestCumulative,
+    };
+  }, [chartData, campaign]);
+
+  return (
+    <Card className="rounded-xl border border-slate-300 shadow-xs bg-white overflow-hidden">
+      {/* Header & Filter Range */}
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 py-4.5 px-4 sm:px-6">
+        <div className="space-y-1">
+          <CardTitle className="text-base sm:text-lg font-semibold text-slate-950">
+            Pertumbuhan &amp; Tren Donasi
+          </CardTitle>
+          <CardDescription className="text-sm sm:text-base text-slate-600">
+            Riwayat akumulasi dana dan transaksi donatur berdasarkan pencatatan sistem.
+          </CardDescription>
+        </div>
+
+        {/* Range Selector */}
+        <div className="flex items-center gap-2 shrink-0">
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[150px] shadow-2xs"
+              >
+                <span className="truncate">
+                  {TIME_RANGE_OPTIONS.find((opt) => opt.value === timeRange)?.label || "Pilih Rentang"}
+                </span>
+                <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52 bg-white border border-slate-200 shadow-md rounded-lg p-1">
+              {TIME_RANGE_OPTIONS.map((opt) => (
+                <DropdownMenuItem
+                  key={opt.value}
+                  onClick={() => setTimeRange(opt.value)}
+                  className={cn(
+                    "flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors",
+                    timeRange === opt.value
+                      ? "bg-slate-100 font-semibold text-primary"
+                      : "text-slate-800 hover:bg-slate-100"
+                  )}
+                >
+                  <span>{opt.label}</span>
+                  {timeRange === opt.value && <Check className="w-4 h-4 text-primary shrink-0 ml-1.5" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+
+      {/* KPI Highlight Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 border-b border-slate-200 bg-slate-50/70 text-xs sm:text-sm">
+        <div className="p-3.5 sm:p-4 space-y-0.5">
+          <span className="text-slate-600 font-medium">Total Akumulasi</span>
+          <p className="text-base sm:text-lg font-semibold text-slate-950">
+            {formatRupiah(summaryMetrics.latestCumulative)}
+          </p>
+        </div>
+
+        <div className="p-3.5 sm:p-4 space-y-0.5">
+          <span className="text-slate-600 font-medium">Donasi Periode Ini</span>
+          <p className="text-base sm:text-lg font-semibold text-slate-950">
+            {formatRupiah(summaryMetrics.totalPeriod || summaryMetrics.latestCumulative)}
+          </p>
+        </div>
+
+        <div className="p-3.5 sm:p-4 space-y-0.5">
+          <span className="text-slate-600 font-medium">Donatur Berpartisipasi</span>
+          <p className="text-base sm:text-lg font-semibold text-slate-950">
+            {summaryMetrics.totalTransactions || campaign.donorCount || 0} donasi
+          </p>
+        </div>
+      </div>
+
+      {/* Interactive Area Chart */}
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 pb-4">
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[260px] sm:h-[300px] w-full"
+        >
+          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+            <defs>
+              <linearGradient id="fillCumulative" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.35} />
+                <stop offset="95%" stopColor="#2563eb" stopOpacity={0.02} />
+              </linearGradient>
+              <linearGradient id="fillDaily" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
+                <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#e2e8f0" />
+            <XAxis
+              dataKey="date"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={28}
+              tickFormatter={(value) => {
+                if (!value) return "";
+                const date = new Date(value);
+                return date.toLocaleDateString("id-ID", {
+                  month: "short",
+                  day: "numeric",
+                });
+              }}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => formatCompactNumber(value)}
+            />
+            <ChartTooltip
+              cursor={{ stroke: "#94a3b8", strokeWidth: 1, strokeDasharray: "4 4" }}
+              content={
+                <ChartTooltipContent
+                  labelFormatter={(value) => {
+                    if (!value) return "";
+                    const date = new Date(value);
+                    return date.toLocaleDateString("id-ID", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    });
+                  }}
+                  formatter={(value, name) => {
+                    const label = name === "cumulativeAmount" ? "Total Terkumpul" : "Donasi Harian";
+                    return (
+                      <div className="flex items-center justify-between w-full gap-4 text-xs">
+                        <span className="text-slate-600">{label}:</span>
+                        <span className="font-semibold text-slate-950">
+                          {formatRupiah(Number(value))}
+                        </span>
+                      </div>
+                    );
+                  }}
+                  indicator="dot"
+                />
+              }
+            />
+            <Area
+              dataKey="dailyAmount"
+              type="monotone"
+              fill="url(#fillDaily)"
+              stroke="#10b981"
+              strokeWidth={2}
+              name="dailyAmount"
+            />
+            <Area
+              dataKey="cumulativeAmount"
+              type="monotone"
+              fill="url(#fillCumulative)"
+              stroke="#2563eb"
+              strokeWidth={2.5}
+              name="cumulativeAmount"
+            />
+            <ChartLegend content={<ChartLegendContent />} />
+          </AreaChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  );
+}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Info } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,18 @@ export function LoginForm() {
   const [isFacebookLoading, setIsFacebookLoading] = useState(false);
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const handledErrorRef = useRef(false);
+  const handledNoticeRef = useRef(false);
+
+  const redirectUrl = searchParams.get("redirect") || searchParams.get("callbackUrl");
+  const reasonParam = searchParams.get("reason");
+  const isDonationRedirect = reasonParam === "donation_requires_login" || reasonParam === "auth_required";
+
+  useEffect(() => {
+    if (isDonationRedirect && !handledNoticeRef.current) {
+      handledNoticeRef.current = true;
+      toast.info("Silakan masuk ke akun terlebih dahulu untuk melanjutkan donasi.");
+    }
+  }, [isDonationRedirect]);
 
   useEffect(() => {
     if (handledErrorRef.current) return;
@@ -103,20 +116,20 @@ export function LoginForm() {
         loginUser(defaultDonor);
         setIsLoading(false);
         toast.success(`Selamat datang, ${defaultDonor.name}!`);
-        router.push(getRedirectPathForRole(defaultDonor.role));
+        router.push(redirectUrl || getRedirectPathForRole(defaultDonor.role));
         return;
       }
 
       loginUser(foundUser);
       setIsLoading(false);
       toast.success(`Selamat datang kembali, ${foundUser.name}! (${foundUser.title})`);
-      router.push(getRedirectPathForRole(foundUser.role));
+      router.push(redirectUrl || getRedirectPathForRole(foundUser.role));
     }, 600);
   };
 
   const handleGoogleLogin = () => {
     setIsGoogleLoading(true);
-    redirectToGoogleOAuth("/");
+    redirectToGoogleOAuth(redirectUrl || "/");
   };
 
   const handleFacebookLogin = () => {
@@ -126,7 +139,7 @@ export function LoginForm() {
       loginUser(fbUser);
       setIsFacebookLoading(false);
       toast.success(`Berhasil masuk dengan Facebook: ${fbUser.name}`);
-      router.push(getRedirectPathForRole(fbUser.role));
+      router.push(redirectUrl || getRedirectPathForRole(fbUser.role));
     }, 700);
   };
 
@@ -137,6 +150,19 @@ export function LoginForm() {
         title="Masuk ke Akun"
         subtitle="Masukkan nama pengguna/email dan kata sandi Anda untuk melanjutkan."
       />
+
+      {/* Donation Auth Notice Banner */}
+      {isDonationRedirect && (
+        <div className="p-3.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-950 text-sm flex items-start gap-2.5 shadow-xs">
+          <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <p className="font-semibold text-amber-900">Perlu Masuk Akun Terlebih Dahulu</p>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              Silakan masuk atau daftar akun untuk melanjutkan proses donasi dan pencatatan e-Kwitansi resmi atas nama Anda.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Social Login Options (Google & Facebook) */}
       <SocialAuthGroup
@@ -225,7 +251,16 @@ export function LoginForm() {
       {/* Switch to Register */}
       <div className="pt-4 border-t border-slate-200 text-center text-sm text-slate-600">
         <span>Belum memiliki akun? </span>
-        <Link href="/register" className="font-semibold text-primary hover:underline">
+        <Link
+          href={
+            redirectUrl
+              ? `/register?redirect=${encodeURIComponent(redirectUrl)}${
+                  reasonParam ? `&reason=${encodeURIComponent(reasonParam)}` : ""
+                }`
+              : "/register"
+          }
+          className="font-semibold text-primary hover:underline"
+        >
           Daftar akun baru
         </Link>
       </div>

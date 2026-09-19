@@ -168,6 +168,94 @@ export async function getCampaignBySlug(slug) {
   return CAMPAIGNS.find((c) => c.slug === slug) || null;
 }
 
+export async function getCampaignDonationStats(slug) {
+  if (!slug) return [];
+  try {
+    const campaign = await prisma.campaign.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        createdAt: true,
+        collectedAmount: true,
+        targetAmount: true,
+      },
+    });
+
+    if (campaign) {
+      const paidDonations = await prisma.donation.findMany({
+        where: {
+          campaignId: campaign.id,
+          status: "PAID",
+        },
+        select: {
+          amount: true,
+          paidAt: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
+
+      if (paidDonations.length > 0) {
+        const dateMap = new Map();
+        paidDonations.forEach((d) => {
+          const dateKey = (d.paidAt || d.createdAt).toISOString().split("T")[0];
+          const existing = dateMap.get(dateKey) || { dailyAmount: 0, donationsCount: 0 };
+          existing.dailyAmount += Number(d.amount || 0);
+          existing.donationsCount += 1;
+          dateMap.set(dateKey, existing);
+        });
+
+        const sortedDates = Array.from(dateMap.keys()).sort();
+        let runningTotal = 0;
+
+        return sortedDates.map((date) => {
+          const info = dateMap.get(date);
+          runningTotal += info.dailyAmount;
+          return {
+            date,
+            dailyAmount: info.dailyAmount,
+            cumulativeAmount: runningTotal,
+            donationsCount: info.donationsCount,
+          };
+        });
+      }
+    }
+  } catch (error) {
+    console.warn("Prisma getCampaignDonationStats fallback:", error.message);
+  }
+
+  // Fallback from static data donors if DB is unavailable
+  const camp = CAMPAIGNS.find((c) => c.slug === slug);
+  if (camp && Array.isArray(camp.recentDonors) && camp.recentDonors.length > 0) {
+    const dateMap = new Map();
+    camp.recentDonors.forEach((d) => {
+      const dateKey = d.date ? d.date.split("T")[0] : new Date().toISOString().split("T")[0];
+      const existing = dateMap.get(dateKey) || { dailyAmount: 0, donationsCount: 0 };
+      existing.dailyAmount += Number(d.amount || 0);
+      existing.donationsCount += 1;
+      dateMap.set(dateKey, existing);
+    });
+
+    const sortedDates = Array.from(dateMap.keys()).sort();
+    let runningTotal = 0;
+
+    return sortedDates.map((date) => {
+      const info = dateMap.get(date);
+      runningTotal += info.dailyAmount;
+      return {
+        date,
+        dailyAmount: info.dailyAmount,
+        cumulativeAmount: runningTotal,
+        donationsCount: info.donationsCount,
+      };
+    });
+  }
+
+  return [];
+}
+
 export async function getCategories() {
   try {
     const dbCats = await prisma.category.findMany({
@@ -236,4 +324,40 @@ export async function getCampaignUpdates() {
     console.warn("Prisma getCampaignUpdates fallback:", error.message);
   }
   return [];
+}
+
+/**
+ * Menentukan target program untuk formulir Donasi Cepat berdasarkan hierarki kebutuhan:
+ * 1. Program AKTIF dengan isUrgent === true yang BELUM mencapai target (collected < target).
+ * 2. Jika tidak ada, program AKTIF dengan tenggat waktu (endDate) terdekat yang BELUM mencapai target.
+ * 3. Jika tidak ada yang mendesak, fallback ke program aktif pertama / program induk.
+ */
+export function getQuickDonateTargetSlug(campaigns = []) {
+  if (!Array.isArray(campaigns) || campaigns.length === 0) {
+    return "beasiswa-santri-penghafal-quran";
+  }
+
+  // 1. Filter hanya program aktif yang belum 100% mencapai target dana
+  const unfulfilled = campaigns.filter(
+    (c) => c.status === "ACTIVE" && Number(c.collectedAmount || 0) < Number(c.targetAmount || 0)
+  );
+
+  const pool = unfulfilled.length > 0 ? unfulfilled : campaigns.filter((c) => c.status === "ACTIVE");
+
+  // 2. Prioritas 1: Program Urgent yang belum capai target
+  const urgent = pool.find((c) => c.isUrgent);
+  if (urgent?.slug) return urgent.slug;
+
+  // 3. Prioritas 2: Tenggat waktu (endDate) terdekat yang belum capai target
+  const sortedByEndDate = [...pool].sort((a, b) => {
+    const timeA = a.endDate ? new Date(a.endDate).getTime() : Infinity;
+    const timeB = b.endDate ? new Date(b.endDate).getTime() : Infinity;
+    return timeA - timeB;
+  });
+
+  if (sortedByEndDate[0]?.slug) {
+    return sortedByEndDate[0].slug;
+  }
+
+  return "beasiswa-santri-penghafal-quran";
 }

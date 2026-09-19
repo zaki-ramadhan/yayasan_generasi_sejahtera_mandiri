@@ -10,16 +10,19 @@ import {
   WhatsAppIcon,
 } from "@/components/icons/SocialIcons";
 
-const PAYMENT_BADGES = [
-  { name: "BSI", label: "Bank Syariah Indonesia", badge: "BSI" },
-  { name: "BCA", label: "Bank Central Asia", badge: "BCA" },
-  { name: "Mandiri", label: "Bank Mandiri", badge: "MANDIRI" },
-  { name: "BRI", label: "Bank BRI", badge: "BRI" },
-  { name: "QRIS", label: "QRIS Nasional", badge: "QRIS" },
-  { name: "GoPay", label: "GoPay", badge: "GoPay" },
-  { name: "OVO", label: "OVO Cash", badge: "OVO" },
-  { name: "ShopeePay", label: "ShopeePay", badge: "ShopeePay" },
-  { name: "DANA", label: "DANA Dompet Digital", badge: "DANA" },
+const PAYMENT_LOGOS = [
+  { name: "QRIS", src: "/img/payments/qris.png", alt: "QRIS Nasional" },
+  { name: "Bank Mandiri", src: "/img/payments/mandiri.png", alt: "Bank Mandiri" },
+  { name: "Bank BNI", src: "/img/payments/BNI.png", alt: "Bank BNI" },
+  { name: "Bank BRI", src: "/img/payments/BRI.png", alt: "Bank BRI" },
+  { name: "Bank Permata", src: "/img/payments/permata.png", alt: "Bank Permata" },
+  { name: "GoPay", src: "/img/payments/gopay.png", alt: "GoPay" },
+  { name: "ShopeePay", src: "/img/payments/shopeepay.png", alt: "ShopeePay" },
+  { name: "Kredivo", src: "/img/payments/kredivo.png", alt: "Kredivo" },
+  { name: "Akulaku", src: "/img/payments/akulaku.png", alt: "Akulaku" },
+  { name: "Indomaret", src: "/img/payments/indomaret.png", alt: "Indomaret" },
+  { name: "Alfamart", src: "/img/payments/alfamart.png", alt: "Alfamart" },
+  { name: "Alfamidi", src: "/img/payments/alfamidi.png", alt: "Alfamidi" },
 ];
 
 const QUICK_NAV_LINKS = [
@@ -37,10 +40,7 @@ export function Footer() {
   return (
     <footer className="relative z-40 overflow-hidden bg-slate-950 text-white pt-12 pb-8 border-t border-slate-800">
       {/* Background Texture Overlay */}
-      <div
-        className="absolute inset-0 z-0 bg-cover bg-center pointer-events-none opacity-100"
-        style={{ backgroundImage: "url('/img/texture_overlay.jpeg')" }}
-      />
+      <div className="absolute inset-0 z-0 bg-cover bg-center pointer-events-none opacity-100 bg-[url('/img/texture_overlay.jpeg')]" />
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-950/70 via-slate-950/90 to-slate-950 pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
@@ -205,19 +205,25 @@ export function Footer() {
         </div>
 
         {/* Section Bawah: Kanal Donasi & Pembayaran Resmi */}
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           <h5 className="text-sm font-semibold uppercase tracking-wider text-slate-300">
             Kanal Donasi &amp; Pembayaran Resmi
           </h5>
-          <div className="flex flex-wrap items-center gap-2">
-            {PAYMENT_BADGES.map((m) => (
-              <span
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            {PAYMENT_LOGOS.map((m) => (
+              <div
                 key={m.name}
-                title={m.label}
-                className="inline-flex items-center justify-center px-2.5 py-1 rounded bg-white text-slate-900 text-xs font-semibold tracking-tight shadow-2xs border border-slate-200 hover:bg-slate-100 transition-colors"
+                title={m.name}
+                className="h-8.5 sm:h-9 px-2.5 py-1 rounded-md bg-white border border-slate-200/90 shadow-2xs flex items-center justify-center hover:bg-slate-50 transition-colors shrink-0"
               >
-                {m.badge}
-              </span>
+                <Image
+                  src={m.src}
+                  alt={m.alt}
+                  width={56}
+                  height={22}
+                  className="h-4 sm:h-4.5 w-auto max-w-[56px] object-contain select-none pointer-events-none"
+                />
+              </div>
             ))}
           </div>
         </div>

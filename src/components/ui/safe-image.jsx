@@ -32,6 +32,12 @@ export function SafeImage({
     );
   }
 
+  const isUnoptimized =
+    typeof src === "string" &&
+    (src.includes("fbcdn.net") ||
+      src.includes("cdninstagram.com") ||
+      src.includes("instagram.com"));
+
   if (fill) {
     return (
       <Image
@@ -40,6 +46,7 @@ export function SafeImage({
         fill
         sizes={sizes}
         priority={priority}
+        unoptimized={isUnoptimized}
         onError={() => setHasError(true)}
         className={cn("object-cover transition-opacity duration-300", className)}
       />
@@ -53,6 +60,7 @@ export function SafeImage({
       width={width || 600}
       height={height || 400}
       priority={priority}
+      unoptimized={isUnoptimized}
       onError={() => setHasError(true)}
       className={cn("object-cover transition-opacity duration-300", className)}
     />

@@ -1,11 +1,11 @@
 export const INSTAGRAM_ACCOUNT = {
-  username: "@generasisejahteramandiri",
-  displayName: "Yayasan Generasi Sejahtera Mandiri",
-  profileUrl: "https://www.instagram.com",
-  postCount: 384,
-  followersCount: "14.8K",
-  followingCount: 120,
-  bio: "Lembaga Filantropi & Dakwah Sosial Terpercaya. Penyaluran ZISWAF, Pendidikan Santri, dan Tanggap Kemanusiaan.",
+  username: "@zqramadhan_",
+  displayName: "Zaki Ramadhan",
+  profileUrl: "https://www.instagram.com/zqramadhan_/",
+  postCount: 3,
+  followersCount: "186",
+  followingCount: 385,
+  bio: "Inovasi teknologi, dakwah, dan kepedulian sosial.",
 };
 
 export const INSTAGRAM_POSTS = [
