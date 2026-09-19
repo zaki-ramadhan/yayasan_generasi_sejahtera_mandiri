@@ -59,7 +59,7 @@ export function RoutineSuccessView({
               >
                 <div className="flex justify-between items-start gap-2">
                   {/* List Outside Numbering & Font-Medium Title */}
-                  <div className="flex items-start gap-1.5 min-w-0">
+                  <div className="flex items-start gap-1.5 min-w-0 flex-1">
                     <span className="text-sm font-medium text-slate-900 shrink-0 select-none">
                       {idx + 1}.
                     </span>
@@ -67,11 +67,7 @@ export function RoutineSuccessView({
                       {camp.title}
                     </span>
                   </div>
-                  {isReminderOnly ? (
-                    <span className="text-xs sm:text-sm font-medium text-slate-500 shrink-0">
-                      Fleksibel (Saat Diingatkan)
-                    </span>
-                  ) : (
+                  {!isReminderOnly && (
                     <span className="font-medium text-slate-950 shrink-0 text-sm sm:text-base">
                       {formatRupiah(nominal)}
                     </span>

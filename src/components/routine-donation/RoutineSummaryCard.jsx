@@ -12,6 +12,10 @@ export function RoutineSummaryCard({
 }) {
   const campaignList = campaigns && campaigns.length > 0 ? campaigns : CAMPAIGNS;
 
+  const hasAnyAutoDonation = selectedPrograms.some(
+    (p) => (p.routineType || "REMINDER_ONLY") === "AUTO_DONATION"
+  );
+
   return (
     <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-5 shadow-xs">
       <div>
@@ -42,7 +46,7 @@ export function RoutineSummaryCard({
             >
               <div className="flex justify-between items-start gap-2">
                 {/* List Outside Numbering & Font-Medium Title */}
-                <div className="flex items-start gap-1.5 min-w-0">
+                <div className="flex items-start gap-1.5 min-w-0 flex-1">
                   <span className="text-sm font-medium text-slate-900 shrink-0 select-none">
                     {idx + 1}.
                   </span>
@@ -50,11 +54,7 @@ export function RoutineSummaryCard({
                     {camp.title}
                   </span>
                 </div>
-                {isReminderOnly ? (
-                  <span className="text-xs sm:text-sm font-medium text-slate-500 shrink-0">
-                    Fleksibel (Saat Diingatkan)
-                  </span>
-                ) : (
+                {!isReminderOnly && (
                   <span className="font-medium text-slate-950 shrink-0 text-sm sm:text-base">
                     {formatRupiah(nominal)}
                   </span>
@@ -79,18 +79,20 @@ export function RoutineSummaryCard({
         })}
       </div>
 
-      {/* Total Commitment Calculation */}
-      <div className="pt-3 border-t border-slate-200 space-y-1">
-        <div className="flex justify-between items-baseline text-base font-medium text-slate-950">
-          <span>Total per Siklus</span>
-          <span className="text-primary text-xl sm:text-2xl font-bold tracking-tight">
-            {totalPerCommitment > 0 ? formatRupiah(totalPerCommitment) : "Fleksibel"}
-          </span>
+      {/* Total Commitment Calculation (Hanya tampil jika ada program donasi otomatis) */}
+      {hasAnyAutoDonation && (
+        <div className="pt-3 border-t border-slate-200 space-y-1">
+          <div className="flex justify-between items-baseline text-base font-medium text-slate-950">
+            <span>Total per Siklus</span>
+            <span className="text-primary text-xl sm:text-2xl font-bold tracking-tight">
+              {formatRupiah(totalPerCommitment)}
+            </span>
+          </div>
+          <p className="mt-2 text-sm text-slate-600 italic font-normal">
+            *Nominal disesuaikan otomatis dengan jadwal frekuensi pilihan
+          </p>
         </div>
-        <p className="mt-2 text-sm text-slate-600 italic font-normal">
-          *Nominal disesuaikan otomatis dengan jadwal frekuensi pilihan
-        </p>
-      </div>
+      )}
 
       {/* Primary 3D CTA Submit Button (Unified with DonationCheckoutSummary) */}
       <div className="space-y-2.5 pt-1">
@@ -100,8 +102,7 @@ export function RoutineSummaryCard({
           disabled={
             isSubmitting ||
             selectedPrograms.length === 0 ||
-            (selectedPrograms.some((p) => (p.routineType || "REMINDER_ONLY") === "AUTO_DONATION") &&
-              totalPerCommitment <= 0)
+            (hasAnyAutoDonation && totalPerCommitment <= 0)
           }
           className="w-full h-12 rounded-lg text-base font-semibold text-white bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700 border-t border-t-blue-400 border-x border-x-blue-600 border-b-2 border-b-blue-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_6px_rgba(29,78,216,0.25)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
         >
@@ -111,7 +112,6 @@ export function RoutineSummaryCard({
             ? `Aktifkan Jadwal (${formatRupiah(totalPerCommitment)})`
             : "Aktifkan Pengingat Donasi Rutin"}
         </Button>
-
       </div>
     </div>
   );
