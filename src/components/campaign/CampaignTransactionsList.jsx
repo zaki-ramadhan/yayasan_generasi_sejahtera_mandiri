@@ -22,14 +22,14 @@ export function CampaignTransactionsList({
 
   if (!donors || donors.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-slate-300 p-6 text-center text-slate-500 text-sm">
+      <div className="py-8 text-center text-slate-500 text-sm">
         Belum ada riwayat transaksi donasi yang tercatat.
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl border border-slate-300 shadow-xs p-5 sm:p-6 space-y-4">
+    <div className="space-y-4 pt-6 border-t border-slate-200">
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
         <div>

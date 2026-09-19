@@ -3,13 +3,7 @@
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChevronDown, Check } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import {
   ChartContainer,
   ChartLegend,
@@ -177,25 +171,25 @@ export function CampaignDonationGrowthChart({
   }, [chartData, campaign]);
 
   return (
-    <Card className="rounded-xl border border-slate-300 shadow-xs bg-white overflow-hidden">
+    <div className="space-y-5">
       {/* Header & Filter Range */}
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 py-4.5 px-4 sm:px-6">
-        <div className="space-y-1">
-          <CardTitle className="text-base sm:text-lg font-semibold text-slate-950">
-            Pertumbuhan &amp; Tren Donasi
-          </CardTitle>
-          <CardDescription className="text-sm sm:text-base text-slate-600">
-            Riwayat akumulasi dana dan transaksi donatur berdasarkan pencatatan sistem.
-          </CardDescription>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="space-y-0.5">
+          <h3 className="text-base sm:text-lg font-semibold text-slate-950">
+            Grafik Perkembangan Donasi
+          </h3>
+          <p className="text-sm sm:text-base text-slate-600">
+            Visualisasi akumulasi dana dan tren donasi harian yang terverifikasi sistem.
+          </p>
         </div>
 
         {/* Range Selector */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[150px] shadow-2xs"
+                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[150px]"
               >
                 <span className="truncate">
                   {TIME_RANGE_OPTIONS.find((opt) => opt.value === timeRange)?.label || "Pilih Rentang"}
@@ -222,10 +216,10 @@ export function CampaignDonationGrowthChart({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </CardHeader>
+      </div>
 
       {/* KPI Highlight Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 border-b border-slate-200 bg-slate-50/70 text-xs sm:text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 rounded-xl border border-slate-200 bg-slate-50/70 text-xs sm:text-sm overflow-hidden">
         <div className="p-3.5 sm:p-4 space-y-0.5">
           <span className="text-slate-600 font-medium">Total Akumulasi</span>
           <p className="text-base sm:text-lg font-semibold text-slate-950">
@@ -249,7 +243,7 @@ export function CampaignDonationGrowthChart({
       </div>
 
       {/* Interactive Area Chart */}
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 pb-4">
+      <div className="pt-2">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[260px] sm:h-[300px] w-full"
@@ -335,7 +329,7 @@ export function CampaignDonationGrowthChart({
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
         </ChartContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
