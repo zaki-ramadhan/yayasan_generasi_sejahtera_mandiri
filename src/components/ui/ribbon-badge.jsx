@@ -13,7 +13,7 @@ const ribbonBadgeVariants = cva(
         amber: "bg-amber-500 text-slate-950",
         rose: "bg-rose-600 text-white",
         slate: "bg-slate-800 text-white",
-        dark: "bg-slate-900/80 text-white"
+        dark: "bg-slate-900/80 backdrop-blur-xs text-white"
       },
       size: {
         xs: "text-[10px] leading-normal pl-1.5 pr-3 py-0.5",
