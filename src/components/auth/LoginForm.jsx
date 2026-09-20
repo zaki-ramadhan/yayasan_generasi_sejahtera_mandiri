@@ -22,6 +22,7 @@ import {
   simulateSocialAuth,
   redirectToGoogleOAuth,
 } from "@/services/authService";
+import { stripEmojis } from "@/lib/security";
 import { cn } from "@/lib/utils";
 
 export function LoginForm() {
@@ -69,8 +70,13 @@ export function LoginForm() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!identifier.trim()) {
+    const cleanId = stripEmojis(identifier).trim();
+    if (!cleanId) {
       newErrors.identifier = "Nama pengguna atau email wajib diisi.";
+    } else if (cleanId.length < 3) {
+      newErrors.identifier = "Nama pengguna atau email minimal 3 karakter.";
+    } else if (cleanId.length > 100) {
+      newErrors.identifier = "Input melebihi batas 100 karakter.";
     }
     if (!password.trim()) {
       newErrors.password = "Kata sandi wajib diisi.";
@@ -188,8 +194,10 @@ export function LoginForm() {
             type="text"
             placeholder="nama atau email Anda"
             value={identifier}
+            maxLength={100}
             onChange={(e) => {
-              setIdentifier(e.target.value);
+              const clean = stripEmojis(e.target.value).slice(0, 100);
+              setIdentifier(clean);
               if (errors.identifier) setErrors((prev) => ({ ...prev, identifier: undefined }));
             }}
             autoComplete="username"

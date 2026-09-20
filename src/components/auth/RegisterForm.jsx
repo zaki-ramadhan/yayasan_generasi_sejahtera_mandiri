@@ -11,6 +11,7 @@ import { SocialAuthGroup } from "@/components/auth/SocialAuthGroup";
 import { AuthFormHeader } from "@/components/auth/AuthFormHeader";
 import { AuthDivider } from "@/components/auth/AuthDivider";
 import { USER_ROLES, loginUser, getRedirectPathForRole, simulateSocialAuth, redirectToGoogleOAuth } from "@/services/authService";
+import { sanitizeEmail, sanitizePhone, validateEmail, validatePhone, stripEmojis } from "@/lib/security";
 import { cn } from "@/lib/utils";
 
 export function RegisterForm() {
@@ -52,31 +53,27 @@ export function RegisterForm() {
     const newErrors = {};
 
     // 1. Username validation
-    const cleanUsername = username.trim();
+    const cleanUsername = stripEmojis(username).trim();
     if (!cleanUsername) {
       newErrors.username = "Nama pengguna wajib diisi.";
     } else if (cleanUsername.length < 3) {
       newErrors.username = "Nama pengguna minimal 3 karakter.";
+    } else if (cleanUsername.length > 30) {
+      newErrors.username = "Nama pengguna maksimal 30 karakter.";
     } else if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
       newErrors.username = "Nama pengguna hanya boleh huruf, angka, dan garis bawah (_).";
     }
 
     // 2. Email validation
-    const cleanEmail = email.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!cleanEmail) {
-      newErrors.email = "Alamat email wajib diisi.";
-    } else if (!emailRegex.test(cleanEmail)) {
-      newErrors.email = "Format email tidak valid (contoh: nama@email.com).";
+    const emailResult = validateEmail(email, true);
+    if (!emailResult.valid) {
+      newErrors.email = emailResult.error;
     }
 
     // 3. WhatsApp phone validation
-    const cleanPhone = phone.trim().replace(/\s+/g, "");
-    const phoneRegex = /^[0-9+]{9,15}$/;
-    if (!cleanPhone) {
-      newErrors.phone = "Nomor WhatsApp aktif wajib diisi.";
-    } else if (!phoneRegex.test(cleanPhone) || cleanPhone.replace(/\D/g, "").length < 9) {
-      newErrors.phone = "Nomor WhatsApp minimal 9 digit angka (contoh: 081234567890).";
+    const phoneResult = validatePhone(phone);
+    if (!phoneResult.valid) {
+      newErrors.phone = phoneResult.error;
     }
 
     // 4. Terms agreement
@@ -182,8 +179,10 @@ export function RegisterForm() {
             type="text"
             placeholder="contoh: ahmad_fauzi"
             value={username}
+            maxLength={30}
             onChange={(e) => {
-              setUsername(e.target.value);
+              const clean = stripEmojis(e.target.value).replace(/[^a-zA-Z0-9_]/g, "").slice(0, 30);
+              setUsername(clean);
               if (errors.username) setErrors((prev) => ({ ...prev, username: undefined }));
             }}
             autoComplete="username"
@@ -206,8 +205,10 @@ export function RegisterForm() {
             type="email"
             placeholder="nama@email.com"
             value={email}
+            maxLength={100}
             onChange={(e) => {
-              setEmail(e.target.value);
+              const clean = sanitizeEmail(e.target.value).slice(0, 100);
+              setEmail(clean);
               if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
             }}
             autoComplete="email"
@@ -231,8 +232,10 @@ export function RegisterForm() {
             inputMode="tel"
             placeholder="081234567890"
             value={phone}
+            maxLength={15}
             onChange={(e) => {
-              setPhone(e.target.value);
+              const clean = sanitizePhone(e.target.value).slice(0, 15);
+              setPhone(clean);
               if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }));
             }}
             autoComplete="tel"

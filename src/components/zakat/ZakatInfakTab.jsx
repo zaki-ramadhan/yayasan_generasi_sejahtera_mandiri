@@ -15,18 +15,20 @@ export function ZakatInfakTab({
       </p>
 
       <div className="space-y-2">
-        <label className="text-sm font-semibold text-slate-800 block text-left">Nominal Sedekah (Rp)</label>
+        <label className="text-sm font-semibold text-slate-800 block text-left">Nominal Sedekah (Min. Rp 10.000)</label>
         <Input
           type="number"
+          min="10000"
+          max="100000000"
           value={infakAmount || ""}
-          onChange={(e) => setInfakAmount(Number(e.target.value) || 0)}
+          onChange={(e) => setInfakAmount(Math.max(0, Math.min(100000000, Math.floor(Number(e.target.value) || 0))))}
           className="h-12 text-center text-lg font-bold border-slate-300"
         />
       </div>
 
       <Button
         onClick={() => onPay(infakAmount, "INFAK")}
-        disabled={infakAmount <= 0}
+        disabled={infakAmount < 10000}
         className="w-full h-12 font-semibold shadow-xs cursor-pointer"
       >
         Salurkan Sedekah {formatRupiah(infakAmount)}

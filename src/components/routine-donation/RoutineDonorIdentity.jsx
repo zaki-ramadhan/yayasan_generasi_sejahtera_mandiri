@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { sanitizeName, sanitizePhone, sanitizeEmail } from "@/lib/security";
 
 const SALUTATIONS = ["Bapak", "Ibu"];
 
@@ -92,7 +93,8 @@ export function RoutineDonorIdentity({
                 type="text"
                 required={!isAnonymous}
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                maxLength={60}
+                onChange={(e) => setFullName(sanitizeName(e.target.value))}
                 placeholder="Contoh: Ahmad Fauzi"
                 className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
               />
@@ -112,10 +114,8 @@ export function RoutineDonorIdentity({
             inputMode="tel"
             required
             value={whatsapp}
-            onChange={(e) => {
-              const raw = e.target.value.replace(/\D/g, "").slice(0, 15);
-              setWhatsapp(raw);
-            }}
+            maxLength={15}
+            onChange={(e) => setWhatsapp(sanitizePhone(e.target.value))}
             placeholder="0812xxxxxxxx"
             className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
           />
@@ -132,7 +132,8 @@ export function RoutineDonorIdentity({
             <Input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              maxLength={100}
+              onChange={(e) => setEmail(sanitizeEmail(e.target.value))}
               placeholder="email@anda.com"
               className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
             />

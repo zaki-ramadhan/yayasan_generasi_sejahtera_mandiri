@@ -1,8 +1,8 @@
-import { Bell, CornerDownRight } from "lucide-react";
+import { Bell, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CAMPAIGNS } from "@/data/campaigns";
 import { formatRupiah } from "@/lib/formatters";
-import { FREQUENCY_OPTIONS } from "./RoutineProgramItem";
+import { formatRoutineSchedule } from "./RoutineProgramItem";
 
 export function RoutineSummaryCard({
   selectedPrograms = [],
@@ -35,8 +35,6 @@ export function RoutineSummaryCard({
           const nominal = p.customAmount
             ? parseInt(p.customAmount.replace(/\D/g, ""), 10) || 0
             : p.amount;
-          const freqLabel =
-            FREQUENCY_OPTIONS.find((f) => f.value === p.frequency)?.label || p.frequency;
           const isReminderOnly = (p.routineType || "REMINDER_ONLY") === "REMINDER_ONLY";
 
           return (
@@ -44,36 +42,41 @@ export function RoutineSummaryCard({
               key={p.id}
               className="pb-3.5 border-b border-slate-100 last:border-0 last:pb-0 text-sm space-y-1"
             >
-              {/* Program Title */}
-              <div className="flex items-start gap-1.5 min-w-0">
-                <span className="text-sm font-semibold text-slate-900 shrink-0 select-none">
+              {/* Program Title - Selaras dengan 'Total per Jadwal' (text-base font-medium text-slate-950) */}
+              <div className="flex items-start gap-2 min-w-0">
+                <span className="text-base font-medium text-slate-950 shrink-0 select-none">
                   {idx + 1}.
                 </span>
-                <span className="text-sm font-medium text-slate-900 line-clamp-2 leading-snug">
+                <span className="text-base font-medium text-slate-950 line-clamp-2 leading-snug">
                   {camp.title}
                 </span>
               </div>
 
-              {/* Tree structure: Enter Icon + Bell in Circle + Vertical Separator + Nominal */}
-              <div className="pl-4 flex items-center gap-2 flex-wrap pt-0.5">
-                <CornerDownRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
-                  <div className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
-                    <Bell className="w-3 h-3 text-slate-600" />
-                  </div>
-                  <span>{freqLabel}</span>
-                </div>
-                <span className="text-xs text-slate-300 select-none">|</span>
-                <span className="text-xs text-slate-500 font-medium">
-                  {isReminderOnly ? "Pengingat WA Saja" : "Donasi Otomatis"}
+              {/* Parameter Chips */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1.5 pl-6">
+                {/* Chip 1: Jadwal */}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">
+                  <Bell className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <span>{formatRoutineSchedule(p)} • {p.reminderTime || "05:00"} WIB</span>
                 </span>
-                {!isReminderOnly && (
-                  <>
-                    <span className="text-xs text-slate-300 select-none">|</span>
-                    <span className="text-xs sm:text-sm font-bold text-primary">
-                      {formatRupiah(nominal)}
+
+                {/* Chip 2: Model Pelaksanaan + Nominal */}
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">
+                  {isReminderOnly ? (
+                    <span>Pengingat WA Saja</span>
+                  ) : (
+                    <span>Donasi Otomatis ({formatRupiah(nominal)})</span>
+                  )}
+                </span>
+
+                {/* Chip 3 (Opsional): Periode Kustom */}
+                {p.hasCustomPeriod && p.startDate && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">
+                    <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                    <span>
+                      {p.startDate} s/d {p.endDate || "Seterusnya"}
                     </span>
-                  </>
+                  </span>
                 )}
               </div>
             </div>

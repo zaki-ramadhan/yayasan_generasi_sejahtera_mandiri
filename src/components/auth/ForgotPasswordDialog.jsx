@@ -13,6 +13,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { stripEmojis, validateEmail, validatePhone } from "@/lib/security";
 
 export function ForgotPasswordDialog({ isOpen, onOpenChange, initialIdentifier = "" }) {
   const [forgotInput, setForgotInput] = useState(initialIdentifier);
@@ -22,11 +23,29 @@ export function ForgotPasswordDialog({ isOpen, onOpenChange, initialIdentifier =
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!forgotInput.trim()) {
+    const clean = stripEmojis(forgotInput).trim();
+    if (!clean) {
       setForgotError("Email atau nomor WhatsApp wajib diisi.");
       toast.error("Email atau nomor WhatsApp wajib diisi.");
       return;
     }
+
+    if (clean.includes("@")) {
+      const emailResult = validateEmail(clean, true);
+      if (!emailResult.valid) {
+        setForgotError(emailResult.error);
+        toast.error(emailResult.error);
+        return;
+      }
+    } else {
+      const phoneResult = validatePhone(clean);
+      if (!phoneResult.valid) {
+        setForgotError("Format email atau nomor WhatsApp tidak valid (contoh: 081234567890).");
+        toast.error("Format email atau nomor WhatsApp tidak valid (contoh: 081234567890).");
+        return;
+      }
+    }
+
     setForgotError("");
     setIsSubmitting(true);
     setTimeout(() => {
@@ -86,8 +105,10 @@ export function ForgotPasswordDialog({ isOpen, onOpenChange, initialIdentifier =
                 type="text"
                 placeholder="nama@email.com atau 081234567890"
                 value={forgotInput}
+                maxLength={100}
                 onChange={(e) => {
-                  setForgotInput(e.target.value);
+                  const clean = stripEmojis(e.target.value).slice(0, 100);
+                  setForgotInput(clean);
                   if (forgotError) setForgotError("");
                 }}
                 className={cn(

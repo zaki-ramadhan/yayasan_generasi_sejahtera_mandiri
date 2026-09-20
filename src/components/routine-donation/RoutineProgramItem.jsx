@@ -1,10 +1,22 @@
-import { Trash2, ChevronDown, Check } from "lucide-react";
+"use client";
+
+import * as React from "react";
+import { format } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
+import { Trash2, ChevronDown, Check, Calendar as CalendarIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { CAMPAIGNS } from "@/data/campaigns";
 import { PAYMENT_CHANNELS } from "@/data/paymentChannels";
 import { PaymentChannelPicker } from "@/components/donation/PaymentChannelPicker";
@@ -14,11 +26,57 @@ import { cn } from "@/lib/utils";
 
 const PRESET_AMOUNTS = [10000, 25000, 50000, 100000, 250000];
 
-export const FREQUENCY_OPTIONS = [
-  { value: "DAILY_SUBUH", label: "Setiap Hari (Sedekah Subuh)" },
-  { value: "WEEKLY_FRIDAY", label: "Setiap Pekan (Jumat Berkah)" },
-  { value: "MONTHLY_PAYDAY", label: "Setiap Bulan (Awal Bulan / Gajian)" },
+export const DAYS_OF_WEEK = [
+  { id: "senin", label: "Senin" },
+  { id: "selasa", label: "Selasa" },
+  { id: "rabu", label: "Rabu" },
+  { id: "kamis", label: "Kamis" },
+  { id: "jumat", label: "Jumat" },
+  { id: "sabtu", label: "Sabtu" },
+  { id: "minggu", label: "Minggu" },
 ];
+
+export const FREQUENCY_OPTIONS = [
+  { value: "DAILY", label: "Setiap Hari" },
+  { value: "WEEKLY", label: "Setiap Pekan (Pilih Hari)" },
+  { value: "MONTHLY", label: "Setiap Bulan (Pilih Tanggal)" },
+];
+
+export function normalizeFrequency(freq) {
+  if (freq === "DAILY_SUBUH" || freq === "DAILY") return "DAILY";
+  if (freq === "WEEKLY_FRIDAY" || freq === "WEEKLY") return "WEEKLY";
+  if (freq === "MONTHLY_PAYDAY" || freq === "MONTHLY") return "MONTHLY";
+  return "DAILY";
+}
+
+export function formatRoutineSchedule(item) {
+  if (!item) return "Setiap Hari";
+  const freq = normalizeFrequency(item.frequency);
+
+  if (freq === "DAILY") {
+    return "Setiap Hari";
+  }
+
+  if (freq === "WEEKLY") {
+    const dayObj = DAYS_OF_WEEK.find((d) => d.id === (item.selectedDay || "jumat"));
+    const dayLabel = dayObj ? dayObj.label : "Jumat";
+    return `Setiap Pekan (${dayLabel})`;
+  }
+
+  if (freq === "MONTHLY") {
+    let dateStr = "1";
+    if (item.monthlyDate) {
+      try {
+        dateStr = format(new Date(item.monthlyDate), "d MMMM", { locale: idLocale });
+      } catch {
+        dateStr = "1";
+      }
+    }
+    return `Setiap Bulan (Tgl ${dateStr})`;
+  }
+
+  return "Setiap Hari";
+}
 
 export const ROUTINE_TYPE_OPTIONS = [
   {
@@ -33,6 +91,253 @@ export const ROUTINE_TYPE_OPTIONS = [
   },
 ];
 
+/**
+ * 24-Hour Numeric Time Input
+ * Strict validation: 00-23 hours, 00-59 minutes, no letters/symbols/emojis, auto-padding & arrow navigation.
+ */
+/**
+ * 24-Hour Numeric Time Input
+ * Standard controlled 2-digit inputs for Hour (00-23) and Minute (00-59).
+ * - Full select on focus & click so users can immediately overwrite.
+ * - Strict numeric filter and clamping to max real time (23 / 59).
+ * - No premature focus jumping while typing digits (eliminates blur race condition).
+ * - Keyboard navigation: ArrowUp/Down for step, ':' or Tab or ArrowRight to switch to minute.
+ * - Auto-pad with leading zero on blur.
+ */
+function TimeInput24Hour({ value = "05:00", onChange }) {
+  const [initH = "05", initM = "00"] = (value || "05:00").split(":");
+  const [prevValue, setPrevValue] = React.useState(value);
+  const [hour, setHour] = React.useState(initH);
+  const [minute, setMinute] = React.useState(initM);
+
+  const hourRef = React.useRef(null);
+  const minuteRef = React.useRef(null);
+
+  // Selaraskan state saat prop value berubah dari luar tanpa useEffect cascade
+  if (prevValue !== value) {
+    setPrevValue(value);
+    setHour(initH);
+    setMinute(initM);
+  }
+
+  const handleHourChange = (e) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    if (raw === "") {
+      setHour("");
+      return;
+    }
+    let num = parseInt(raw, 10);
+    if (num > 23) {
+      num = 23;
+    }
+    const val = raw.length > 2 ? String(num).slice(-2) : String(num);
+    setHour(val);
+
+    if (val.length === 2) {
+      const padH = val.padStart(2, "0");
+      const padM = (minute || "00").padStart(2, "0");
+      onChange(`${padH}:${padM}`);
+    }
+  };
+
+  const handleHourBlur = () => {
+    let finalH = "05";
+    if (hour !== "") {
+      let num = parseInt(hour, 10) || 0;
+      num = Math.max(0, Math.min(23, num));
+      finalH = String(num).padStart(2, "0");
+    }
+    setHour(finalH);
+    const padM = (minute || "00").padStart(2, "0");
+    onChange(`${finalH}:${padM}`);
+  };
+
+  const handleHourKeyDown = (e) => {
+    if (["e", "E", "+", "-", ".", ","].includes(e.key)) {
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const cur = parseInt(hour, 10) || 0;
+      const next = (cur + 1) % 24;
+      const nextStr = String(next).padStart(2, "0");
+      setHour(nextStr);
+      onChange(`${nextStr}:${(minute || "00").padStart(2, "0")}`);
+      requestAnimationFrame(() => hourRef.current?.select());
+      return;
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const cur = parseInt(hour, 10) || 0;
+      const next = cur === 0 ? 23 : cur - 1;
+      const nextStr = String(next).padStart(2, "0");
+      setHour(nextStr);
+      onChange(`${nextStr}:${(minute || "00").padStart(2, "0")}`);
+      requestAnimationFrame(() => hourRef.current?.select());
+      return;
+    }
+
+    if (e.key === ":" || e.key === "ArrowRight") {
+      e.preventDefault();
+      minuteRef.current?.focus();
+      minuteRef.current?.select();
+    }
+  };
+
+  const handleMinuteChange = (e) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    if (raw === "") {
+      setMinute("");
+      return;
+    }
+    let num = parseInt(raw, 10);
+    if (num > 59) {
+      num = 59;
+    }
+    const val = raw.length > 2 ? String(num).slice(-2) : String(num);
+    setMinute(val);
+
+    if (val.length === 2) {
+      const padH = (hour || "05").padStart(2, "0");
+      const padM = val.padStart(2, "0");
+      onChange(`${padH}:${padM}`);
+    }
+  };
+
+  const handleMinuteBlur = () => {
+    let finalM = "00";
+    if (minute !== "") {
+      let num = parseInt(minute, 10) || 0;
+      num = Math.max(0, Math.min(59, num));
+      finalM = String(num).padStart(2, "0");
+    }
+    setMinute(finalM);
+    const padH = (hour || "05").padStart(2, "0");
+    onChange(`${padH}:${finalM}`);
+  };
+
+  const handleMinuteKeyDown = (e) => {
+    if (["e", "E", "+", "-", ".", ","].includes(e.key)) {
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const cur = parseInt(minute, 10) || 0;
+      const step = e.shiftKey ? 5 : 1;
+      const next = (cur + step) % 60;
+      const nextStr = String(next).padStart(2, "0");
+      setMinute(nextStr);
+      onChange(`${(hour || "05").padStart(2, "0")}:${nextStr}`);
+      requestAnimationFrame(() => minuteRef.current?.select());
+      return;
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const cur = parseInt(minute, 10) || 0;
+      const step = e.shiftKey ? 5 : 1;
+      const next = cur - step < 0 ? 60 + (cur - step) : cur - step;
+      const nextStr = String(next).padStart(2, "0");
+      setMinute(nextStr);
+      onChange(`${(hour || "05").padStart(2, "0")}:${nextStr}`);
+      requestAnimationFrame(() => minuteRef.current?.select());
+      return;
+    }
+
+    if (e.key === "ArrowLeft" || (e.key === "Backspace" && minute === "")) {
+      e.preventDefault();
+      hourRef.current?.focus();
+      hourRef.current?.select();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text") || "";
+    const clean = pasted.replace(/[^\d:]/g, "");
+    if (clean.includes(":")) {
+      const [h, m] = clean.split(":");
+      const cleanH = String(Math.max(0, Math.min(23, parseInt(h, 10) || 0))).padStart(2, "0");
+      const cleanM = String(Math.max(0, Math.min(59, parseInt(m, 10) || 0))).padStart(2, "0");
+      setHour(cleanH);
+      setMinute(cleanM);
+      onChange(`${cleanH}:${cleanM}`);
+    } else if (clean.length >= 4) {
+      const h = clean.slice(0, 2);
+      const m = clean.slice(2, 4);
+      const cleanH = String(Math.max(0, Math.min(23, parseInt(h, 10) || 0))).padStart(2, "0");
+      const cleanM = String(Math.max(0, Math.min(59, parseInt(m, 10) || 0))).padStart(2, "0");
+      setHour(cleanH);
+      setMinute(cleanM);
+      onChange(`${cleanH}:${cleanM}`);
+    } else if (clean.length > 0) {
+      const num = Math.max(0, Math.min(23, parseInt(clean, 10) || 0));
+      const cleanH = String(num).padStart(2, "0");
+      setHour(cleanH);
+      onChange(`${cleanH}:${(minute || "00").padStart(2, "0")}`);
+      minuteRef.current?.focus();
+      minuteRef.current?.select();
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="relative">
+        <input
+          ref={hourRef}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={2}
+          placeholder="05"
+          aria-label="Jam pengingat (00-23)"
+          value={hour}
+          onChange={handleHourChange}
+          onBlur={handleHourBlur}
+          onFocus={(e) => e.target.select()}
+          onClick={(e) => e.target.select()}
+          onKeyDown={handleHourKeyDown}
+          onPaste={handlePaste}
+          className="w-16 h-11 text-center font-semibold text-base sm:text-lg text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all tracking-wider shadow-2xs"
+        />
+        <span className="sr-only">Jam</span>
+      </div>
+
+      <span className="text-xl font-bold text-slate-400 select-none pb-0.5">:</span>
+
+      <div className="relative">
+        <input
+          ref={minuteRef}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={2}
+          placeholder="00"
+          aria-label="Menit pengingat (00-59)"
+          value={minute}
+          onChange={handleMinuteChange}
+          onBlur={handleMinuteBlur}
+          onFocus={(e) => e.target.select()}
+          onClick={(e) => e.target.select()}
+          onKeyDown={handleMinuteKeyDown}
+          onPaste={handlePaste}
+          className="w-16 h-11 text-center font-semibold text-base sm:text-lg text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all tracking-wider shadow-2xs"
+        />
+        <span className="sr-only">Menit</span>
+      </div>
+
+      <span className="text-xs sm:text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-2.5 rounded-lg border border-slate-200 select-none">
+        WIB
+      </span>
+    </div>
+  );
+}
+
 export function RoutineProgramItem({
   item,
   index,
@@ -43,7 +348,9 @@ export function RoutineProgramItem({
 }) {
   const campaignList = campaigns && campaigns.length > 0 ? campaigns : CAMPAIGNS;
   const selectedCampaign = campaignList.find((c) => c.id === item.campaignId) || campaignList[0];
-  const selectedFreq = FREQUENCY_OPTIONS.find((f) => f.value === item.frequency) || FREQUENCY_OPTIONS[0];
+  const currentFrequency = normalizeFrequency(item.frequency);
+  const selectedFreq =
+    FREQUENCY_OPTIONS.find((f) => f.value === currentFrequency) || FREQUENCY_OPTIONS[0];
   const currentRoutineType = item.routineType || "REMINDER_ONLY";
   const isAutoDonation = currentRoutineType === "AUTO_DONATION";
 
@@ -76,7 +383,9 @@ export function RoutineProgramItem({
               className="flex h-11 w-full items-center justify-between rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm sm:text-base font-normal text-slate-900 hover:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer text-left"
             >
               <span className="truncate">
-                {selectedCampaign ? `${selectedCampaign.title} (${selectedCampaign.categoryName || "Program Umum"})` : "-- Silakan Pilih Program --"}
+                {selectedCampaign
+                  ? `${selectedCampaign.title} (${selectedCampaign.categoryName || "Program Umum"})`
+                  : "-- Silakan Pilih Program --"}
               </span>
               <ChevronDown className="h-4 w-4 text-slate-500 shrink-0 ml-2" />
             </button>
@@ -98,7 +407,9 @@ export function RoutineProgramItem({
                       : "text-slate-800 hover:bg-slate-100"
                   )}
                 >
-                  <span className="truncate">{camp.title} ({camp.categoryName || "Program Umum"})</span>
+                  <span className="truncate">
+                    {camp.title} ({camp.categoryName || "Program Umum"})
+                  </span>
                   {isSelected && (
                     <Check className="h-4 w-4 text-primary shrink-0 ml-2" />
                   )}
@@ -110,46 +421,142 @@ export function RoutineProgramItem({
       </div>
 
       {/* Frequency Picker (DropdownMenu modal={false} - Zero Scroll Lock) */}
-      <div className="space-y-1.5">
-        <label className="text-sm font-semibold text-slate-800 block">
-          Jadwal donasi rutin
-        </label>
-        <DropdownMenu modal={false}>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="flex h-11 w-full items-center justify-between rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm sm:text-base font-normal text-slate-900 hover:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer text-left"
+      <div className="space-y-2">
+        <div className="space-y-1.5">
+          <label className="text-sm font-semibold text-slate-800 block">
+            Jadwal donasi rutin
+          </label>
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex h-11 w-full items-center justify-between rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm sm:text-base font-normal text-slate-900 hover:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer text-left"
+              >
+                <span className="truncate">{selectedFreq.label}</span>
+                <ChevronDown className="h-4 w-4 text-slate-500 shrink-0 ml-2" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="w-[var(--radix-dropdown-menu-trigger-width)] bg-white border border-slate-200 shadow-md rounded-lg p-1.5 z-50"
             >
-              <span className="truncate">{selectedFreq.label}</span>
-              <ChevronDown className="h-4 w-4 text-slate-500 shrink-0 ml-2" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="start"
-            className="w-[var(--radix-dropdown-menu-trigger-width)] bg-white border border-slate-200 shadow-md rounded-lg p-1.5 z-50"
-          >
-            {FREQUENCY_OPTIONS.map((freq) => {
-              const isSelected = item.frequency === freq.value;
-              return (
-                <DropdownMenuItem
-                  key={freq.value}
-                  onClick={() => onChange(item.id, "frequency", freq.value)}
+              {FREQUENCY_OPTIONS.map((freq) => {
+                const isSelected = currentFrequency === freq.value;
+                return (
+                  <DropdownMenuItem
+                    key={freq.value}
+                    onClick={() => {
+                      onChange(item.id, "frequency", freq.value);
+                      if (freq.value === "WEEKLY" && !item.selectedDay) {
+                        onChange(item.id, "selectedDay", "jumat");
+                      }
+                      if (freq.value === "MONTHLY" && !item.monthlyDate) {
+                        onChange(item.id, "monthlyDate", new Date().toISOString());
+                      }
+                    }}
+                    className={cn(
+                      "flex items-center justify-between px-3 py-2.5 text-sm rounded-md cursor-pointer transition-colors",
+                      isSelected
+                        ? "bg-blue-50 font-semibold text-primary"
+                        : "text-slate-800 hover:bg-slate-100"
+                    )}
+                  >
+                    <span className="truncate">{freq.label}</span>
+                    {isSelected && (
+                      <Check className="h-4 w-4 text-primary shrink-0 ml-2" />
+                    )}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Sub-Pilihan Frekuensi: Pekanan (Grid 3x3 Hari, Minggu col-span-3) */}
+        {currentFrequency === "WEEKLY" && (
+          <div className="space-y-2 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
+            <label className="text-sm font-semibold text-slate-800 block">
+              Pilih hari donasi rutin
+            </label>
+            <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+              {DAYS_OF_WEEK.map((day) => {
+                const isSelected = (item.selectedDay || "jumat") === day.id;
+                return (
+                  <button
+                    key={day.id}
+                    type="button"
+                    onClick={() => onChange(item.id, "selectedDay", day.id)}
+                    className={cn(
+                      "py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg text-sm sm:text-base border transition-all text-center cursor-pointer min-h-[44px] sm:min-h-[46px] flex items-center justify-center font-medium",
+                      day.id === "minggu" && "col-span-3",
+                      isSelected
+                        ? "bg-blue-50 text-blue-950 border-blue-600 ring-1 ring-blue-600 font-semibold shadow-2xs"
+                        : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50"
+                    )}
+                  >
+                    {day.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs sm:text-sm text-slate-600 italic font-normal">
+              *Jadwal donasi akan diingatkan atau ditagihkan setiap hari{" "}
+              {DAYS_OF_WEEK.find((d) => d.id === (item.selectedDay || "jumat"))?.label || "Jumat"}.
+            </p>
+          </div>
+        )}
+
+        {/* Sub-Pilihan Frekuensi: Bulanan (Shadcn Date Picker Popover + Calendar) */}
+        {currentFrequency === "MONTHLY" && (
+          <div className="space-y-2 pt-1 animate-in fade-in slide-in-from-top-1 duration-150">
+            <label className="text-sm font-semibold text-slate-800 block">
+              Pilih tanggal donasi rutin
+            </label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  data-empty={!item.monthlyDate}
                   className={cn(
-                    "flex items-center justify-between px-3 py-2.5 text-sm rounded-md cursor-pointer transition-colors",
-                    isSelected
-                      ? "bg-blue-50 font-semibold text-primary"
-                      : "text-slate-800 hover:bg-slate-100"
+                    "w-full sm:w-[280px] justify-between text-left font-normal h-11 border-slate-300 bg-white hover:bg-slate-50 text-slate-900 px-3.5 cursor-pointer",
+                    !item.monthlyDate && "text-slate-500"
                   )}
                 >
-                  <span className="truncate">{freq.label}</span>
-                  {isSelected && (
-                    <Check className="h-4 w-4 text-primary shrink-0 ml-2" />
-                  )}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                  <span className="flex items-center gap-2 truncate">
+                    <CalendarIcon className="h-4 w-4 text-slate-500 shrink-0" />
+                    {item.monthlyDate ? (
+                      <span className="font-medium text-slate-900 truncate">
+                        Setiap tgl {format(new Date(item.monthlyDate), "d MMMM", { locale: idLocale })}
+                      </span>
+                    ) : (
+                      <span>Pilih tanggal</span>
+                    )}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-slate-500 shrink-0 opacity-70 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto p-0 bg-white border border-slate-200 shadow-md rounded-xl z-50"
+                align="start"
+              >
+                <Calendar
+                  mode="single"
+                  selected={item.monthlyDate ? new Date(item.monthlyDate) : undefined}
+                  onSelect={(d) => {
+                    if (d) {
+                      onChange(item.id, "monthlyDate", d.toISOString());
+                    }
+                  }}
+                  defaultMonth={item.monthlyDate ? new Date(item.monthlyDate) : new Date()}
+                />
+              </PopoverContent>
+            </Popover>
+            <p className="text-xs sm:text-sm text-slate-600 italic font-normal">
+              *Donasi rutin akan berulang setiap tanggal{" "}
+              {item.monthlyDate ? format(new Date(item.monthlyDate), "d MMMM", { locale: idLocale }) : "1"} setiap bulannya.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Routine Type Option (Pengingat WA vs Donasi Otomatis) */}
@@ -179,7 +586,9 @@ export function RoutineProgramItem({
                   <div
                     className={cn(
                       "w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ml-2",
-                      isSelected ? "border-primary bg-primary text-white" : "border-slate-300 bg-white"
+                      isSelected
+                        ? "border-primary bg-primary text-white"
+                        : "border-slate-300 bg-white"
                     )}
                   >
                     {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -244,67 +653,17 @@ export function RoutineProgramItem({
         )}
       </div>
 
-      {/* Jam Pengingat (Format Murni 24 Jam WIB - Tanpa AM/PM) */}
+      {/* Jam Pengingat (Format 24 Jam dengan Input Number & Sanitasi) */}
       <div className="space-y-1.5 pt-2 border-t border-slate-100">
         <label className="text-sm font-semibold text-slate-800 block">
-          Jam pengingat
+          Jam pengingat (WIB)
         </label>
-        <div className="flex items-center gap-2 max-w-xs">
-          {/* Jam (00 - 23) */}
-          <div className="relative flex-1">
-            <select
-              aria-label="Pilih Jam Pengingat"
-              value={(() => {
-                const parts = (item.reminderTime || "05:00").split(":");
-                return parts[0] || "05";
-              })()}
-              onChange={(e) => {
-                const currentMin = (item.reminderTime || "05:00").split(":")[1] || "00";
-                onChange(item.id, "reminderTime", `${e.target.value}:${currentMin}`);
-              }}
-              className="w-full h-11 px-3 pr-8 rounded-lg border border-slate-300 text-sm sm:text-base font-medium text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer appearance-none text-center"
-            >
-              {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")).map((h) => (
-                <option key={h} value={h}>
-                  {h}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
-          </div>
-
-          <span className="text-base font-bold text-slate-400 select-none">:</span>
-
-          {/* Menit (00 - 55 kelipatan 5) */}
-          <div className="relative flex-1">
-            <select
-              aria-label="Pilih Menit Pengingat"
-              value={(() => {
-                const parts = (item.reminderTime || "05:00").split(":");
-                return parts[1] || "00";
-              })()}
-              onChange={(e) => {
-                const currentHr = (item.reminderTime || "05:00").split(":")[0] || "05";
-                onChange(item.id, "reminderTime", `${currentHr}:${e.target.value}`);
-              }}
-              className="w-full h-11 px-3 pr-8 rounded-lg border border-slate-300 text-sm sm:text-base font-medium text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer appearance-none text-center"
-            >
-              {Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0")).map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
-          </div>
-
-          {/* Suffix Badge WIB */}
-          <span className="h-11 px-3.5 bg-slate-100 border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg flex items-center justify-center shrink-0 select-none">
-            WIB
-          </span>
-        </div>
+        <TimeInput24Hour
+          value={item.reminderTime || "05:00"}
+          onChange={(newTime) => onChange(item.id, "reminderTime", newTime)}
+        />
         <p className="mt-1 text-sm text-slate-600 italic font-normal">
-          *Pengingat atau notifikasi tagihan akan dikirimkan otomatis pada jam yang dipilih (Format 24 Jam WIB).
+          *Notifikasi otomatis akan dikirimkan pada jam yang ditentukan (Format 24 Jam).
         </p>
       </div>
 
@@ -329,10 +688,10 @@ export function RoutineProgramItem({
                       onChange(item.id, "customAmount", "");
                     }}
                     className={cn(
-                      "py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg text-sm sm:text-base border transition-all text-center cursor-pointer min-h-[44px] sm:min-h-[46px] flex items-center justify-center",
+                      "py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg text-sm sm:text-base border transition-all text-center cursor-pointer min-h-[44px] sm:min-h-[46px] flex items-center justify-center font-medium",
                       isSelected
                         ? "bg-blue-50 text-blue-950 border-blue-600 ring-1 ring-blue-600 font-semibold shadow-2xs"
-                        : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50 font-medium"
+                        : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50"
                     )}
                   >
                     {formatRupiah(amt)}
@@ -346,10 +705,10 @@ export function RoutineProgramItem({
                   onChange(item.id, "isCustom", true);
                 }}
                 className={cn(
-                  "py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg text-sm sm:text-base border transition-all text-center cursor-pointer min-h-[44px] sm:min-h-[46px] flex items-center justify-center",
+                  "py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg text-sm sm:text-base border transition-all text-center cursor-pointer min-h-[44px] sm:min-h-[46px] flex items-center justify-center font-medium",
                   item.isCustom
                     ? "bg-blue-50 text-blue-950 border-blue-600 ring-1 ring-blue-600 font-semibold shadow-2xs"
-                    : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50 font-medium"
+                    : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50"
                 )}
               >
                 Lainnya
@@ -372,9 +731,12 @@ export function RoutineProgramItem({
                     placeholder="0"
                     value={item.customAmount ? formatNumber(Number(item.customAmount)) : ""}
                     onChange={(e) => {
-                      const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
-                      onChange(item.id, "customAmount", raw);
-                      onChange(item.id, "amount", raw ? parseInt(raw, 10) : 0);
+                      const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
+                      const parsed = raw ? parseInt(raw, 10) : 0;
+                      const clamped = Math.min(parsed, DONATION_LIMITS.MAX_AMOUNT);
+                      const finalRaw = clamped > 0 ? String(clamped) : (raw === "" ? "" : "0");
+                      onChange(item.id, "customAmount", finalRaw);
+                      onChange(item.id, "amount", clamped);
                     }}
                     className="w-full h-11 pl-10 pr-3 rounded-lg border border-slate-300 text-base font-normal text-slate-950 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   />

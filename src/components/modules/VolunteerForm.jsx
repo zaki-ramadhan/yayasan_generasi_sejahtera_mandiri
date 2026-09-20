@@ -5,6 +5,15 @@ import { toast } from "@/hooks/use-toast";
 import { Heart, Send, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  sanitizeName,
+  sanitizePhone,
+  sanitizeEmail,
+  stripEmojis,
+  validateName,
+  validatePhone,
+  validateEmail,
+} from "@/lib/security";
 
 const INTEREST_OPTIONS = [
   "Pengajar & Pembimbing Al-Qur'an",
@@ -26,8 +35,30 @@ export function VolunteerForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!fullName || !phone || !city) {
-      toast.error("Mohon lengkapi seluruh kolom yang wajib diisi.");
+
+    const nameVal = validateName(fullName);
+    if (!nameVal.isValid) {
+      toast.error(nameVal.message);
+      return;
+    }
+
+    const phoneVal = validatePhone(phone);
+    if (!phoneVal.isValid) {
+      toast.error(phoneVal.message);
+      return;
+    }
+
+    if (email) {
+      const emailVal = validateEmail(email);
+      if (!emailVal.isValid) {
+        toast.error(emailVal.message);
+        return;
+      }
+    }
+
+    const cleanCity = stripEmojis(city).replace(/[^a-zA-ZÀ-ÿ\s.,'\-]/g, "").trim();
+    if (!cleanCity || cleanCity.length < 2) {
+      toast.error("Mohon masukkan kota / kabupaten domisili yang valid.");
       return;
     }
 
@@ -37,12 +68,12 @@ export function VolunteerForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fullName,
-          phone,
-          email,
-          city,
+          fullName: nameVal.sanitized,
+          phone: phoneVal.sanitized,
+          email: email ? validateEmail(email).sanitized : "",
+          city: cleanCity,
           interest,
-          motivation,
+          motivation: stripEmojis(motivation).slice(0, 500),
         }),
       });
 
@@ -84,7 +115,8 @@ export function VolunteerForm() {
           type="text"
           required
           value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          maxLength={60}
+          onChange={(e) => setFullName(sanitizeName(e.target.value))}
           placeholder="Nama Anda"
           className="h-11"
         />
@@ -98,7 +130,8 @@ export function VolunteerForm() {
             inputMode="tel"
             required
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            maxLength={15}
+            onChange={(e) => setPhone(sanitizePhone(e.target.value))}
             placeholder="0812xxxxxxxx"
             className="h-11"
           />
@@ -109,7 +142,8 @@ export function VolunteerForm() {
           <Input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            maxLength={100}
+            onChange={(e) => setEmail(sanitizeEmail(e.target.value))}
             placeholder="email@anda.com"
             className="h-11"
           />
@@ -123,7 +157,8 @@ export function VolunteerForm() {
             type="text"
             required
             value={city}
-            onChange={(e) => setCity(e.target.value)}
+            maxLength={50}
+            onChange={(e) => setCity(stripEmojis(e.target.value).replace(/[^a-zA-ZÀ-ÿ\s.,'\-]/g, "").slice(0, 50))}
             placeholder="Contoh: Bogor / Jakarta"
             className="h-11"
           />
@@ -150,9 +185,10 @@ export function VolunteerForm() {
         <textarea
           rows={3}
           value={motivation}
-          onChange={(e) => setMotivation(e.target.value)}
+          maxLength={500}
+          onChange={(e) => setMotivation(stripEmojis(e.target.value).slice(0, 500))}
           placeholder="Ceritakan keahlian atau alasan Anda ingin bergabung..."
-          className="w-full rounded-lg border border-border-strong bg-white p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+          className="w-full rounded-lg border border-border-strong bg-white p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary transition-colors resize-none"
         />
       </div>
 

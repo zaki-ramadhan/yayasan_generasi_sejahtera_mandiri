@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { PAYMENT_CHANNELS } from "@/data/paymentChannels";
 import { formatRupiah } from "@/lib/formatters";
-import { DONATION_LIMITS, generateIdempotencyKey } from "@/lib/security";
+import {
+  DONATION_LIMITS,
+  generateIdempotencyKey,
+  validateName,
+  validatePhone,
+  validateEmail,
+  sanitizePrayer,
+} from "@/lib/security";
 import { getStoredUser } from "@/services/authService";
 import { saveDonationDraft, loadDonationDraft, clearDonationDraft } from "@/lib/donationDraft";
 import { NominalPresetsPicker } from "@/components/donation/NominalPresetsPicker";
@@ -133,18 +140,18 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
   };
 
   const handleCustomInputChange = (e) => {
-    const rawVal = e.target.value.replace(/\D/g, "").slice(0, 11);
-    setCustomAmountInput(rawVal);
+    const rawVal = e.target.value.replace(/\D/g, "").slice(0, 9);
     const num = Number(rawVal);
-    setAmount(num || 0);
+    const clamped = Math.min(num, DONATION_LIMITS.MAX_AMOUNT);
+    const finalRaw = clamped > 0 ? String(clamped) : (rawVal === "" ? "" : "0");
+    setCustomAmountInput(finalRaw);
+    setAmount(clamped);
   };
 
   const handlePrayerChange = (e) => {
-    let val = e.target.value;
-    val = val.replace(/^\s+/, "");
-    val = val.replace(/\s{2,}/g, " ");
-    if (val.length <= 150) {
-      setPrayer(val);
+    const clean = sanitizePrayer(e.target.value);
+    if (clean.length <= 150) {
+      setPrayer(clean);
     }
   };
 
@@ -159,20 +166,29 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
       toast.error(`Nominal donasi minimal ${formatRupiah(DONATION_LIMITS.MIN_AMOUNT)}`);
       return;
     }
-
     if (amount > DONATION_LIMITS.MAX_AMOUNT) {
       toast.error(`Nominal donasi maksimal ${formatRupiah(DONATION_LIMITS.MAX_AMOUNT)}`);
       return;
     }
 
-    if (!donorPhone || donorPhone.trim().length < 9) {
-      toast.error("Mohon masukkan nomor WhatsApp yang aktif untuk konfirmasi pembayaran");
+    const nameVal = validateName(donorName, isAnonymous);
+    if (!nameVal.isValid) {
+      toast.error(nameVal.message);
       return;
     }
 
-    if (!isAnonymous && (!donorName || donorName.trim().length < 2)) {
-      toast.error("Mohon masukkan nama donatur atau pilih opsi Hamba Allah (Anonim)");
+    const phoneVal = validatePhone(donorPhone);
+    if (!phoneVal.isValid) {
+      toast.error(phoneVal.message);
       return;
+    }
+
+    if (donorEmail) {
+      const emailVal = validateEmail(donorEmail);
+      if (!emailVal.isValid) {
+        toast.error(emailVal.message);
+        return;
+      }
     }
 
     try {

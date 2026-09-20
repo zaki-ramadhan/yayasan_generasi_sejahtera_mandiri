@@ -1,4 +1,5 @@
 import { Phone, Mail, Clock, MapPin } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 import { ORG_PROFILE } from "@/data/orgProfile";
 
 export function AboutContactCard() {
@@ -38,7 +39,7 @@ export function AboutContactCard() {
             rel="noopener noreferrer"
             className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer"
           >
-            <Phone className="w-4 h-4 shrink-0" />
+            <WhatsAppIcon className="w-4.5 h-4.5 shrink-0" />
             <span>Hubungi Layanan WhatsApp</span>
           </a>
         </div>

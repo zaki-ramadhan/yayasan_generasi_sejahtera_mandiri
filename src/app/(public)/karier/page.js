@@ -6,6 +6,15 @@ import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  sanitizeName,
+  sanitizePhone,
+  sanitizeEmail,
+  stripEmojis,
+  validateName,
+  validatePhone,
+  validateEmail,
+} from "@/lib/security";
 
 const VACANCIES = [
   {
@@ -61,10 +70,25 @@ export default function KarierPage() {
 
   const handleApply = (e) => {
     e.preventDefault();
-    if (!applicantName || !applicantPhone || !applicantEmail) {
-      toast.error("Mohon lengkapi formulir pendaftaran.");
+
+    const nameVal = validateName(applicantName);
+    if (!nameVal.isValid) {
+      toast.error(nameVal.message);
       return;
     }
+
+    const phoneVal = validatePhone(applicantPhone);
+    if (!phoneVal.isValid) {
+      toast.error(phoneVal.message);
+      return;
+    }
+
+    const emailVal = validateEmail(applicantEmail, true);
+    if (!emailVal.isValid) {
+      toast.error(emailVal.message);
+      return;
+    }
+
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
@@ -186,7 +210,8 @@ export default function KarierPage() {
                 type="text"
                 placeholder="Nama sesuai KTP"
                 value={applicantName}
-                onChange={(e) => setApplicantName(e.target.value)}
+                maxLength={60}
+                onChange={(e) => setApplicantName(sanitizeName(e.target.value))}
                 className="h-10 text-sm text-slate-900 border-slate-300"
               />
             </div>
@@ -199,7 +224,8 @@ export default function KarierPage() {
                 type="email"
                 placeholder="nama@email.com"
                 value={applicantEmail}
-                onChange={(e) => setApplicantEmail(e.target.value)}
+                maxLength={100}
+                onChange={(e) => setApplicantEmail(sanitizeEmail(e.target.value))}
                 className="h-10 text-sm text-slate-900 border-slate-300"
               />
             </div>
@@ -212,7 +238,8 @@ export default function KarierPage() {
                 type="tel"
                 placeholder="081234567890"
                 value={applicantPhone}
-                onChange={(e) => setApplicantPhone(e.target.value)}
+                maxLength={15}
+                onChange={(e) => setApplicantPhone(sanitizePhone(e.target.value))}
                 className="h-10 text-sm text-slate-900 border-slate-300"
               />
             </div>
@@ -225,7 +252,8 @@ export default function KarierPage() {
                 type="url"
                 placeholder="https://..."
                 value={portfolioLink}
-                onChange={(e) => setPortfolioLink(e.target.value)}
+                maxLength={200}
+                onChange={(e) => setPortfolioLink(stripEmojis(e.target.value).trim())}
                 className="h-10 text-sm text-slate-900 border-slate-300"
               />
             </div>

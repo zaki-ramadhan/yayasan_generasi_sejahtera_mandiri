@@ -29,17 +29,19 @@ export function QuickDonateBar({ defaultCampaignSlug = "beasiswa-santri-penghafa
   };
 
   const handleCustomChange = (e) => {
-    const raw = e.target.value.replace(/\D/g, "");
-    setCustomAmount(raw);
+    const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
     const num = Number(raw);
-    setSelectedAmount(num || 0);
+    const clamped = Math.min(num, 100000000);
+    const finalRaw = clamped > 0 ? String(clamped) : (raw === "" ? "" : "0");
+    setCustomAmount(finalRaw);
+    setSelectedAmount(clamped);
   };
 
   const finalAmount = isCustomMode ? (customAmount ? Number(customAmount) : 0) : selectedAmount;
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
-    if (finalAmount < 10000) return;
+    if (finalAmount < 10000 || finalAmount > 100000000) return;
 
     const user = getStoredUser();
     const targetUrl = `/campaign/${defaultCampaignSlug}/donate?amount=${finalAmount}`;

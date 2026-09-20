@@ -24,8 +24,12 @@ export function ZakatFidyahTab({
           <Input
             type="number"
             min="1"
+            max="365"
             value={fidyahDays || ""}
-            onChange={(e) => setFidyahDays(Number(e.target.value) || 0)}
+            onChange={(e) => {
+              const val = Math.max(0, Math.min(365, Math.floor(Number(e.target.value) || 0)));
+              setFidyahDays(val);
+            }}
             className="h-11 border-slate-300"
           />
         </div>

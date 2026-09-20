@@ -1,5 +1,10 @@
 import prisma from "@/lib/prisma";
-import { sanitizeInput } from "@/lib/security";
+import {
+  sanitizeInput,
+  validateName,
+  validatePhone,
+  validateEmail,
+} from "@/lib/security";
 
 export async function registerVolunteer({
   fullName,
@@ -9,17 +14,31 @@ export async function registerVolunteer({
   interest,
   motivation = "",
 }) {
-  if (!fullName || !phone || !city) {
-    throw new Error("Mohon lengkapi seluruh kolom wajib (Nama, WhatsApp, Kota Domisili).");
+  const nameVal = validateName(fullName);
+  if (!nameVal.isValid) throw new Error(nameVal.message);
+
+  const phoneVal = validatePhone(phone);
+  if (!phoneVal.isValid) throw new Error(phoneVal.message);
+
+  let cleanEmail = null;
+  if (email) {
+    const emailVal = validateEmail(email);
+    if (!emailVal.isValid) throw new Error(emailVal.message);
+    cleanEmail = emailVal.sanitized;
+  }
+
+  const cleanCity = sanitizeInput(city);
+  if (!cleanCity || cleanCity.length < 2) {
+    throw new Error("Mohon masukkan kota domisili yang valid.");
   }
 
   const cleanData = {
-    fullName: sanitizeInput(fullName),
-    email: sanitizeInput(email) || null,
-    phone: sanitizeInput(phone),
-    city: sanitizeInput(city),
+    fullName: nameVal.sanitized,
+    email: cleanEmail,
+    phone: phoneVal.sanitized,
+    city: cleanCity,
     interest: sanitizeInput(interest) || "Pengajar & Pembimbing Al-Qur'an",
-    motivation: sanitizeInput(motivation) || "",
+    motivation: sanitizeInput(motivation).slice(0, 500) || "",
     status: "PENDING",
   };
 

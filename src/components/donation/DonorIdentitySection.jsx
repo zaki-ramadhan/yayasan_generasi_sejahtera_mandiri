@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { sanitizeName, sanitizePhone, sanitizeEmail } from "@/lib/security";
 
 export function DonorIdentitySection({
   isAnonymous,
@@ -12,7 +13,7 @@ export function DonorIdentitySection({
   prayer,
   setPrayer,
   onPrayerChange,
-  hasExistingPrayer,
+  hasExistingPrayer = false,
 }) {
   return (
     <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4 shadow-xs">
@@ -45,7 +46,8 @@ export function DonorIdentitySection({
             type="text"
             required={!isAnonymous}
             value={donorName}
-            onChange={(e) => setDonorName(e.target.value)}
+            maxLength={60}
+            onChange={(e) => setDonorName(sanitizeName(e.target.value))}
             placeholder="Contoh: Ahmad Fauzi"
             className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
           />
@@ -60,7 +62,8 @@ export function DonorIdentitySection({
             inputMode="tel"
             required
             value={donorPhone}
-            onChange={(e) => setDonorPhone(e.target.value)}
+            maxLength={15}
+            onChange={(e) => setDonorPhone(sanitizePhone(e.target.value))}
             placeholder="0812xxxxxxxx"
             className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
           />
@@ -72,7 +75,8 @@ export function DonorIdentitySection({
           <Input
             type="email"
             value={donorEmail}
-            onChange={(e) => setDonorEmail(e.target.value)}
+            maxLength={100}
+            onChange={(e) => setDonorEmail(sanitizeEmail(e.target.value))}
             placeholder="email@anda.com"
             className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
           />

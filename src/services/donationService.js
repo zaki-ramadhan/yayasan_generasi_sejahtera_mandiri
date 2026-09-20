@@ -1,5 +1,12 @@
 import prisma from "@/lib/prisma";
-import { validateDonationAmount, sanitizeInput } from "@/lib/security";
+import {
+  validateDonationAmount,
+  validateName,
+  validatePhone,
+  validateEmail,
+  sanitizePrayer,
+  sanitizeInput,
+} from "@/lib/security";
 import { PAYMENT_CHANNELS } from "@/data/paymentChannels";
 
 // Fallback in-memory donation store for offline/demo sessions
@@ -49,6 +56,25 @@ export async function createDonation({
     throw new Error(validation.message);
   }
 
+  const nameVal = validateName(donorName, isAnonymous);
+  if (!nameVal.isValid) {
+    throw new Error(nameVal.message);
+  }
+
+  const phoneVal = validatePhone(donorPhone);
+  if (!phoneVal.isValid) {
+    throw new Error(phoneVal.message);
+  }
+
+  let cleanDonorEmail = "";
+  if (donorEmail) {
+    const emailVal = validateEmail(donorEmail);
+    if (!emailVal.isValid) {
+      throw new Error(emailVal.message);
+    }
+    cleanDonorEmail = emailVal.sanitized;
+  }
+
   const channel = PAYMENT_CHANNELS.find((p) => p.id === paymentChannelId) || PAYMENT_CHANNELS[0];
   const uniqueCode = channel.type === "QRIS" ? 0 : Math.floor(100 + Math.random() * 900);
   const adminFee = channel.fee || 0;
@@ -58,14 +84,13 @@ export async function createDonation({
   let virtualAccountNumber = "";
   if (channel.type === "VA") {
     virtualAccountNumber = `${channel.accountNumberPrefix || "88"}${
-      donorPhone ? donorPhone.replace(/\D/g, "").slice(-8) : "12345678"
+      phoneVal.sanitized.slice(-8)
     }`;
   }
 
-  const cleanDonorName = isAnonymous ? "Hamba Allah" : sanitizeInput(donorName) || "Hamba Allah";
-  const cleanDonorEmail = sanitizeInput(donorEmail);
-  const cleanDonorPhone = sanitizeInput(donorPhone);
-  const cleanPrayer = sanitizeInput(prayer);
+  const cleanDonorName = nameVal.sanitized;
+  const cleanDonorPhone = phoneVal.sanitized;
+  const cleanPrayer = sanitizePrayer(prayer);
   const expiredAtDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   const donationData = {

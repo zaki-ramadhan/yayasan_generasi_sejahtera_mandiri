@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { MessageCircle } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/SocialIcons";
 import { ORG_PROFILE } from "@/data/orgProfile";
 
 export function FloatingWhatsApp() {
@@ -29,11 +29,11 @@ export function FloatingWhatsApp() {
         href={waUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="group inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 hover:from-emerald-400 hover:via-emerald-500 hover:to-emerald-600 border-t border-t-emerald-300 border-x border-x-emerald-500 border-b-2 border-b-emerald-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_4px_12px_rgba(5,150,105,0.35)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all cursor-pointer"
-        aria-label="Chat WhatsApp Cepat"
+        className="group inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium text-white bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 hover:from-emerald-400 hover:via-emerald-500 hover:to-emerald-600 border-t border-t-emerald-300 border-x border-x-emerald-500 border-b-2 border-b-emerald-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_4px_12px_rgba(5,150,105,0.35)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all cursor-pointer"
+        aria-label="Ada Pertanyaan?"
       >
-        <MessageCircle className="w-4 h-4 text-white shrink-0 fill-white/20" />
-        <span>Chat WhatsApp</span>
+        <WhatsAppIcon className="w-4.5 h-4.5 text-white shrink-0" />
+        <span>Ada Pertanyaan?</span>
       </a>
     </div>
   );

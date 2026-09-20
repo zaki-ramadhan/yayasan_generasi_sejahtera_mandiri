@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { DONATION_LIMITS } from "@/lib/security";
+import { DONATION_LIMITS, validateName, validatePhone } from "@/lib/security";
 import { formatRupiah } from "@/lib/formatters";
 import { getStoredUser } from "@/services/authService";
 import { RoutineDonationHero } from "@/components/routine-donation/RoutineDonationHero";
@@ -37,12 +37,14 @@ export function RoutineDonationForm({ campaigns = [] }) {
     });
   }, []);
 
-  // Multi-program state (max 3)
+  // Multi-program state (max 2)
   const [selectedPrograms, setSelectedPrograms] = useState([
     {
       id: 1,
       campaignId: defaultCampaignId,
-      frequency: "DAILY_SUBUH",
+      frequency: "DAILY",
+      selectedDay: "jumat",
+      monthlyDate: new Date().toISOString(),
       routineType: "REMINDER_ONLY",
       hasCustomPeriod: false,
       startDate: "",
@@ -66,7 +68,9 @@ export function RoutineDonationForm({ campaigns = [] }) {
       {
         id: (prev[prev.length - 1]?.id || 0) + 1,
         campaignId: nextCampaign ? nextCampaign.id : defaultCampaignId,
-        frequency: "DAILY_SUBUH",
+        frequency: "DAILY",
+        selectedDay: "jumat",
+        monthlyDate: new Date().toISOString(),
         routineType: "REMINDER_ONLY",
         hasCustomPeriod: false,
         startDate: "",
@@ -104,15 +108,16 @@ export function RoutineDonationForm({ campaigns = [] }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 1. Validasi Identitas
-    if (!isAnonymous && (!fullName || fullName.trim().length < 2)) {
-      toast.error("Mohon masukkan nama lengkap Anda atau pilih opsi Hamba Allah.");
+    // 1. Validasi Identitas (Anti-bocor, anti-emoji & verifikasi format seluler)
+    const nameVal = validateName(fullName, isAnonymous);
+    if (!nameVal.isValid) {
+      toast.error(nameVal.message);
       return;
     }
 
-    const cleanWa = whatsapp.replace(/\D/g, "");
-    if (!cleanWa || cleanWa.length < 9 || cleanWa.length > 15) {
-      toast.error("Mohon masukkan nomor WhatsApp yang aktif (9-15 digit) untuk menerima pengingat.");
+    const phoneVal = validatePhone(whatsapp);
+    if (!phoneVal.isValid) {
+      toast.error(phoneVal.message);
       return;
     }
 
