@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { PrayerCard } from "@/components/modules/PrayerCard";
+import { PrayerChatBubble } from "@/components/modules/PrayerChatBubble";
 import { usePrayersSync } from "@/hooks/usePrayersSync";
 import { cn } from "@/lib/utils";
 
@@ -75,15 +75,14 @@ export function CampaignPrayersSidebar({ initialDonors = [], campaignSlug }) {
         </DropdownMenu>
       </div>
 
-      {/* 3 Top Prayer Cards (Natural fit height, non-scrollable) */}
-      <div className="space-y-6 pt-3 pb-1">
+      {/* 3 Top Prayer Chat Bubbles (Right-aligned, natural fit height) */}
+      <div className="space-y-5 pt-1.5 pb-1">
         {displayPrayers.map((donor) => (
-          <PrayerCard
+          <PrayerChatBubble
             key={donor.id}
             donor={donor}
             isAmined={aminedSet.has(donor.id)}
             onToggleAmin={handleToggleAmin}
-            isCompact={true}
           />
         ))}
       </div>

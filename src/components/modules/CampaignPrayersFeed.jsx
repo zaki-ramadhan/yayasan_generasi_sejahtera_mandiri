@@ -150,7 +150,7 @@ export function CampaignPrayersFeed({ initialDonors = [], campaignSlug, campaign
       {/* ONLY THIS PARENT IS SCROLLABLE: 2-Card Grid */}
       <div className="max-h-[500px] sm:max-h-[540px] overflow-y-auto pr-2 pt-3 pb-3">
         {visiblePrayers.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 sm:gap-y-7 gap-x-3.5 sm:gap-x-4">
             {visiblePrayers.map((donor) => (
               <PrayerCard
                 key={donor.id}

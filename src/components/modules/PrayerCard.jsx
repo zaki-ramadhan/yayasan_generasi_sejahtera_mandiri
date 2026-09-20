@@ -1,8 +1,8 @@
 "use client";
 
-import { Heart } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/formatters";
+import { PrayerAvatar } from "@/components/modules/PrayerAvatar";
+import { PrayerAminButton } from "@/components/modules/PrayerAminButton";
 
 /**
  * Helper to compute humanized relative time
@@ -26,7 +26,6 @@ export function getRelativeTime(dateString) {
 }
 
 export function PrayerCard({ donor, isAmined, onToggleAmin, isCompact = false }) {
-  const initial = (donor.name || "H").charAt(0).toUpperCase();
   const cleanPrayer = (donor.prayer || "").replace(/\s+/g, " ").trim();
 
   return (
@@ -37,11 +36,7 @@ export function PrayerCard({ donor, isAmined, onToggleAmin, isCompact = false })
     >
       {/* Floating Top-Left Avatar */}
       <div className="absolute -top-3.5 left-4">
-        <Avatar className="w-8 h-8 rounded-full border-2 border-white ring-1 ring-slate-300 shadow-xs bg-slate-100">
-          <AvatarFallback className="bg-slate-100 text-slate-800 font-medium text-xs">
-            {initial}
-          </AvatarFallback>
-        </Avatar>
+        <PrayerAvatar name={donor.name} size="md" />
       </div>
 
       {/* Prayer Message Body with 3-line max constraint */}
@@ -67,26 +62,13 @@ export function PrayerCard({ donor, isAmined, onToggleAmin, isCompact = false })
         </div>
 
         {/* Interactive Aamiin Action Button */}
-        <button
-          type="button"
-          disabled={isAmined}
-          onClick={() => !isAmined && onToggleAmin(donor.id)}
-          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-all shrink-0 select-none ${
-            isAmined
-              ? "cursor-default text-slate-700"
-              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
-          }`}
-          aria-label={isAmined ? `Doa dari ${donor.name} telah diaminkan` : `Aamiinkan doa dari ${donor.name}`}
-        >
-          <Heart
-            className={`w-3.5 h-3.5 transition-colors ${
-              isAmined
-                ? "fill-rose-500 text-rose-500"
-                : "text-rose-500 fill-transparent"
-            }`}
-          />
-          <span>{donor.aminCount} Aamiin</span>
-        </button>
+        <PrayerAminButton
+          donorId={donor.id}
+          donorName={donor.name}
+          aminCount={donor.aminCount}
+          isAmined={isAmined}
+          onToggleAmin={onToggleAmin}
+        />
       </div>
     </article>
   );
