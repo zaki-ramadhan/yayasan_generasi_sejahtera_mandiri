@@ -16,7 +16,7 @@ export function RoutineDonationHero() {
           href="/program"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-primary hover:underline transition-colors py-0.5 group"
         >
-          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+          <ArrowLeft className="w-4 h-4" />
           <span>Kembali ke Katalog Program</span>
         </Link>
         <div>

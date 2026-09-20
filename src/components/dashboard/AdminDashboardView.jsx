@@ -15,7 +15,7 @@ export function AdminDashboardView({ userRole, stats }) {
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       {/* Left: Recent Transactions / Mutations */}
       <div className="lg:col-span-8 bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 space-y-4 shadow-2xs">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-bold text-slate-950">
               {userRole === USER_ROLES.FINANCE ? "Rekonsiliasi Mutasi Rekening & QRIS" : "Mutasi Donasi Masuk Real-Time"}
@@ -102,14 +102,15 @@ export function AdminDashboardView({ userRole, stats }) {
           </div>
           <div className="space-y-3">
             {campaigns.slice(0, 3).map((camp) => {
-              const pct = Math.min(Math.round((camp.collectedAmount / camp.targetAmount) * 100), 100);
+              const hasTarget = Boolean(camp.targetAmount && Number(camp.targetAmount) > 0);
+              const pct = hasTarget ? Math.min(Math.round((camp.collectedAmount / camp.targetAmount) * 100), 100) : null;
               return (
                 <div key={camp.id} className="space-y-1">
                   <div className="flex justify-between text-xs">
                     <span className="font-semibold text-slate-800 truncate max-w-[180px]">{camp.title}</span>
-                    <span className="font-bold text-primary">{pct}%</span>
+                    <span className="font-bold text-primary">{hasTarget ? `${pct}%` : "Berkelanjutan"}</span>
                   </div>
-                  <Progress value={pct} className="h-1.5" />
+                  {hasTarget && <Progress value={pct} className="h-1.5" />}
                 </div>
               );
             })}

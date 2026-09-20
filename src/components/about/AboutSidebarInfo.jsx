@@ -8,7 +8,7 @@ export function AboutSidebarInfo() {
     <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4 shadow-2xs">
       {/* 1. Legalitas & Akreditasi */}
       <div className="space-y-3.5">
-        <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
+        <div className="flex items-center gap-2">
           <h3 className="font-semibold text-slate-950 text-base">
             Legalitas &amp; Sertifikasi
           </h3>
@@ -60,7 +60,7 @@ export function AboutSidebarInfo() {
 
       {/* 2. Kantor & Layanan Donatur */}
       <div className="space-y-3.5 pt-4 border-t border-slate-200">
-        <h3 className="font-semibold text-slate-950 text-base border-b border-slate-200 pb-2.5">
+        <h3 className="font-semibold text-slate-950 text-base">
           Kantor &amp; Layanan Donatur
         </h3>
 

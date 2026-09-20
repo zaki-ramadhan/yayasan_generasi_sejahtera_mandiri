@@ -4,7 +4,7 @@ import { ORG_PROFILE } from "@/data/orgProfile";
 export function AboutLegalCredentials() {
   return (
     <div className="bg-white p-5 rounded-xl border border-slate-300 space-y-3.5">
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2.5">
+      <div className="flex items-center gap-2">
         <h3 className="font-semibold text-slate-950 text-base">
           Legalitas &amp; Sertifikasi
         </h3>

@@ -75,7 +75,7 @@ export function Footer() {
 
             {/* Social Media Icons */}
             <div className="pt-1.5 space-y-2">
-              <span className="text-sm font-semibold uppercase tracking-wider text-slate-300 block">
+              <span className="text-sm font-semibold uppercase tracking-wider text-white block">
                 Media Sosial
               </span>
               <div className="flex items-center gap-2.5 text-white">
@@ -206,22 +206,23 @@ export function Footer() {
 
         {/* Section Bawah: Kanal Donasi & Pembayaran Resmi */}
         <div className="space-y-3">
-          <h5 className="text-sm font-semibold uppercase tracking-wider text-slate-300">
-            Kanal Donasi &amp; Pembayaran Resmi
+          <h5 className="inline-block text-sm font-semibold uppercase tracking-wider text-white">
+            Tersedia metode pembayaran:
           </h5>
           <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
             {PAYMENT_LOGOS.map((m) => (
               <div
                 key={m.name}
                 title={m.name}
-                className="h-8.5 sm:h-9 px-2.5 py-1 rounded-md bg-white border border-slate-200/90 shadow-2xs flex items-center justify-center hover:bg-slate-50 transition-colors shrink-0"
+                className="w-[72px] sm:w-[80px] h-9 sm:h-10 rounded-md bg-white border border-slate-200/90 shadow-2xs flex items-center justify-center hover:bg-slate-50 transition-colors shrink-0 p-2"
               >
                 <Image
-                  src={m.src}
+                  src={`${m.src}?v=2`}
                   alt={m.alt}
-                  width={56}
-                  height={22}
-                  className="h-4 sm:h-4.5 w-auto max-w-[56px] object-contain select-none pointer-events-none"
+                  width={64}
+                  height={28}
+                  className="max-h-5 sm:max-h-6 w-auto max-w-full object-contain select-none pointer-events-none"
+                  unoptimized
                 />
               </div>
             ))}

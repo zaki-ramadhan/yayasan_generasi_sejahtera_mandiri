@@ -140,10 +140,10 @@ export function HomeInstagramFeed({ posts = [], account = DEFAULT_ACCOUNT }) {
               <span>Terpopuler</span>
               <Flame
                 className={cn(
-                  "w-4 h-4 sm:w-4.5 sm:h-4.5",
+                  "w-4 h-4 sm:w-5 sm:h-5 -ml-0.5",
                   filterType === "popular"
-                    ? "text-primary fill-primary"
-                    : "text-slate-400 fill-slate-300"
+                    ? "text-amber-600 fill-amber-500"
+                    : "text-slate-300 fill-slate-300"
                 )}
               />
             </button>

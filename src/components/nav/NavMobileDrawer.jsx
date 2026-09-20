@@ -42,7 +42,7 @@ export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
             isHomeActive ? "bg-slate-100 text-primary" : "text-slate-800 hover:bg-slate-50"
           )}
         >
-          Home
+          Beranda
         </Link>
 
         {/* Tentang Kami */}

@@ -197,14 +197,9 @@ export function RoutineDonationForm({ campaigns = [] }) {
           {/* Step 2: Selected Programs Selection List */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold shrink-0">
-                  2
-                </span>
                 <h2 className="text-base sm:text-lg font-semibold text-slate-950">
                   Program Kebaikan &amp; Frekuensi
                 </h2>
-              </div>
               <span className="text-sm text-slate-600 font-normal">
                 {selectedPrograms.length} dari 2 program
               </span>

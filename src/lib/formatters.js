@@ -169,8 +169,9 @@ export function calculateProgress(collectedAmount, targetAmount) {
 }
 
 export function calculateDaysLeft(endDateInput) {
-  if (!endDateInput) return 0;
+  if (!endDateInput) return null;
   const targetDate = new Date(endDateInput);
+  if (isNaN(targetDate.getTime())) return null;
   const now = new Date();
   const diffTime = targetDate.getTime() - now.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));

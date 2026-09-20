@@ -9,6 +9,7 @@ import { ArticleCard } from "@/components/shared/ArticleCard";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeInstagramFeed } from "@/components/home/HomeInstagramFeed";
 import { HomeCtaSection } from "@/components/home/HomeCtaSection";
+import { HomePartnersSection } from "@/components/home/HomePartnersSection";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { formatNumber, formatRupiah, formatDate, getCompactRupiahParts } from "@/lib/formatters";
@@ -36,7 +37,10 @@ export default async function HomePage() {
       {/* 1. HERO SECTION WITH BACKGROUND IMAGE SLIDER & SOFT OVERLAY */}
       <HomeHero defaultCampaignSlug={quickDonateTargetSlug} />
 
-      {/* 2. PROGRAM DONASI AKTIF */}
+      {/* 2. MITRA & LEMBAGA TERKAIT */}
+      <HomePartnersSection />
+
+      {/* 3. PROGRAM DONASI AKTIF */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="text-center max-w-2xl mx-auto space-y-1.5">
           <h2 className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight">
@@ -49,12 +53,12 @@ export default async function HomePage() {
 
         {/* Campaign Cards Grid (Top 5 Pilihan - Sisa Card Terpusat di Tengah) */}
         <div className="flex flex-wrap justify-center gap-6">
-          {featuredCampaigns.map((camp) => (
+          {featuredCampaigns.map((camp, index) => (
             <div
               key={camp.id}
               className="w-full sm:w-[calc(50%-12px)] lg:w-[calc((100%-48px)/3)] flex"
             >
-              <CampaignCard campaign={camp} showDescription={false} />
+              <CampaignCard campaign={camp} showDescription={false} priority={index === 0} />
             </div>
           ))}
         </div>
@@ -142,7 +146,7 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           {/* Left: Articles as Editorial Digest */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-300 pb-2.5">
+            <div className="flex items-center justify-between">
               <h2 className="text-xl sm:text-2xl font-semibold text-slate-950">
                 Artikel &amp; Kabar Lapangan
               </h2>
@@ -161,7 +165,7 @@ export default async function HomePage() {
 
           {/* Right: FAQ with 2px Interactive Bottom Border on Hover */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="border-b border-slate-300 pb-2.5">
+            <div>
               <h2 className="text-xl sm:text-2xl font-semibold text-slate-950">
                 FAQ
               </h2>

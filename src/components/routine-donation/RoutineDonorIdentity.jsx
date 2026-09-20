@@ -25,14 +25,9 @@ export function RoutineDonorIdentity({
   return (
     <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4 shadow-xs">
       {/* Header Step 1 (Unified with Checkout) */}
-      <div className="flex items-center gap-2.5">
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold shrink-0">
-          1
-        </span>
         <h2 className="text-base sm:text-lg font-semibold text-slate-950">
           Data Donatur
         </h2>
-      </div>
 
       {/* Anonymous Checkbox (Unified with Checkout) */}
       <label className="flex items-center gap-2.5 p-3 rounded-lg bg-slate-50 border border-slate-300 cursor-pointer select-none">

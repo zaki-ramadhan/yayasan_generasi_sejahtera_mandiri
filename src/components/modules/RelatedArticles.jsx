@@ -44,7 +44,7 @@ export function RelatedArticles({ currentArticle, allArticles = [] }) {
   if (!related || related.length === 0) return null;
 
   return (
-    <section className="space-y-4 pt-6 border-t border-slate-200">
+    <section className="space-y-3 pt-6 border-t border-slate-200">
       <div className="flex items-center justify-between">
         <h3 className="text-base sm:text-lg font-semibold text-slate-950">
           Artikel Terkait
@@ -57,7 +57,7 @@ export function RelatedArticles({ currentArticle, allArticles = [] }) {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-3">
         {related.map((art) => (
           <ArticleCard key={art.id} article={art} />
         ))}

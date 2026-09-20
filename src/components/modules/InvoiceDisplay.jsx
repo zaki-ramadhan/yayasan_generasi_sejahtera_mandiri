@@ -100,7 +100,7 @@ export function InvoiceDisplay({ donation }) {
 
       {/* Payment Instructions & Code Section */}
       <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-6">
-        <div className="border-b border-slate-200 pb-3">
+        <div>
           <h2 className="text-base sm:text-lg font-semibold text-slate-950">
             {donation.paymentChannelName}
           </h2>

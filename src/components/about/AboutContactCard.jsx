@@ -6,7 +6,7 @@ export function AboutContactCard() {
 
   return (
     <div className="bg-white p-5 rounded-xl border border-slate-300 space-y-3.5">
-      <h3 className="font-semibold text-slate-950 text-base border-b border-slate-200 pb-2.5">
+      <h3 className="font-semibold text-slate-950 text-base">
         Kantor &amp; Layanan Donatur
       </h3>
 

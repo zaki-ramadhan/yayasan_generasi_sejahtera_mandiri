@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock, MapPin, Users } from "lucide-react";
+import { Clock, MapPin, Users, Infinity } from "lucide-react";
 import { formatRupiah, calculateProgress, calculateDaysLeft } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -12,9 +12,11 @@ export function CampaignCard({
   campaign,
   highlightQuery = "",
   showDescription = true,
+  priority = false,
   className,
 }) {
-  const progress = calculateProgress(campaign.collectedAmount, campaign.targetAmount);
+  const hasTarget = Boolean(campaign.targetAmount && Number(campaign.targetAmount) > 0);
+  const progress = hasTarget ? calculateProgress(campaign.collectedAmount, campaign.targetAmount) : 0;
   const daysLeft = calculateDaysLeft(campaign.endDate);
   const totalDonors = campaign.donorCount || 0;
 
@@ -26,6 +28,7 @@ export function CampaignCard({
           src={campaign.bannerUrl}
           alt={campaign.title}
           fallbackText={campaign.categoryName || "Program Donasi"}
+          priority={priority}
         />
         {campaign.categoryName && (
           <div className="absolute top-2.5 left-0 z-10 drop-shadow-xs">
@@ -40,9 +43,7 @@ export function CampaignCard({
       <div className="flex flex-col flex-1 p-4 sm:p-5 space-y-2.5">
         {/* Title (Uniform 2-line height) */}
         <h3 className="text-base sm:text-lg font-semibold text-slate-950 leading-snug line-clamp-2 min-h-[2.6rem] flex items-start">
-          <Link href={`/campaign/${campaign.slug}`} className="hover:text-primary transition-colors">
-            <HighlightText text={campaign.title} highlight={highlightQuery} />
-          </Link>
+          <HighlightText text={campaign.title} highlight={highlightQuery} />
         </h3>
 
         {/* Location */}
@@ -62,22 +63,38 @@ export function CampaignCard({
 
         {/* Progress Bar & Amounts */}
         <div className="space-y-1.5 pt-1 mt-auto">
-          <Progress value={progress} className="h-2" />
+          {hasTarget ? (
+            <>
+              <Progress value={progress} className="h-2" />
 
-          <div className="flex justify-between items-baseline text-sm">
-            <div>
-              <span className="text-xs sm:text-sm text-slate-600 font-medium block">Terkumpul</span>
-              <span className="font-bold text-slate-950 text-base sm:text-lg">
-                {formatRupiah(campaign.collectedAmount)}
+              <div className="flex justify-between items-baseline text-sm">
+                <div>
+                  <span className="text-xs sm:text-sm text-slate-600 font-medium block">Terkumpul</span>
+                  <span className="font-bold text-slate-950 text-base sm:text-lg">
+                    {formatRupiah(campaign.collectedAmount)}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs sm:text-sm text-slate-600 font-medium block">Target ({progress}%)</span>
+                  <span className="text-slate-900 font-semibold text-sm sm:text-base">
+                    {formatRupiah(campaign.targetAmount)}
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex justify-between items-center py-1">
+              <div>
+                <span className="text-xs sm:text-sm text-slate-600 font-medium block">Total Terkumpul</span>
+                <span className="font-bold text-slate-950 text-base sm:text-lg">
+                  {formatRupiah(campaign.collectedAmount)}
+                </span>
+              </div>
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md">
+                Berkelanjutan
               </span>
             </div>
-            <div className="text-right">
-              <span className="text-xs sm:text-sm text-slate-600 font-medium block">Target ({progress}%)</span>
-              <span className="text-slate-900 font-semibold text-sm sm:text-base">
-                {formatRupiah(campaign.targetAmount)}
-              </span>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Footer Meta: Donor Count with Users Icon & CTA */}
@@ -90,10 +107,17 @@ export function CampaignCard({
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
-            <span className="text-sm font-semibold text-slate-900 flex items-center gap-1.5 shrink-0">
-              <Clock className="w-4 h-4 text-slate-700 shrink-0 stroke-[2]" />
-              <span>{daysLeft > 0 ? `${daysLeft} hr` : "Selesai"}</span>
-            </span>
+            {campaign.endDate && daysLeft !== null ? (
+              <span className="text-sm font-semibold text-slate-900 flex items-center gap-1.5 shrink-0">
+                <Clock className="w-4 h-4 text-slate-700 shrink-0 stroke-[2]" />
+                <span>{daysLeft > 0 ? `${daysLeft} hr` : "Selesai"}</span>
+              </span>
+            ) : (
+              <span className="text-sm font-semibold text-emerald-700 flex items-center gap-1 shrink-0">
+                <Infinity className="w-4 h-4 shrink-0" />
+                <span>Rutin</span>
+              </span>
+            )}
             <Link href={`/campaign/${campaign.slug}`}>
               <Button
                 size="sm"

@@ -480,9 +480,9 @@ export function getQuickDonateTargetSlug(campaigns = []) {
     return "beasiswa-santri-penghafal-quran";
   }
 
-  // 1. Filter hanya program aktif yang belum 100% mencapai target dana
+  // 1. Filter hanya program aktif yang belum 100% mencapai target dana (atau program berkelanjutan tanpa target)
   const unfulfilled = campaigns.filter(
-    (c) => c.status === "ACTIVE" && Number(c.collectedAmount || 0) < Number(c.targetAmount || 0)
+    (c) => c.status === "ACTIVE" && (!c.targetAmount || Number(c.collectedAmount || 0) < Number(c.targetAmount || 0))
   );
 
   const pool = unfulfilled.length > 0 ? unfulfilled : campaigns.filter((c) => c.status === "ACTIVE");

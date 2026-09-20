@@ -16,7 +16,7 @@ export function DonorIdentitySection({
 }) {
   return (
     <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4 shadow-xs">
-      <div className="flex items-center gap-2.5 pb-2 border-b border-slate-200">
+      <div className="flex items-center gap-2.5">
         <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold shrink-0">
           3
         </span>

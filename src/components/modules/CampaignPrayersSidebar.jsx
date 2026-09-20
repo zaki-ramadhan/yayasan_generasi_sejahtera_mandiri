@@ -35,7 +35,7 @@ export function CampaignPrayersSidebar({ initialDonors = [], campaignSlug }) {
   if (prayersOnly.length === 0) return null;
 
   return (
-    <div className="bg-slate-50 rounded-xl space-y-4 shadow-xs h-auto">
+    <div className="space-y-4 h-auto">
       {/* Header with Custom Dropdown Sort Filter */}
       <div className="flex items-center justify-between gap-3">
         <h3 className="font-semibold text-slate-950 text-base">

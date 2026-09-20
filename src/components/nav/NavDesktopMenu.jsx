@@ -33,7 +33,7 @@ export function NavDesktopMenu({ pathname }) {
             : "text-slate-700 hover:text-slate-950 border-transparent hover:border-slate-300 -mb-px"
         )}
       >
-        Home
+        Beranda
       </Link>
 
       {/* 2. Tentang Kami */}

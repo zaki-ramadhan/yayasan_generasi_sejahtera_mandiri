@@ -5,7 +5,7 @@ import { ORG_PROFILE } from "@/data/orgProfile";
 export function AboutLeadership() {
   return (
     <section className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4">
-      <h2 className="text-lg sm:text-xl font-semibold text-slate-950 border-b border-slate-200 pb-2.5">
+      <h2 className="text-lg sm:text-xl font-semibold text-slate-950">
         Dewan Pengurus &amp; Pengawas Syariah
       </h2>
 

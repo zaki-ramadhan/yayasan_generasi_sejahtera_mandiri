@@ -5,7 +5,7 @@ export function CampaignUpdatesFeed({ updates = [] }) {
   if (!updates || updates.length === 0) {
     return (
       <div className="text-center py-12 text-slate-500 text-sm sm:text-base">
-        Belum ada kabar penyaluran terbaru untuk program ini.
+        Belum ada laporan penyaluran untuk program ini.
       </div>
     );
   }
@@ -15,14 +15,17 @@ export function CampaignUpdatesFeed({ updates = [] }) {
       <div className="divide-y divide-slate-200">
         {updates.map((upd) => (
           <div key={upd.id} className="py-5 first:pt-0 last:pb-0 space-y-2">
-            <div className="flex items-center justify-between text-sm sm:text-base text-slate-600 flex-wrap gap-2">
-              <span className="flex items-center gap-1.5 font-normal text-slate-600">
-                <Calendar className="w-4 h-4 text-slate-400" />
-                {formatDate(upd.date)}
+            <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 flex-wrap gap-2">
+              <span className="flex items-center gap-1.5 text-slate-500">
+                <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span>{formatDate(upd.date)}</span>
               </span>
               {upd.disbursedAmount ? (
-                <span className="font-normal text-slate-600">
-                  Tersalurkan: <span className="font-semibold text-green-700">{formatRupiah(upd.disbursedAmount)}</span>
+                <span className="text-slate-600">
+                  Tersalurkan:{" "}
+                  <span className="font-semibold text-emerald-700">
+                    {formatRupiah(upd.disbursedAmount)}
+                  </span>
                 </span>
               ) : null}
             </div>

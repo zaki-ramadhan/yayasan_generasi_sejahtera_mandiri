@@ -208,11 +208,12 @@ export function ProgramCatalog({ initialCampaigns = [], categories = CATEGORIES 
       ) : paginatedCampaigns.length > 0 ? (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
-            {paginatedCampaigns.map((camp) => (
+            {paginatedCampaigns.map((camp, index) => (
               <CampaignCard
                 key={camp.id}
                 campaign={camp}
                 highlightQuery={debouncedSearchQuery}
+                priority={index === 0}
               />
             ))}
           </div>

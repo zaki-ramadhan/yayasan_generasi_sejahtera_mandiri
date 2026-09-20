@@ -49,9 +49,9 @@ export function DonationCheckoutSummary({
 
         {/* Payment Breakdown Section */}
         <div className="space-y-3">
-          <div className="border-b border-slate-200 pb-2.5">
+          <div className="space-y-0.5">
             <h3 className="text-base sm:text-lg font-semibold text-slate-950">Ringkasan Pembayaran</h3>
-            <p className="text-sm text-slate-600 mt-0.5">Pastikan rincian donasi Anda telah sesuai</p>
+            <p className="text-sm text-slate-600">Pastikan rincian donasi Anda telah sesuai</p>
           </div>
 
           <div className="space-y-2.5 text-sm">

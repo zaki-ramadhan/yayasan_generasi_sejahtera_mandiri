@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, Infinity } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { formatRupiah } from "@/lib/formatters";
 
 export function CampaignHeader({ campaign, progress }) {
+  const hasTarget = Boolean(campaign.targetAmount && Number(campaign.targetAmount) > 0);
+
   return (
     <div className="space-y-3">
       {/* Title */}
@@ -25,23 +27,46 @@ export function CampaignHeader({ campaign, progress }) {
         )}
       </div>
 
+      {/* Short Summary (Synchronized with Card description) */}
+      {campaign.excerpt && (
+        <p className="text-sm sm:text-base text-slate-700 leading-relaxed pt-0.5">
+          {campaign.excerpt}
+        </p>
+      )}
+
       {/* Mobile-only Progress summary */}
       <div className="lg:hidden space-y-3 pt-3 border-t border-slate-200">
-        <Progress value={progress} className="h-2.5" />
-        <div className="flex justify-between items-baseline text-sm sm:text-base">
-          <div>
-            <span className="text-sm text-slate-700 block">Dana Terkumpul</span>
-            <span className="text-lg sm:text-xl font-semibold text-primary">
-              {formatRupiah(campaign.collectedAmount)}
+        {hasTarget ? (
+          <>
+            <Progress value={progress} className="h-2.5" />
+            <div className="flex justify-between items-baseline text-sm sm:text-base">
+              <div>
+                <span className="text-sm text-slate-700 block">Dana Terkumpul</span>
+                <span className="text-lg sm:text-xl font-semibold text-primary">
+                  {formatRupiah(campaign.collectedAmount)}
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-sm text-slate-700 block">Target ({progress}%)</span>
+                <span className="text-slate-900 font-medium text-sm sm:text-base">
+                  {formatRupiah(campaign.targetAmount)}
+                </span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex justify-between items-center">
+            <div>
+              <span className="text-sm text-slate-700 block">Dana Terkumpul</span>
+              <span className="text-lg sm:text-xl font-semibold text-primary">
+                {formatRupiah(campaign.collectedAmount)}
+              </span>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md">
+              <Infinity className="w-3.5 h-3.5 shrink-0" /> Berkelanjutan
             </span>
           </div>
-          <div className="text-right">
-            <span className="text-sm text-slate-700 block">Target ({progress}%)</span>
-            <span className="text-slate-900 font-medium text-sm sm:text-base">
-              {formatRupiah(campaign.targetAmount)}
-            </span>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

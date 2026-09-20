@@ -21,10 +21,10 @@ model Campaign {
   slug            String           @unique
   categoryId      String
   category        Category         @relation(fields: [categoryId], references: [id])
-  targetAmount    Float
+  targetAmount    Float?
   collectedAmount Float            @default(0)
   donorCount      Int              @default(0)
-  endDate         DateTime
+  endDate         DateTime?
   isUrgent        Boolean          @default(false)
   isFeatured      Boolean          @default(false)
   location        String?

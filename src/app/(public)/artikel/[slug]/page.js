@@ -31,12 +31,12 @@ export default async function ArticleDetailPage({ params }) {
   }
 
   return (
-    <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6">
+    <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-5">
       <Link
         href="/artikel"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-primary transition-colors py-0.5 group"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-primary hover:underline transition-colors py-0.5 group"
       >
-        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+        <ArrowLeft className="w-4 h-4" />
         <span>Kembali ke Berita &amp; Artikel</span>
       </Link>
 
@@ -122,7 +122,7 @@ export default async function ArticleDetailPage({ params }) {
       <RelatedArticles currentArticle={article} allArticles={allArticles} />
 
       {/* Donation Promo CTA Box (Atmospheric gradient overlay + semi-transparent bg image + 3D CTA button) */}
-      <div className="relative overflow-hidden rounded-xl border border-slate-700/70 bg-slate-950 text-white p-5 sm:p-6 shadow-md mt-8">
+      <div className="relative overflow-hidden rounded-xl border border-slate-700/70 bg-slate-950 text-white p-5 sm:p-6 shadow-md mt-4">
         {/* Background image + atmospheric bottom-anchored radial gradient */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <Image
