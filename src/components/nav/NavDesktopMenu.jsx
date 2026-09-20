@@ -1,6 +1,8 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronDown, ArrowUpRight, Check } from "lucide-react";
 import {
 	DropdownMenu,
@@ -17,6 +19,13 @@ import {
 import { cn } from "@/lib/utils";
 
 export function NavDesktopMenu({ pathname }) {
+	const router = useRouter();
+	const [isProgramOpen, setIsProgramOpen] = useState(false);
+	const [isInformasiOpen, setIsInformasiOpen] = useState(false);
+
+	const programTimerRef = useRef(null);
+	const informasiTimerRef = useRef(null);
+
 	const isProgramActive = isParentMenuActive(
 		PROGRAM_MENU,
 		pathname,
@@ -30,11 +39,73 @@ export function NavDesktopMenu({ pathname }) {
 		pathname,
 	);
 
+	const [prevPathname, setPrevPathname] = useState(pathname);
+	if (prevPathname !== pathname) {
+		setPrevPathname(pathname);
+		setIsProgramOpen(false);
+		setIsInformasiOpen(false);
+	}
+
+	useEffect(() => {
+		return () => {
+			if (programTimerRef.current) clearTimeout(programTimerRef.current);
+			if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
+		};
+	}, []);
+
+	const closeAllMenus = () => {
+		if (programTimerRef.current) clearTimeout(programTimerRef.current);
+		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
+		setIsProgramOpen(false);
+		setIsInformasiOpen(false);
+	};
+
+	const handleProgramEnter = () => {
+		if (programTimerRef.current) clearTimeout(programTimerRef.current);
+		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
+		setIsInformasiOpen(false);
+		setIsProgramOpen(true);
+	};
+
+	const handleProgramLeave = () => {
+		if (programTimerRef.current) clearTimeout(programTimerRef.current);
+		programTimerRef.current = setTimeout(() => {
+			setIsProgramOpen(false);
+		}, 150);
+	};
+
+	const handleInformasiEnter = () => {
+		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
+		if (programTimerRef.current) clearTimeout(programTimerRef.current);
+		setIsProgramOpen(false);
+		setIsInformasiOpen(true);
+	};
+
+	const handleInformasiLeave = () => {
+		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
+		informasiTimerRef.current = setTimeout(() => {
+			setIsInformasiOpen(false);
+		}, 150);
+	};
+
+	const handleProgramItemClick = (href) => {
+		if (programTimerRef.current) clearTimeout(programTimerRef.current);
+		setIsProgramOpen(false);
+		router.push(href);
+	};
+
+	const handleInformasiItemClick = (href) => {
+		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
+		setIsInformasiOpen(false);
+		router.push(href);
+	};
+
 	return (
 		<nav className="hidden lg:flex items-stretch h-full gap-1 xl:gap-2">
 			{/* 1. Home */}
 			<Link
 				href="/"
+				onMouseEnter={closeAllMenus}
 				className={cn(
 					"inline-flex items-center px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
 					isNavItemActive(
@@ -51,6 +122,7 @@ export function NavDesktopMenu({ pathname }) {
 			{/* 2. Tentang Kami */}
 			<Link
 				href="/tentang-kami"
+				onMouseEnter={closeAllMenus}
 				className={cn(
 					"inline-flex items-center px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
 					isNavItemActive(
@@ -66,12 +138,22 @@ export function NavDesktopMenu({ pathname }) {
 			</Link>
 
 			{/* 3. Program Dropdown (2 items) */}
-			<DropdownMenu>
+			<DropdownMenu open={isProgramOpen} onOpenChange={setIsProgramOpen}>
 				<DropdownMenuTrigger
 					asChild
 				>
 					<button
 						type="button"
+						onMouseEnter={handleProgramEnter}
+						onMouseLeave={handleProgramLeave}
+						onPointerDown={(e) => {
+							e.preventDefault();
+							handleProgramEnter();
+						}}
+						onClick={(e) => {
+							e.preventDefault();
+							handleProgramEnter();
+						}}
 						className={cn(
 							"inline-flex items-center gap-1.5 px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
 							isProgramActive
@@ -88,6 +170,9 @@ export function NavDesktopMenu({ pathname }) {
 				<DropdownMenuContent
 					align="start"
 					className="w-60 p-1.5 shadow-md"
+					onMouseEnter={handleProgramEnter}
+					onMouseLeave={handleProgramLeave}
+					onOpenAutoFocus={(e) => e.preventDefault()}
 				>
 					{PROGRAM_MENU.map(
 						(
@@ -104,11 +189,16 @@ export function NavDesktopMenu({ pathname }) {
 										item.label
 									}
 									asChild
+									onSelect={() => handleProgramItemClick(item.href)}
 								>
 									<Link
 										href={
 											item.href
 										}
+										onClick={(e) => {
+											e.preventDefault();
+											handleProgramItemClick(item.href);
+										}}
 										className={cn(
 											"group flex items-center justify-between px-3 py-2.5 text-sm rounded-md transition-colors",
 											isActive
@@ -147,6 +237,7 @@ export function NavDesktopMenu({ pathname }) {
 			{/* 4. Artikel (Direct Link) */}
 			<Link
 				href="/artikel"
+				onMouseEnter={closeAllMenus}
 				className={cn(
 					"inline-flex items-center px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
 					isArtikelActive
@@ -158,12 +249,22 @@ export function NavDesktopMenu({ pathname }) {
 			</Link>
 
 			{/* 5. Informasi Dropdown */}
-			<DropdownMenu>
+			<DropdownMenu open={isInformasiOpen} onOpenChange={setIsInformasiOpen}>
 				<DropdownMenuTrigger
 					asChild
 				>
 					<button
 						type="button"
+						onMouseEnter={handleInformasiEnter}
+						onMouseLeave={handleInformasiLeave}
+						onPointerDown={(e) => {
+							e.preventDefault();
+							handleInformasiEnter();
+						}}
+						onClick={(e) => {
+							e.preventDefault();
+							handleInformasiEnter();
+						}}
 						className={cn(
 							"inline-flex items-center gap-1.5 px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
 							isInformasiActive
@@ -180,6 +281,9 @@ export function NavDesktopMenu({ pathname }) {
 				<DropdownMenuContent
 					align="start"
 					className="w-64 p-1.5 shadow-md"
+					onMouseEnter={handleInformasiEnter}
+					onMouseLeave={handleInformasiLeave}
+					onOpenAutoFocus={(e) => e.preventDefault()}
 				>
 					{INFORMASI_MENU.map(
 						(
@@ -196,11 +300,16 @@ export function NavDesktopMenu({ pathname }) {
 										item.label
 									}
 									asChild
+									onSelect={() => handleInformasiItemClick(item.href)}
 								>
 									<Link
 										href={
 											item.href
 										}
+										onClick={(e) => {
+											e.preventDefault();
+											handleInformasiItemClick(item.href);
+										}}
 										className={cn(
 											"group flex items-center justify-between px-3 py-2.5 text-sm rounded-md transition-colors",
 											isActive

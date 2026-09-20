@@ -187,7 +187,7 @@ export function CampaignTransactionsList({
           <div key={group.key} className="space-y-2">
             {/* WhatsApp-Style Sticky Date Badge */}
             <div className="sticky top-0 z-10 flex justify-center py-1 pointer-events-none">
-              <span className="inline-flex items-center px-3 py-1 rounded-md text-xs bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white border border-slate-800 shadow-xs pointer-events-auto select-none">
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white border border-slate-800 shadow-xs pointer-events-auto select-none">
                 {group.label}
               </span>
             </div>

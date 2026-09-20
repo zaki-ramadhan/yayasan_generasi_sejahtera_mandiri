@@ -22,7 +22,7 @@ export function PrayerInputBar({ onSend, className }) {
 
   return (
     <div className={cn("flex items-center gap-2 w-full", className)}>
-      <div className="flex-1 flex items-center bg-white border border-slate-300 focus-within:border-primary/60 rounded-full px-4 py-2.5 transition-colors">
+      <div className="flex-1 flex items-center bg-white border border-slate-400 focus-within:border-primary rounded-full px-4 py-2.5 transition-colors">
         <input
           type="text"
           value={text}

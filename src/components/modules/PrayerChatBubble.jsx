@@ -26,7 +26,7 @@ export function PrayerChatBubble({ donor, isAmined, onToggleAmin, isOwn = false 
         {/* Bubble saja, tanpa timestamp */}
         <div
           className={cn(
-            "relative bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-2xs px-4 pt-3 pb-5 max-w-[82%] sm:max-w-[78%]",
+            "relative bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-2xs px-4 py-3 max-w-[82%] sm:max-w-[78%]",
             isOwn ? "rounded-2xl rounded-br-xs" : "rounded-2xl rounded-bl-xs"
           )}
         >
