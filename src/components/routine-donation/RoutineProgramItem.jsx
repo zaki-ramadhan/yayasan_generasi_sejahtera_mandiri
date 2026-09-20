@@ -372,7 +372,7 @@ export function RoutineProgramItem({
       </div>
 
       {/* Program Picker (DropdownMenu modal={false} - Zero Scroll Lock) */}
-      <div className="space-y-1.5">
+      <div id={index === 0 ? "tour-program-picker" : undefined} className="space-y-1.5">
         <label className="text-sm font-semibold text-slate-800 block">
           Pilih program donasi
         </label>
@@ -421,7 +421,7 @@ export function RoutineProgramItem({
       </div>
 
       {/* Frequency Picker (DropdownMenu modal={false} - Zero Scroll Lock) */}
-      <div className="space-y-2">
+      <div id={index === 0 ? "tour-schedule-frequency" : undefined} className="space-y-2">
         <div className="space-y-1.5">
           <label className="text-sm font-semibold text-slate-800 block">
             Jadwal donasi rutin
@@ -560,7 +560,7 @@ export function RoutineProgramItem({
       </div>
 
       {/* Routine Type Option (Pengingat WA vs Donasi Otomatis) */}
-      <div className="space-y-1.5">
+      <div id={index === 0 ? "tour-routine-type" : undefined} className="space-y-1.5">
         <label className="text-sm font-semibold text-slate-800 block">
           Model pelaksanaan donasi
         </label>
@@ -654,7 +654,7 @@ export function RoutineProgramItem({
       </div>
 
       {/* Jam Pengingat (Format 24 Jam dengan Input Number & Sanitasi) */}
-      <div className="space-y-1.5 pt-2 border-t border-slate-100">
+      <div id={index === 0 ? "tour-schedule-time" : undefined} className="space-y-1.5 pt-2 border-t border-slate-100">
         <label className="text-sm font-semibold text-slate-800 block">
           Jam pengingat (WIB)
         </label>

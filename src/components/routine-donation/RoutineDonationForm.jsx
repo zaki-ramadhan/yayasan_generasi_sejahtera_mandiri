@@ -11,6 +11,7 @@ import { RoutineDonorIdentity } from "@/components/routine-donation/RoutineDonor
 import { RoutineProgramItem } from "@/components/routine-donation/RoutineProgramItem";
 import { RoutineSummaryCard } from "@/components/routine-donation/RoutineSummaryCard";
 import { RoutineSuccessView } from "@/components/routine-donation/RoutineSuccessView";
+import { startRoutineTour } from "./routineTour";
 
 export function RoutineDonationForm({ campaigns = [] }) {
   const [salutation, setSalutation] = useState("Bapak");
@@ -183,7 +184,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
 
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
-      <RoutineDonationHero />
+      <RoutineDonationHero onStartTour={startRoutineTour} />
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         {/* Left Column (7 Cols): Donor Identity & Program Selection */}
@@ -225,6 +226,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
             {/* Add program button (max 2) */}
             {selectedPrograms.length < 2 && (
               <button
+                id="tour-add-program"
                 type="button"
                 onClick={handleAddProgram}
                 className="w-full h-11 px-4 rounded-lg border border-dashed border-slate-300 hover:border-primary text-slate-700 hover:text-primary bg-white hover:bg-slate-50 font-medium text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"

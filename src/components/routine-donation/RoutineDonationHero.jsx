@@ -1,16 +1,10 @@
 import Link from "next/link";
-import { ArrowLeft, Info } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { ArrowLeft, HelpCircle } from "lucide-react";
 
-export function RoutineDonationHero() {
+export function RoutineDonationHero({ onStartTour }) {
   return (
     <div className="space-y-4">
-      {/* Back button & Title (Unified with donate/page.js) */}
+      {/* Back button & Title */}
       <div className="space-y-3">
         <Link
           href="/program"
@@ -19,38 +13,27 @@ export function RoutineDonationHero() {
           <ArrowLeft className="w-4 h-4" />
           <span>Kembali ke Katalog Program</span>
         </Link>
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight">
-            Atur Jadwal Donasi Rutin
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 mt-1">
-            Atur pengingat WhatsApp atau jadwal sedekah berkala untuk program donasi pilihan Anda.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight">
+              Atur Jadwal Donasi Rutin
+            </h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-1 font-normal">
+              Atur pengingat WhatsApp atau jadwal sedekah berkala untuk program donasi pilihan Anda.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onStartTour}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-800 text-sm font-medium transition-colors cursor-pointer shrink-0 self-start sm:self-auto shadow-2xs"
+            aria-label="Butuh Panduan?"
+          >
+            <HelpCircle className="w-4 h-4 text-sky-600 shrink-0" />
+            <span>Butuh Panduan?</span>
+          </button>
         </div>
       </div>
-
-      {/* Info Accordion */}
-      <Accordion type="single" collapsible className="bg-sky-50/80 border border-sky-200 rounded-xl px-4">
-        <AccordionItem value="cara-kerja" className="border-none">
-          <AccordionTrigger className="text-sm font-semibold text-sky-950 py-3 hover:no-underline cursor-pointer">
-            <span className="flex items-center gap-2 text-left">
-              <Info className="w-4 h-4 text-sky-600 shrink-0" />
-              <span>Panduan: Cara Kerja Donasi Rutin</span>
-            </span>
-          </AccordionTrigger>
-          <AccordionContent className="text-xs sm:text-sm text-sky-900 leading-relaxed pt-1 pb-4 space-y-2">
-            <p>
-              1. Sistem YGSM akan mengirimkan notifikasi pengingat ramah disertai tautan invoice QRIS / Virtual Account langsung ke WhatsApp Anda pada waktu yang telah ditentukan.
-            </p>
-            <p>
-              2. Anda tidak terikat kontrak paksaan; Anda dapat menunda, mengganti nominal, atau membatalkan jadwal donasi rutin kapan pun tanpa biaya tambahan.
-            </p>
-            <p>
-              3. Seluruh sedekah tercatat dalam rekam jejak transparansi dan dapat diakses melalui portal donatur resmi.
-            </p>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
     </div>
   );
 }

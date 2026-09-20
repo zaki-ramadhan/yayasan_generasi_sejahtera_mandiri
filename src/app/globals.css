@@ -57,3 +57,107 @@ body[data-scroll-locked] {
   box-shadow: none !important;
 }
 
+/* Custom Driver.js Popover Styling (Clean, Neutral, Accessible, No Bold Spam) */
+.driver-popover.ygsm-driver-popover {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+  padding: 18px 20px;
+  max-width: 320px;
+  font-family: inherit;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #0f172a;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-description {
+  font-size: 14px;
+  font-weight: 400;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-progress-text {
+  font-size: 13px;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-close-btn {
+  color: #94a3b8;
+  font-size: 20px;
+  font-weight: 400;
+  top: 8px;
+  right: 10px;
+  transition: color 0.15s ease;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-close-btn:hover {
+  color: #0f172a;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-footer-btn {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 5px;
+  transition: all 0.15s ease;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-prev-btn {
+  background-color: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-prev-btn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-next-btn {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  border: 1px solid #1d4ed8;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-next-btn:hover {
+  background-color: #1e40af;
+}
+
+/* Explicit, clearly visible tooltip arrow (ekor) with matching slate border */
+.driver-popover.ygsm-driver-popover .driver-popover-arrow {
+  border-width: 8px;
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-arrow-side-bottom {
+  border-bottom-color: #ffffff;
+  bottom: 100%;
+  filter: drop-shadow(0 -1.5px 0.5px #cbd5e1);
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-arrow-side-top {
+  border-top-color: #ffffff;
+  top: 100%;
+  filter: drop-shadow(0 1.5px 0.5px #cbd5e1);
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-arrow-side-left {
+  border-left-color: #ffffff;
+  left: 100%;
+  filter: drop-shadow(1.5px 0 0.5px #cbd5e1);
+}
+
+.driver-popover.ygsm-driver-popover .driver-popover-arrow-side-right {
+  border-right-color: #ffffff;
+  right: 100%;
+  filter: drop-shadow(-1.5px 0 0.5px #cbd5e1);
+}
+

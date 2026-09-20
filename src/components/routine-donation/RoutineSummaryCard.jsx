@@ -17,13 +17,13 @@ export function RoutineSummaryCard({
   );
 
   return (
-    <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-5 shadow-xs">
+    <div id="tour-summary-card" className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-5 shadow-xs">
       <div>
         <h3 className="text-base sm:text-lg font-semibold text-slate-950">
           Ringkasan Jadwal Donasi
         </h3>
         <p className="text-sm text-slate-600 mt-0.5">
-          {selectedPrograms.length} program donasi terdaftar
+          {selectedPrograms.length} program terdaftar
         </p>
       </div>
 
