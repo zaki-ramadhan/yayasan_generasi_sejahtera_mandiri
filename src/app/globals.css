@@ -161,3 +161,45 @@ body[data-scroll-locked] {
   filter: drop-shadow(-1.5px 0 0.5px #cbd5e1);
 }
 
+/* Toast Animations (Top-Center Slide & Fade with ease-in-out) */
+@keyframes toast-slide-in-top {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes toast-slide-out-top {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in-top 300ms ease-in-out forwards;
+}
+
+.toast-exit {
+  animation: toast-slide-out-top 300ms ease-in-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter {
+    animation: none;
+    opacity: 1;
+  }
+  .toast-exit {
+    animation: none;
+    opacity: 0;
+  }
+}
+

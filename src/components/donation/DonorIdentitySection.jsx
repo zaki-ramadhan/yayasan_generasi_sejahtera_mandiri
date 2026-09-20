@@ -48,7 +48,7 @@ export function DonorIdentitySection({
             value={donorName}
             maxLength={60}
             onChange={(e) => setDonorName(sanitizeName(e.target.value))}
-            placeholder="Contoh: Ahmad Fauzi"
+            placeholder="Nama lengkap Anda"
             className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
           />
         </div>
@@ -64,7 +64,7 @@ export function DonorIdentitySection({
             value={donorPhone}
             maxLength={15}
             onChange={(e) => setDonorPhone(sanitizePhone(e.target.value))}
-            placeholder="0812xxxxxxxx"
+            placeholder="08xxxxxxxxxx"
             className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
           />
           <span className="text-sm text-slate-600 block font-normal">Untuk pengiriman invoice &amp; bukti donasi</span>
@@ -77,7 +77,7 @@ export function DonorIdentitySection({
             value={donorEmail}
             maxLength={100}
             onChange={(e) => setDonorEmail(sanitizeEmail(e.target.value))}
-            placeholder="email@anda.com"
+            placeholder="email@domain.com"
             className="h-11 text-sm sm:text-base border-slate-300 focus:ring-primary font-normal"
           />
         </div>
@@ -107,7 +107,7 @@ export function DonorIdentitySection({
             value={prayer}
             onChange={onPrayerChange}
             onBlur={() => setPrayer((prev) => prev.trim().replace(/\s+/g, " "))}
-            placeholder="Contoh: Bismillah, semoga menjadi amal jariyah dan membawa keberkahan untuk kita semua..."
+            placeholder="Tuliskan doa atau permohonan kebaikan Anda..."
             className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors font-normal resize-none"
           />
         )}

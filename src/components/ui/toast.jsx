@@ -2,18 +2,20 @@
 
 import * as React from "react";
 import { cva } from "class-variance-authority";
-import { X, CheckCircle2, AlertTriangle, AlertCircle, Info } from "lucide-react";
+import { X, CheckCircle2, AlertTriangle, CircleX, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-3 overflow-hidden rounded-xl border p-4 shadow-xl transition-all duration-300 ease-in-out data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
+  "group pointer-events-auto relative flex w-full items-center justify-between space-x-3 overflow-hidden rounded-xl border p-4 shadow-xl will-change-transform",
   {
     variants: {
       variant: {
         default: "border-slate-800 bg-slate-900 text-white shadow-slate-950/30",
+        info: "border-blue-700 bg-blue-600 text-white shadow-blue-950/25",
         success: "border-emerald-700 bg-emerald-600 text-white shadow-emerald-950/25",
         destructive: "border-rose-700 bg-rose-600 text-white shadow-rose-950/25",
+        error: "border-rose-700 bg-rose-600 text-white shadow-rose-950/25",
         warning: "border-amber-700 bg-amber-600 text-white shadow-amber-950/25",
       },
     },
@@ -23,11 +25,16 @@ const toastVariants = cva(
   }
 );
 
-const Toast = React.forwardRef(({ className, variant, onOpenChange, ...props }, ref) => {
+const Toast = React.forwardRef(({ className, variant, open = true, onOpenChange, ...props }, ref) => {
   return (
     <div
       ref={ref}
-      className={cn(toastVariants({ variant }), className)}
+      data-state={open ? "open" : "closed"}
+      className={cn(
+        toastVariants({ variant }),
+        open ? "toast-enter" : "toast-exit",
+        className
+      )}
       {...props}
     />
   );
@@ -38,7 +45,7 @@ const ToastAction = React.forwardRef(({ className, ...props }, ref) => (
   <button
     ref={ref}
     className={cn(
-      "inline-flex h-8 shrink-0 items-center justify-center rounded-lg border border-white/30 bg-white/10 px-3 text-xs font-semibold text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-1 focus:ring-white disabled:pointer-events-none disabled:opacity-50",
+      "inline-flex h-8 shrink-0 items-center justify-center rounded-lg border border-white/30 bg-white/10 px-3 text-xs font-medium text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-1 focus:ring-white disabled:pointer-events-none disabled:opacity-50",
       className
     )}
     {...props}
@@ -69,7 +76,7 @@ ToastClose.displayName = "ToastClose";
 const ToastTitle = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm font-semibold text-white leading-snug [&+div]:text-xs", className)}
+    className={cn("text-sm font-medium text-white leading-snug", className)}
     {...props}
   />
 ));
@@ -78,7 +85,7 @@ ToastTitle.displayName = "ToastTitle";
 const ToastDescription = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-xs font-normal text-white leading-relaxed mt-0.5", className)}
+    className={cn("text-sm font-medium text-white/90 leading-snug mt-0.5", className)}
     {...props}
   />
 ));
@@ -88,8 +95,8 @@ function ToastIcon({ variant }) {
   if (variant === "success") {
     return <CheckCircle2 className="h-5 w-5 shrink-0 text-white" />;
   }
-  if (variant === "destructive") {
-    return <AlertCircle className="h-5 w-5 shrink-0 text-white" />;
+  if (variant === "destructive" || variant === "error") {
+    return <CircleX className="h-5 w-5 shrink-0 text-white" />;
   }
   if (variant === "warning") {
     return <AlertTriangle className="h-5 w-5 shrink-0 text-white" />;
@@ -104,13 +111,17 @@ export function Toaster() {
     <div
       tabIndex={-1}
       aria-live="polite"
-      className="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px] pointer-events-none gap-2"
+      className="fixed top-4 inset-x-0 mx-auto z-[100] flex max-h-screen w-full max-w-[420px] flex-col items-center pointer-events-none gap-2 px-4 sm:px-0"
     >
       {toasts.map(function ({ id, title, description, action, variant, open, onOpenChange, ...props }) {
-        if (open === false) return null;
-
         return (
-          <Toast key={id} variant={variant} className="pointer-events-auto" {...props}>
+          <Toast
+            key={id}
+            variant={variant}
+            open={open}
+            className="pointer-events-auto"
+            {...props}
+          >
             <div className="flex items-start gap-3 w-full pr-7">
               <ToastIcon variant={variant} />
               <div className="grid gap-0.5 text-left flex-1 min-w-0">

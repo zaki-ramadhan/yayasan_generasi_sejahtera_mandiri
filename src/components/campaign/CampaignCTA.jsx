@@ -1,9 +1,41 @@
+"use client";
+
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { isCampaignClosed } from "@/lib/formatters";
 
+function subscribeAuth(callback) {
+  window.addEventListener("ygsm_auth_change", callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener("ygsm_auth_change", callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+function getAuthSnapshot() {
+  return localStorage.getItem("ygsm_auth_user");
+}
+
+function getAuthServerSnapshot() {
+  return null;
+}
+
 export function CampaignCTA({ campaign }) {
-  if (isCampaignClosed(campaign)) {
+  const userJson = useSyncExternalStore(subscribeAuth, getAuthSnapshot, getAuthServerSnapshot);
+
+  let isLoggedIn = false;
+  try {
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      isLoggedIn = Boolean(user && user.id);
+    }
+  } catch {
+    isLoggedIn = false;
+  }
+
+  if (isCampaignClosed(campaign) || isLoggedIn) {
     return null;
   }
 

@@ -12,9 +12,11 @@ import {
   validatePhone,
   validateEmail,
   sanitizePrayer,
+  sanitizePhone,
 } from "@/lib/security";
 import { getStoredUser } from "@/services/authService";
 import { saveDonationDraft, loadDonationDraft, clearDonationDraft } from "@/lib/donationDraft";
+import { saveDonorInvoice } from "@/lib/donorStorage";
 import { NominalPresetsPicker } from "@/components/donation/NominalPresetsPicker";
 import { PaymentChannelPicker } from "@/components/donation/PaymentChannelPicker";
 import { DonorIdentitySection } from "@/components/donation/DonorIdentitySection";
@@ -100,7 +102,10 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
         setDonorEmail(user.email);
       }
       if (user.phone && user.phone !== "-") {
-        setDonorPhone(user.phone);
+        const cleanPhone = sanitizePhone(user.phone);
+        if (cleanPhone) {
+          setDonorPhone(cleanPhone);
+        }
       }
 
       setIsAuthChecking(false);
@@ -222,21 +227,21 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
 
       const donation = json.data;
 
-      if (sanitizedPrayer && campaign?.slug && typeof window !== "undefined") {
-        try {
-          const storedPrayers = JSON.parse(localStorage.getItem("ygsm_user_prayers") || "[]");
-          if (!storedPrayers.includes(campaign.slug)) {
-            storedPrayers.push(campaign.slug);
-            localStorage.setItem("ygsm_user_prayers", JSON.stringify(storedPrayers));
-          }
-        } catch {
-          // Ignore
-        }
-      }
+      saveDonorInvoice({
+        invoiceId: donation.invoiceId,
+        token: donation.accessToken || "",
+        campaignSlug: campaign?.slug || "",
+        donorName: donation.donorName,
+        isAnonymous,
+        hasPrayer: Boolean(sanitizedPrayer),
+      });
 
       clearDonationDraft();
       toast.success("Tagihan donasi berhasil dibuat!");
-      router.push(`/invoice/${donation.invoiceId}`);
+      const targetUrl = donation.accessToken
+        ? `/invoice/${donation.invoiceId}?token=${donation.accessToken}`
+        : `/invoice/${donation.invoiceId}`;
+      router.push(targetUrl);
     } catch (err) {
       toast.error(err.message || "Gagal memproses transaksi. Silakan coba kembali.");
       setIsSubmitting(false);

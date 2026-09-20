@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Heart, Send, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getStoredUser } from "@/services/authService";
 import {
   sanitizeName,
   sanitizePhone,
@@ -32,6 +33,26 @@ export function VolunteerForm() {
   const [motivation, setMotivation] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const user = getStoredUser();
+    if (!user) return;
+
+    queueMicrotask(() => {
+      if (user.name && user.name !== "Pengguna Google" && user.name !== "Pengguna Facebook") {
+        setFullName(user.name);
+      }
+      if (user.phone && user.phone !== "-") {
+        const cleanPhone = sanitizePhone(user.phone);
+        if (cleanPhone) {
+          setPhone(cleanPhone);
+        }
+      }
+      if (user.email && !user.email.endsWith("@google.user") && !user.email.endsWith("@facebook.user")) {
+        setEmail(user.email);
+      }
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import {
   validateDonationAmount,
@@ -18,6 +19,7 @@ donationStore.set("INV-2026-DEMO", {
   campaignId: "camp-001",
   campaignTitle: "Beasiswa Pendidikan Santri Penghafal Al-Qur'an 30 Juz",
   campaignSlug: "beasiswa-santri-penghafal-quran",
+  campaignImage: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80",
   donationType: "CAMPAIGN",
   amount: 100000,
   uniqueCode: 124,
@@ -80,6 +82,7 @@ export async function createDonation({
   const adminFee = channel.fee || 0;
   const totalAmount = Number(amount) + uniqueCode + adminFee;
   const invoiceId = `INV-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+  const accessToken = crypto.randomBytes(16).toString("hex");
 
   let virtualAccountNumber = "";
   if (channel.type === "VA") {
@@ -96,6 +99,7 @@ export async function createDonation({
   const donationData = {
     id: `don-${Date.now()}`,
     invoiceId,
+    accessToken,
     campaignId: campaignId || null,
     campaignTitle,
     campaignSlug,
@@ -127,6 +131,7 @@ export async function createDonation({
     const createdDb = await prisma.donation.create({
       data: {
         invoiceId,
+        accessToken,
         campaignId: campaignId || undefined,
         donationType,
         amount: Number(amount),
@@ -158,7 +163,7 @@ export async function createDonation({
   return donationData;
 }
 
-export async function getDonationByInvoiceId(invoiceId) {
+export async function getDonationByInvoiceId(invoiceId, token = null) {
   if (!invoiceId) return null;
 
   try {
@@ -173,12 +178,35 @@ export async function getDonationByInvoiceId(invoiceId) {
       const channel =
         PAYMENT_CHANNELS.find((p) => p.id === dbDonation.paymentChannel) || PAYMENT_CHANNELS[0];
 
+      let effectiveAccessToken = dbDonation.accessToken;
+      if (!effectiveAccessToken) {
+        effectiveAccessToken = crypto
+          .createHash("sha256")
+          .update(`${dbDonation.invoiceId}_ygsm_salt`)
+          .digest("hex")
+          .slice(0, 32);
+
+        try {
+          await prisma.donation.update({
+            where: { id: dbDonation.id },
+            data: { accessToken: effectiveAccessToken },
+          });
+        } catch {
+          // Ignore if update fails
+        }
+      }
+
+      const isAuthorized = Boolean(token && token === effectiveAccessToken);
+
       return {
         id: dbDonation.id,
         invoiceId: dbDonation.invoiceId,
+        accessToken: effectiveAccessToken,
+        isAuthorized,
         campaignId: dbDonation.campaignId,
         campaignTitle: dbDonation.campaign?.title || "Sedekah Umum YGSM",
         campaignSlug: dbDonation.campaign?.slug || "",
+        campaignImage: dbDonation.campaign?.bannerUrl || null,
         donationType: dbDonation.donationType,
         amount: dbDonation.amount,
         uniqueCode: dbDonation.uniqueCode,
@@ -202,7 +230,120 @@ export async function getDonationByInvoiceId(invoiceId) {
     console.warn("Prisma getDonationByInvoiceId fallback:", error.message);
   }
 
-  return donationStore.get(invoiceId) || null;
+  const fallbackDonation = donationStore.get(invoiceId);
+  if (fallbackDonation) {
+    let effectiveAccessToken = fallbackDonation.accessToken;
+    if (!effectiveAccessToken) {
+      effectiveAccessToken = crypto
+        .createHash("sha256")
+        .update(`${fallbackDonation.invoiceId}_ygsm_salt`)
+        .digest("hex")
+        .slice(0, 32);
+      fallbackDonation.accessToken = effectiveAccessToken;
+    }
+
+    const isAuthorized = Boolean(token && token === effectiveAccessToken);
+    return {
+      ...fallbackDonation,
+      accessToken: effectiveAccessToken,
+      isAuthorized,
+    };
+  }
+
+  return null;
+}
+
+export async function updateDonationPrayer({ invoiceId, prayer, isAnonymous }) {
+  if (!invoiceId) {
+    throw new Error("Nomor invoice diperlukan.");
+  }
+
+  const cleanPrayer = sanitizePrayer(prayer);
+  if (!cleanPrayer) {
+    throw new Error("Pesan doa tidak boleh kosong.");
+  }
+
+  let updatedData = null;
+
+  try {
+    const existingDb = await prisma.donation.findUnique({
+      where: { invoiceId },
+      include: { campaign: true },
+    });
+
+    if (existingDb) {
+      const updatePayload = {
+        prayer: cleanPrayer,
+      };
+
+      if (typeof isAnonymous === "boolean") {
+        updatePayload.isAnonymous = isAnonymous;
+        if (isAnonymous) {
+          updatePayload.donorName = "Hamba Allah";
+        }
+      }
+
+      const updatedDb = await prisma.donation.update({
+        where: { invoiceId },
+        data: updatePayload,
+        include: { campaign: true },
+      });
+
+      updatedData = {
+        id: updatedDb.id,
+        invoiceId: updatedDb.invoiceId,
+        campaignId: updatedDb.campaignId,
+        campaignTitle: updatedDb.campaign?.title || "Sedekah Umum YGSM",
+        campaignSlug: updatedDb.campaign?.slug || "",
+        amount: updatedDb.amount,
+        donorName: updatedDb.donorName,
+        isAnonymous: updatedDb.isAnonymous,
+        prayer: updatedDb.prayer,
+        status: updatedDb.status,
+      };
+    }
+  } catch (error) {
+    console.warn("Prisma updateDonationPrayer fallback:", error.message);
+  }
+
+  const cached = donationStore.get(invoiceId);
+  if (cached) {
+    cached.prayer = cleanPrayer;
+    if (typeof isAnonymous === "boolean") {
+      cached.isAnonymous = isAnonymous;
+      if (isAnonymous) {
+        cached.donorName = "Hamba Allah";
+      }
+    }
+    donationStore.set(invoiceId, cached);
+
+    if (!updatedData) {
+      updatedData = {
+        id: cached.id,
+        invoiceId: cached.invoiceId,
+        campaignId: cached.campaignId,
+        campaignTitle: cached.campaignTitle,
+        campaignSlug: cached.campaignSlug,
+        amount: cached.amount,
+        donorName: cached.donorName,
+        isAnonymous: cached.isAnonymous,
+        prayer: cached.prayer,
+        status: cached.status,
+      };
+    }
+  }
+
+  if (!updatedData) {
+    updatedData = {
+      id: `don-${Date.now()}`,
+      invoiceId,
+      donorName: isAnonymous ? "Hamba Allah" : "Donatur",
+      isAnonymous: Boolean(isAnonymous),
+      prayer: cleanPrayer,
+    };
+  }
+
+  return updatedData;
 }
 
 export async function getRecentDonations(limit = 10) {

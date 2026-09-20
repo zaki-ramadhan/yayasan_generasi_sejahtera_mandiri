@@ -120,6 +120,7 @@ export function LoginForm() {
         };
 
         loginUser(defaultDonor);
+        sessionStorage.removeItem("ygsm_just_logged_in");
         setIsLoading(false);
         toast.success(`Selamat datang, ${defaultDonor.name}!`);
         router.push(redirectUrl || getRedirectPathForRole(defaultDonor.role));
@@ -127,6 +128,7 @@ export function LoginForm() {
       }
 
       loginUser(foundUser);
+      sessionStorage.removeItem("ygsm_just_logged_in");
       setIsLoading(false);
       toast.success(`Selamat datang kembali, ${foundUser.name}! (${foundUser.title})`);
       router.push(redirectUrl || getRedirectPathForRole(foundUser.role));
@@ -143,6 +145,7 @@ export function LoginForm() {
     setTimeout(() => {
       const fbUser = simulateSocialAuth("facebook");
       loginUser(fbUser);
+      sessionStorage.removeItem("ygsm_just_logged_in");
       setIsFacebookLoading(false);
       toast.success(`Berhasil masuk dengan Facebook: ${fbUser.name}`);
       router.push(redirectUrl || getRedirectPathForRole(fbUser.role));

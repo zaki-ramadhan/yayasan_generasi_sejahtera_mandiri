@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { createDonation, getRecentDonations } from "@/services/donationService";
+import {
+  createDonation,
+  getRecentDonations,
+  updateDonationPrayer,
+} from "@/services/donationService";
 import { getCampaignDonationsPaginated } from "@/services/campaignService";
 
 export async function GET(request) {
@@ -32,7 +36,18 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const donation = await createDonation(body);
-    return NextResponse.json({ success: true, data: donation }, { status: 201 });
+    const response = NextResponse.json({ success: true, data: donation }, { status: 201 });
+
+    if (donation.accessToken && donation.invoiceId) {
+      response.cookies.set(`ygsm_inv_${donation.invoiceId}`, donation.accessToken, {
+        path: "/",
+        maxAge: 24 * 60 * 60,
+        sameSite: "lax",
+        httpOnly: true,
+      });
+    }
+
+    return response;
   } catch (error) {
     return NextResponse.json(
       { success: false, message: error.message || "Gagal memproses donasi." },
@@ -40,3 +55,24 @@ export async function POST(request) {
     );
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const body = await request.json();
+    const { invoiceId, prayer, isAnonymous } = body;
+    if (!invoiceId) {
+      return NextResponse.json(
+        { success: false, message: "Nomor invoice diperlukan." },
+        { status: 400 }
+      );
+    }
+    const updated = await updateDonationPrayer({ invoiceId, prayer, isAnonymous });
+    return NextResponse.json({ success: true, data: updated });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, message: error.message || "Gagal memperbarui doa." },
+      { status: 400 }
+    );
+  }
+}
+

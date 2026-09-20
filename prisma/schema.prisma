@@ -51,6 +51,7 @@ model CampaignUpdate {
   content         String
   disbursedAmount Float    @default(0)
   date            DateTime @default(now())
+  images          String[] @default([])
   createdAt       DateTime @default(now())
 
   @@index([campaignId])
@@ -59,6 +60,7 @@ model CampaignUpdate {
 model Donation {
   id             String    @id @default(cuid())
   invoiceId      String    @unique
+  accessToken    String?   @unique
   campaignId     String?
   campaign       Campaign? @relation(fields: [campaignId], references: [id])
   donationType   String    @default("CAMPAIGN") // CAMPAIGN, ZAKAT, INFAK_SUBUH, WAKAF

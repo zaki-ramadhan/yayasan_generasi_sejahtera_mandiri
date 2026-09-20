@@ -3,7 +3,7 @@
 import * as React from "react";
 
 const TOAST_LIMIT = 3;
-const TOAST_EXIT_ANIMATION_DELAY = 350; // Delay for smooth exit animation before removal
+const TOAST_EXIT_ANIMATION_DELAY = 300; // Delay for smooth 300ms exit animation before removal
 const DEFAULT_TOAST_DURATION = 4000; // Auto-dismiss after 4 seconds
 
 const actionTypes = {
@@ -104,6 +104,7 @@ function dispatch(action) {
 
 function toast({ duration = DEFAULT_TOAST_DURATION, ...props }) {
   const id = genId();
+  let dismissTimer;
 
   const update = (props) =>
     dispatch({
@@ -111,8 +112,10 @@ function toast({ duration = DEFAULT_TOAST_DURATION, ...props }) {
       toast: { ...props, id },
     });
 
-  const dismiss = () =>
+  const dismiss = () => {
+    if (dismissTimer) clearTimeout(dismissTimer);
     dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
+  };
 
   dispatch({
     type: actionTypes.ADD_TOAST,
@@ -128,7 +131,7 @@ function toast({ duration = DEFAULT_TOAST_DURATION, ...props }) {
 
   // Auto-dismiss after specified duration
   if (duration > 0 && duration !== Infinity) {
-    setTimeout(() => {
+    dismissTimer = setTimeout(() => {
       dismiss();
     }, duration);
   }
@@ -174,18 +177,32 @@ toast.error = (titleOrDescription, options = {}) => {
 };
 
 toast.info = (titleOrDescription, options = {}) => {
+  if (typeof titleOrDescription === "string" && !options.title && !options.description) {
+    return toast({
+      title: titleOrDescription,
+      variant: "info",
+      ...options,
+    });
+  }
   return toast({
-    title: typeof titleOrDescription === "string" ? titleOrDescription : options.title,
-    description: options.description,
-    variant: "default",
+    title: options.title || "Informasi",
+    description: typeof titleOrDescription === "string" ? titleOrDescription : options.description,
+    variant: "info",
     ...options,
   });
 };
 
 toast.warning = (titleOrDescription, options = {}) => {
+  if (typeof titleOrDescription === "string" && !options.title && !options.description) {
+    return toast({
+      title: titleOrDescription,
+      variant: "warning",
+      ...options,
+    });
+  }
   return toast({
-    title: typeof titleOrDescription === "string" ? titleOrDescription : options.title,
-    description: options.description,
+    title: options.title || "Peringatan",
+    description: typeof titleOrDescription === "string" ? titleOrDescription : options.description,
     variant: "warning",
     ...options,
   });

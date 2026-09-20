@@ -18,7 +18,7 @@ export function CampaignHeader({ campaign, progress }) {
         <span className="font-semibold text-slate-950">{campaign.categoryName}</span>
         {campaign.location && (
           <>
-            <span className="text-slate-400">/</span>
+            <span className="text-slate-300 select-none" aria-hidden="true">|</span>
             <span className="flex items-center gap-1.5 text-slate-700">
               <MapPin className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-500 shrink-0" />
               <span>{campaign.location}</span>

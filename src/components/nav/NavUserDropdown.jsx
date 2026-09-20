@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   User,
@@ -21,8 +22,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ROLE_LABELS, USER_ROLES } from "@/services/authService";
+import { cn } from "@/lib/utils";
 
 export function NavUserDropdown({ currentUser, onLogout }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   if (!currentUser) {
     return (
       <Link href="/login">
@@ -43,16 +47,29 @@ export function NavUserDropdown({ currentUser, onLogout }) {
   const roleLabel = ROLE_LABELS[currentUser.role] || currentUser.role || "Donatur";
 
   return (
-    <DropdownMenu>
-      {/* Trigger: Header-matching background, subtle hover effect */}
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      {/* Trigger: Active state highlights background, border, avatar ring, and rotates chevron */}
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="group flex items-center gap-1.5 p-1 pr-1.5 sm:pr-2 rounded-full bg-transparent hover:bg-slate-100 border border-slate-200/80 hover:border-slate-300 transition-colors duration-150 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+          className={cn(
+            "group flex items-center gap-1.5 p-1 pr-1.5 sm:pr-2 rounded-full transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
+            isOpen
+              ? "bg-slate-100 border border-slate-300 shadow-2xs ring-2 ring-primary/15"
+              : "bg-transparent hover:bg-slate-100 border border-slate-200/90 hover:border-slate-300"
+          )}
           aria-label="Buka menu profil pengguna"
+          aria-expanded={isOpen}
         >
           {/* Profile Picture */}
-          <div className="relative w-7 h-7 rounded-full overflow-hidden bg-slate-100 border border-slate-300 shrink-0 flex items-center justify-center">
+          <div
+            className={cn(
+              "relative w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center transition-all duration-200",
+              isOpen
+                ? "border border-primary ring-2 ring-primary/30 ring-offset-1 ring-offset-white shadow-2xs bg-white"
+                : "border border-slate-300 bg-slate-100"
+            )}
+          >
             {currentUser.avatar ? (
               <img
                 src={currentUser.avatar}
@@ -61,15 +78,20 @@ export function NavUserDropdown({ currentUser, onLogout }) {
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <span className="font-semibold text-xs text-slate-800">
+              <span className="font-medium text-xs text-slate-800">
                 {currentUser.initials || currentUser.name?.charAt(0) || "U"}
               </span>
             )}
           </div>
 
-          {/* Small chevron arrow */}
+          {/* Small chevron arrow with smooth rotation */}
           <ChevronDown
-            className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-800 transition-colors"
+            className={cn(
+              "w-3.5 h-3.5 transition-transform duration-200 ease-in-out",
+              isOpen
+                ? "rotate-180 text-primary"
+                : "text-slate-500 group-hover:text-slate-800"
+            )}
             strokeWidth={2}
           />
         </button>

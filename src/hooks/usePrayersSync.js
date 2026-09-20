@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useState, useMemo, useCallback, useSyncExternalStore } from "react";
 
 const AMINED_STORAGE_KEY = "ygsm_amined_prayers";
 const AMIN_COUNTS_KEY = "ygsm_prayer_amin_counts";
@@ -32,6 +32,7 @@ function getServerCountsSnapshot() {
 }
 
 export function usePrayersSync(initialDonors = []) {
+  const [submittedPrayers, setSubmittedPrayers] = useState([]);
   const aminedRaw = useSyncExternalStore(subscribe, getAminedSnapshot, getServerSnapshot);
   const countsRaw = useSyncExternalStore(subscribe, getCountsSnapshot, getServerCountsSnapshot);
 
@@ -56,7 +57,11 @@ export function usePrayersSync(initialDonors = []) {
     extraCounts = {};
   }
 
-  const donors = initialDonors.map((d) => {
+  const allDonors = useMemo(() => {
+    return [...submittedPrayers, ...initialDonors];
+  }, [submittedPrayers, initialDonors]);
+
+  const donors = allDonors.map((d) => {
     const baseCount =
       typeof d.aminCount === "number" && d.aminCount > 0
         ? d.aminCount
@@ -90,9 +95,15 @@ export function usePrayersSync(initialDonors = []) {
     }
   }, []);
 
+  const addNewPrayer = useCallback((newDonor) => {
+    setSubmittedPrayers((prev) => [newDonor, ...prev]);
+  }, []);
+
   return {
     donors,
     aminedSet,
     handleToggleAmin,
+    addNewPrayer,
   };
 }
+

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { DONATION_LIMITS, validateName, validatePhone } from "@/lib/security";
+import { DONATION_LIMITS, validateName, validatePhone, sanitizePhone } from "@/lib/security";
 import { formatRupiah, isCampaignClosed } from "@/lib/formatters";
 import { getStoredUser } from "@/services/authService";
 import { RoutineDonationHero } from "@/components/routine-donation/RoutineDonationHero";
@@ -36,7 +36,10 @@ export function RoutineDonationForm({ campaigns = [] }) {
         setFullName(user.name);
       }
       if (user.phone && user.phone !== "-") {
-        setWhatsapp(user.phone);
+        const cleanPhone = sanitizePhone(user.phone);
+        if (cleanPhone) {
+          setWhatsapp(cleanPhone);
+        }
       }
     });
   }, []);

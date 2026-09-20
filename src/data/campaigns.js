@@ -21,14 +21,20 @@ export const CAMPAIGNS = [
         "date": "2026-08-15",
         "title": "Penyaluran Mushaf Al-Qur'an & Seragam Santri Baru",
         "content": "Alhamdulillah, dana sebesar Rp 25.000.000 telah disalurkan untuk pengadaan 50 paket mushaf hafalan dan perlengkapan asrama santri angkatan baru.",
-        "disbursedAmount": 25000000
+        "disbursedAmount": 25000000,
+        "images": [
+          "https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=800&q=80"
+        ]
       },
       {
         "id": "upd-002",
         "date": "2026-07-01",
         "title": "Wisuda Tahfidz 15 Juz Angkatan Pertama",
         "content": "12 santri dhuafa berhasil menyelesaikan setoran hafalan 15 juz mutqin. Terima kasih atas sedekah dan doa para muhsinin.",
-        "disbursedAmount": 18000000
+        "disbursedAmount": 18000000,
+        "images": [
+          "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80"
+        ]
       }
     ],
     "recentDonors": [
@@ -46,7 +52,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-001-2",
         "name": "Keluarga Ibu Sri",
-        "email": "sri.wahyuni78@yahoo.co.id",
+        "email": "sr***78@yahoo.co.id",
         "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-16T11:17:00Z",
@@ -57,7 +63,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-001-3",
         "name": "Dra. Hj. Nurul Hidayah",
-        "email": "nurul.hidayah@kemenag.go.id",
+        "email": "nu***ah@kemenag.go.id",
         "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-15T14:34:00Z",
@@ -79,7 +85,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-001-5",
         "name": "Rina Kartika",
-        "email": "rina.kartika@yahoo.com",
+        "email": "ri***ka@yahoo.com",
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
         "amount": 1000000,
         "date": "2026-09-12T08:08:00Z",
@@ -90,7 +96,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-001-6",
         "name": "H. Hendra Wijaya",
-        "email": "hendra.wijaya@holding.co.id",
+        "email": "he***ya@holding.co.id",
         "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
         "amount": 1500000,
         "date": "2026-09-11T11:25:00Z",
@@ -101,7 +107,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-001-7",
         "name": "Irfan Hakim",
-        "email": "irfan.hakim@media.id",
+        "email": "ir***im@media.id",
         "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80",
         "amount": 200000,
         "date": "2026-09-10T14:42:00Z",
@@ -123,7 +129,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-001-9",
         "name": "Budi Santoso",
-        "email": "budi.santoso@gmail.com",
+        "email": "bu***so@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
         "amount": 100000,
         "date": "2026-09-07T08:16:00Z",
@@ -134,7 +140,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-001-10",
         "name": "Agus Pratama",
-        "email": "agus.pratama@bankmandiri.co.id",
+        "email": "ag***ma@bankmandiri.co.id",
         "avatar": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-06T11:33:00Z",
@@ -166,7 +172,11 @@ export const CAMPAIGNS = [
         "date": "2026-09-10",
         "title": "Pendirian Dapur Umum & Distribusi 1.500 Nasi Bungkus",
         "content": "Tim relawan telah mendistribusikan 1.500 porsi makanan siap santap kepada para pengungsi di 3 desa terdampak.",
-        "disbursedAmount": 32000000
+        "disbursedAmount": 32000000,
+        "images": [
+          "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80"
+        ]
       }
     ],
     "recentDonors": [
@@ -184,7 +194,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-002-2",
         "name": "Rina Kartika",
-        "email": "rina.kartika@yahoo.com",
+        "email": "ri***ka@yahoo.com",
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-16T11:17:00Z",
@@ -195,7 +205,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-002-3",
         "name": "H. Hendra Wijaya",
-        "email": "hendra.wijaya@holding.co.id",
+        "email": "he***ya@holding.co.id",
         "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
         "amount": 750000,
         "date": "2026-09-15T14:34:00Z",
@@ -217,7 +227,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-002-5",
         "name": "Siti Rahmawati",
-        "email": "siti.rahmawati@gmail.com",
+        "email": "si***ti@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
         "amount": 1500000,
         "date": "2026-09-12T08:08:00Z",
@@ -228,7 +238,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-002-6",
         "name": "Budi Santoso",
-        "email": "budi.santoso@gmail.com",
+        "email": "bu***so@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
         "amount": 200000,
         "date": "2026-09-11T11:25:00Z",
@@ -239,7 +249,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-002-7",
         "name": "Agus Pratama",
-        "email": "agus.pratama@bankmandiri.co.id",
+        "email": "ag***ma@bankmandiri.co.id",
         "avatar": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80",
         "amount": 300000,
         "date": "2026-09-10T14:42:00Z",
@@ -261,7 +271,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-002-9",
         "name": "dr. Maya Anggraini",
-        "email": "maya.anggraini@rs-islam.id",
+        "email": "ma***ni@rs-islam.id",
         "avatar": "https://images.unsplash.com/photo-1594824813501-48950d4b4a3f?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-07T08:16:00Z",
@@ -272,7 +282,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-002-10",
         "name": "Prof. H. Bambang Soediro",
-        "email": "bambang.soediro@ui.ac.id",
+        "email": "ba***ro@ui.ac.id",
         "avatar": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-06T11:33:00Z",
@@ -304,7 +314,10 @@ export const CAMPAIGNS = [
         "date": "2026-08-01",
         "title": "Penyerahan Gerobak Usaha & Modal Awal untuk 15 Mustahik",
         "content": "Penyaluran zakat produktif tahap 3 berupa 15 unit gerobak usaha makanan dan modal perputaran kas sebesar Rp 45.000.000.",
-        "disbursedAmount": 45000000
+        "disbursedAmount": 45000000,
+        "images": [
+          "https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=800&q=80"
+        ]
       }
     ],
     "recentDonors": [
@@ -322,7 +335,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-003-2",
         "name": "Siti Rahmawati",
-        "email": "siti.rahmawati@gmail.com",
+        "email": "si***ti@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
         "amount": 750000,
         "date": "2026-09-16T11:17:00Z",
@@ -333,7 +346,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-003-3",
         "name": "Budi Santoso",
-        "email": "budi.santoso@gmail.com",
+        "email": "bu***so@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
         "amount": 1000000,
         "date": "2026-09-15T14:34:00Z",
@@ -355,7 +368,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-003-5",
         "name": "Farhan Hidayat",
-        "email": "farhan.hidayat@tech.id",
+        "email": "fa***at@tech.id",
         "avatar": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80",
         "amount": 200000,
         "date": "2026-09-12T08:08:00Z",
@@ -366,7 +379,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-003-6",
         "name": "dr. Maya Anggraini",
-        "email": "maya.anggraini@rs-islam.id",
+        "email": "ma***ni@rs-islam.id",
         "avatar": "https://images.unsplash.com/photo-1594824813501-48950d4b4a3f?auto=format&fit=crop&w=150&q=80",
         "amount": 300000,
         "date": "2026-09-11T11:25:00Z",
@@ -377,7 +390,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-003-7",
         "name": "Prof. H. Bambang Soediro",
-        "email": "bambang.soediro@ui.ac.id",
+        "email": "ba***ro@ui.ac.id",
         "avatar": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=150&q=80",
         "amount": 100000,
         "date": "2026-09-10T14:42:00Z",
@@ -399,7 +412,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-003-9",
         "name": "Fajar Nugraha",
-        "email": "fajar.nugraha@outlook.com",
+        "email": "fa***ha@outlook.com",
         "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-07T08:16:00Z",
@@ -410,7 +423,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-003-10",
         "name": "Dewi Anggraini",
-        "email": "dewi.anggraini@gmail.com",
+        "email": "de***ni@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
         "amount": 750000,
         "date": "2026-09-06T11:33:00Z",
@@ -437,7 +450,19 @@ export const CAMPAIGNS = [
     "bannerUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
     "excerpt": "Hadirkan senyuman dan kebahagiaan anak-anak yatim dengan paket perlengkapan sekolah, santunan uang saku, dan gizi.",
     "story": "Rasulullah SAW bersabda: \"Aku dan orang yang menanggung anak yatim (kedudukannya) di surga seperti ini,\" seraya mengisyaratkan jari telunjuk dan jari tengahnya. (HR. Bukhari).\n\nProgram Santunan Yatim Ceria YGSM menyasar 100 anak yatim piatu di pelosok Banten dengan bantuan berupa:\n1. Paket tas, sepatu, dan seragam sekolah baru.\n2. Santunan biaya SPP dan uang saku bulanan.\n3. Paket makanan bernutrisi tinggi dan susu.",
-    "updates": [],
+    "updates": [
+      {
+        "id": "upd-004-1",
+        "date": "2026-09-05",
+        "title": "Penyaluran Paket Kado Kasih & Santunan 100 Yatim",
+        "content": "Alhamdulillah, amanah donatur sebesar Rp 28.500.000 telah disalurkan dalam bentuk paket perlengkapan sekolah, santunan tunai, dan bingkisan gizi untuk 100 anak yatim dhuafa di Lebak, Banten.",
+        "disbursedAmount": 28500000,
+        "images": [
+          "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80"
+        ]
+      }
+    ],
     "recentDonors": [
       {
         "id": "don-camp-004-1",
@@ -453,7 +478,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-004-2",
         "name": "Farhan Hidayat",
-        "email": "farhan.hidayat@tech.id",
+        "email": "fa***at@tech.id",
         "avatar": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80",
         "amount": 1000000,
         "date": "2026-09-16T11:17:00Z",
@@ -464,7 +489,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-004-3",
         "name": "dr. Maya Anggraini",
-        "email": "maya.anggraini@rs-islam.id",
+        "email": "ma***ni@rs-islam.id",
         "avatar": "https://images.unsplash.com/photo-1594824813501-48950d4b4a3f?auto=format&fit=crop&w=150&q=80",
         "amount": 1500000,
         "date": "2026-09-15T14:34:00Z",
@@ -486,7 +511,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-004-5",
         "name": "Keluarga Besar Bpk. Sukardi",
-        "email": "sukardi.family@gmail.com",
+        "email": "su***ly@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80",
         "amount": 300000,
         "date": "2026-09-12T08:08:00Z",
@@ -497,7 +522,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-004-6",
         "name": "Fajar Nugraha",
-        "email": "fajar.nugraha@outlook.com",
+        "email": "fa***ha@outlook.com",
         "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
         "amount": 100000,
         "date": "2026-09-11T11:25:00Z",
@@ -508,7 +533,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-004-7",
         "name": "Dewi Anggraini",
-        "email": "dewi.anggraini@gmail.com",
+        "email": "de***ni@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-10T14:42:00Z",
@@ -530,7 +555,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-004-9",
         "name": "Siti Maryam",
-        "email": "siti.maryam@gmail.com",
+        "email": "si***am@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
         "amount": 750000,
         "date": "2026-09-07T08:16:00Z",
@@ -541,7 +566,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-004-10",
         "name": "Ahmad Fauzi",
-        "email": "ahmad.fauzi@gmail.com",
+        "email": "ah***zi@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
         "amount": 1000000,
         "date": "2026-09-06T11:33:00Z",
@@ -573,7 +598,10 @@ export const CAMPAIGNS = [
         "date": "2026-08-20",
         "title": "Survei Geolistrik & Penentuan Titik Sumber Air",
         "content": "Tim teknis telah menyelesaikan survei geolistrik di Dusun Karangtengah dan mendapati potensi debit air tanah melimpah di kedalaman 75 meter.",
-        "disbursedAmount": 8500000
+        "disbursedAmount": 8500000,
+        "images": [
+          "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80"
+        ]
       }
     ],
     "recentDonors": [
@@ -591,7 +619,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-005-2",
         "name": "Keluarga Besar Bpk. Sukardi",
-        "email": "sukardi.family@gmail.com",
+        "email": "su***ly@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80",
         "amount": 1500000,
         "date": "2026-09-16T11:17:00Z",
@@ -602,7 +630,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-005-3",
         "name": "Fajar Nugraha",
-        "email": "fajar.nugraha@outlook.com",
+        "email": "fa***ha@outlook.com",
         "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
         "amount": 200000,
         "date": "2026-09-15T14:34:00Z",
@@ -624,7 +652,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-005-5",
         "name": "dr. Hendra Setiawan",
-        "email": "hendra.setiawan@rsud.go.id",
+        "email": "he***an@rsud.go.id",
         "avatar": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=150&q=80",
         "amount": 100000,
         "date": "2026-09-12T08:08:00Z",
@@ -635,7 +663,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-005-6",
         "name": "Siti Maryam",
-        "email": "siti.maryam@gmail.com",
+        "email": "si***am@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-11T11:25:00Z",
@@ -646,7 +674,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-005-7",
         "name": "Ahmad Fauzi",
-        "email": "ahmad.fauzi@gmail.com",
+        "email": "ah***zi@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-10T14:42:00Z",
@@ -668,7 +696,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-005-9",
         "name": "Dra. Hj. Nurul Hidayah",
-        "email": "nurul.hidayah@kemenag.go.id",
+        "email": "nu***ah@kemenag.go.id",
         "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
         "amount": 1000000,
         "date": "2026-09-07T08:16:00Z",
@@ -679,7 +707,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-005-10",
         "name": "Muhammad Rizky",
-        "email": "m.rizky88@gmail.com",
+        "email": "m.***88@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
         "amount": 1500000,
         "date": "2026-09-06T11:33:00Z",
@@ -711,7 +739,10 @@ export const CAMPAIGNS = [
         "date": "2026-08-10",
         "title": "Penyaluran 8 Unit Gerobak Berkah & Bahan Baku UMKM",
         "content": "Telah diserahterimakan 8 gerobak usaha kuliner bagi ibu-ibu janda dhuafa pejuang nafkah di Tangerang.",
-        "disbursedAmount": 24000000
+        "disbursedAmount": 24000000,
+        "images": [
+          "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=800&q=80"
+        ]
       }
     ],
     "recentDonors": [
@@ -729,7 +760,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-006-2",
         "name": "dr. Hendra Setiawan",
-        "email": "hendra.setiawan@rsud.go.id",
+        "email": "he***an@rsud.go.id",
         "avatar": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=150&q=80",
         "amount": 200000,
         "date": "2026-09-16T11:17:00Z",
@@ -740,7 +771,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-006-3",
         "name": "Siti Maryam",
-        "email": "siti.maryam@gmail.com",
+        "email": "si***am@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
         "amount": 300000,
         "date": "2026-09-15T14:34:00Z",
@@ -762,7 +793,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-006-5",
         "name": "Keluarga Ibu Sri",
-        "email": "sri.wahyuni78@yahoo.co.id",
+        "email": "sr***78@yahoo.co.id",
         "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-12T08:08:00Z",
@@ -773,7 +804,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-006-6",
         "name": "Dra. Hj. Nurul Hidayah",
-        "email": "nurul.hidayah@kemenag.go.id",
+        "email": "nu***ah@kemenag.go.id",
         "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-11T11:25:00Z",
@@ -784,7 +815,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-006-7",
         "name": "Muhammad Rizky",
-        "email": "m.rizky88@gmail.com",
+        "email": "m.***88@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
         "amount": 750000,
         "date": "2026-09-10T14:42:00Z",
@@ -806,7 +837,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-006-9",
         "name": "H. Hendra Wijaya",
-        "email": "hendra.wijaya@holding.co.id",
+        "email": "he***ya@holding.co.id",
         "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
         "amount": 1500000,
         "date": "2026-09-07T08:16:00Z",
@@ -817,7 +848,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-006-10",
         "name": "Irfan Hakim",
-        "email": "irfan.hakim@media.id",
+        "email": "ir***im@media.id",
         "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80",
         "amount": 200000,
         "date": "2026-09-06T11:33:00Z",
@@ -850,7 +881,10 @@ export const CAMPAIGNS = [
         "date": "2026-09-05",
         "title": "Renovasi Asrama Selesai 100% & Syukuran Bersama Santri",
         "content": "Alhamdulillah, seluruh pekerjaan atap plafon dan lantai ruang belajar telah selesai 100%. Santri kini belajar dengan tenang dan nyaman.",
-        "disbursedAmount": 95000000
+        "disbursedAmount": 95000000,
+        "images": [
+          "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80"
+        ]
       }
     ],
     "recentDonors": [
@@ -868,7 +902,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-007-2",
         "name": "Keluarga Ibu Sri",
-        "email": "sri.wahyuni78@yahoo.co.id",
+        "email": "sr***78@yahoo.co.id",
         "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
         "amount": 300000,
         "date": "2026-09-16T11:17:00Z",
@@ -879,7 +913,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-007-3",
         "name": "Dra. Hj. Nurul Hidayah",
-        "email": "nurul.hidayah@kemenag.go.id",
+        "email": "nu***ah@kemenag.go.id",
         "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
         "amount": 100000,
         "date": "2026-09-15T14:34:00Z",
@@ -901,7 +935,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-007-5",
         "name": "Rina Kartika",
-        "email": "rina.kartika@yahoo.com",
+        "email": "ri***ka@yahoo.com",
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-12T08:08:00Z",
@@ -912,7 +946,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-007-6",
         "name": "H. Hendra Wijaya",
-        "email": "hendra.wijaya@holding.co.id",
+        "email": "he***ya@holding.co.id",
         "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
         "amount": 750000,
         "date": "2026-09-11T11:25:00Z",
@@ -923,7 +957,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-007-7",
         "name": "Irfan Hakim",
-        "email": "irfan.hakim@media.id",
+        "email": "ir***im@media.id",
         "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80",
         "amount": 1000000,
         "date": "2026-09-10T14:42:00Z",
@@ -945,7 +979,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-007-9",
         "name": "Budi Santoso",
-        "email": "budi.santoso@gmail.com",
+        "email": "bu***so@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
         "amount": 200000,
         "date": "2026-09-07T08:16:00Z",
@@ -956,7 +990,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-007-10",
         "name": "Agus Pratama",
-        "email": "agus.pratama@bankmandiri.co.id",
+        "email": "ag***ma@bankmandiri.co.id",
         "avatar": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80",
         "amount": 300000,
         "date": "2026-09-06T11:33:00Z",
@@ -988,7 +1022,10 @@ export const CAMPAIGNS = [
         "date": "2026-09-02",
         "title": "Distribusi 200 Paket Gizi & Skrining Balita Sehat",
         "content": "Tim medis relawan telah menyalurkan 200 paket gizi lengkap dan melakukan skrining tumbuh kembang di 4 posyandu desa binaan.",
-        "disbursedAmount": 18500000
+        "disbursedAmount": 18500000,
+        "images": [
+          "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80"
+        ]
       }
     ],
     "recentDonors": [
@@ -1006,7 +1043,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-008-2",
         "name": "Rina Kartika",
-        "email": "rina.kartika@yahoo.com",
+        "email": "ri***ka@yahoo.com",
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
         "amount": 100000,
         "date": "2026-09-16T11:17:00Z",
@@ -1017,7 +1054,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-008-3",
         "name": "H. Hendra Wijaya",
-        "email": "hendra.wijaya@holding.co.id",
+        "email": "he***ya@holding.co.id",
         "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-15T14:34:00Z",
@@ -1039,7 +1076,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-008-5",
         "name": "Siti Rahmawati",
-        "email": "siti.rahmawati@gmail.com",
+        "email": "si***ti@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
         "amount": 750000,
         "date": "2026-09-12T08:08:00Z",
@@ -1050,7 +1087,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-008-6",
         "name": "Budi Santoso",
-        "email": "budi.santoso@gmail.com",
+        "email": "bu***so@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
         "amount": 1000000,
         "date": "2026-09-11T11:25:00Z",
@@ -1061,7 +1098,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-008-7",
         "name": "Agus Pratama",
-        "email": "agus.pratama@bankmandiri.co.id",
+        "email": "ag***ma@bankmandiri.co.id",
         "avatar": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80",
         "amount": 1500000,
         "date": "2026-09-10T14:42:00Z",
@@ -1083,7 +1120,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-008-9",
         "name": "dr. Maya Anggraini",
-        "email": "maya.anggraini@rs-islam.id",
+        "email": "ma***ni@rs-islam.id",
         "avatar": "https://images.unsplash.com/photo-1594824813501-48950d4b4a3f?auto=format&fit=crop&w=150&q=80",
         "amount": 300000,
         "date": "2026-09-07T08:16:00Z",
@@ -1094,7 +1131,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-008-10",
         "name": "Prof. H. Bambang Soediro",
-        "email": "bambang.soediro@ui.ac.id",
+        "email": "ba***ro@ui.ac.id",
         "avatar": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=150&q=80",
         "amount": 100000,
         "date": "2026-09-06T11:33:00Z",
@@ -1120,7 +1157,18 @@ export const CAMPAIGNS = [
     "bannerUrl": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
     "excerpt": "Bebaskan biaya kuliah 20 mahasiswa yatim berprestasi di perguruan tinggi negeri hingga lulus sarjana.",
     "story": "Banyak pemuda berprestasi dari keluarga yatim dhuafa terpaksa mengubur impian kuliah karena ketiadaan biaya semesteran dan biaya hidup di perantauan.\n\nProgram Beasiswa Sarjana YGSM membiayai:\n1. Uang Kuliah Tunggal (UKT) penuh hingga semester 8.\n2. Uang saku living cost dan akomodasi asrama mahasiswa.\n3. Pembinaan kepemimpinan, kepenulisan, dan keislaman.",
-    "updates": [],
+    "updates": [
+      {
+        "id": "upd-009-1",
+        "date": "2026-08-25",
+        "title": "Penyaluran Biaya UKT Semester Ganjil 20 Mahasiswa",
+        "content": "Sebesar Rp 45.000.000 dana beasiswa telah disalurkan untuk pelunasan UKT semester ganjil bagi 20 mahasiswa yatim binaan di berbagai perguruan tinggi negeri.",
+        "disbursedAmount": 45000000,
+        "images": [
+          "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80"
+        ]
+      }
+    ],
     "recentDonors": [
       {
         "id": "don-camp-009-1",
@@ -1136,7 +1184,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-009-2",
         "name": "Siti Rahmawati",
-        "email": "siti.rahmawati@gmail.com",
+        "email": "si***ti@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-16T11:17:00Z",
@@ -1147,7 +1195,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-009-3",
         "name": "Budi Santoso",
-        "email": "budi.santoso@gmail.com",
+        "email": "bu***so@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-15T14:34:00Z",
@@ -1169,7 +1217,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-009-5",
         "name": "Farhan Hidayat",
-        "email": "farhan.hidayat@tech.id",
+        "email": "fa***at@tech.id",
         "avatar": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80",
         "amount": 1000000,
         "date": "2026-09-12T08:08:00Z",
@@ -1180,7 +1228,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-009-6",
         "name": "dr. Maya Anggraini",
-        "email": "maya.anggraini@rs-islam.id",
+        "email": "ma***ni@rs-islam.id",
         "avatar": "https://images.unsplash.com/photo-1594824813501-48950d4b4a3f?auto=format&fit=crop&w=150&q=80",
         "amount": 1500000,
         "date": "2026-09-11T11:25:00Z",
@@ -1191,7 +1239,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-009-7",
         "name": "Prof. H. Bambang Soediro",
-        "email": "bambang.soediro@ui.ac.id",
+        "email": "ba***ro@ui.ac.id",
         "avatar": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=150&q=80",
         "amount": 200000,
         "date": "2026-09-10T14:42:00Z",
@@ -1213,7 +1261,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-009-9",
         "name": "Fajar Nugraha",
-        "email": "fajar.nugraha@outlook.com",
+        "email": "fa***ha@outlook.com",
         "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
         "amount": 100000,
         "date": "2026-09-07T08:16:00Z",
@@ -1224,7 +1272,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-009-10",
         "name": "Dewi Anggraini",
-        "email": "dewi.anggraini@gmail.com",
+        "email": "de***ni@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-06T11:33:00Z",
@@ -1256,7 +1304,11 @@ export const CAMPAIGNS = [
         "date": "2026-09-01",
         "title": "Penyaluran 2 Ton Beras Bulan September",
         "content": "Alhamdulillah, 2.000 kg beras telah didistribusikan langsung ke 6 asrama santri dan 150 KK lansia dhuafa.",
-        "disbursedAmount": 30000000
+        "disbursedAmount": 30000000,
+        "images": [
+          "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&w=800&q=80"
+        ]
       }
     ],
     "recentDonors": [
@@ -1274,7 +1326,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-010-2",
         "name": "Farhan Hidayat",
-        "email": "farhan.hidayat@tech.id",
+        "email": "fa***at@tech.id",
         "avatar": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-16T11:17:00Z",
@@ -1285,7 +1337,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-010-3",
         "name": "dr. Maya Anggraini",
-        "email": "maya.anggraini@rs-islam.id",
+        "email": "ma***ni@rs-islam.id",
         "avatar": "https://images.unsplash.com/photo-1594824813501-48950d4b4a3f?auto=format&fit=crop&w=150&q=80",
         "amount": 750000,
         "date": "2026-09-15T14:34:00Z",
@@ -1307,7 +1359,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-010-5",
         "name": "Keluarga Besar Bpk. Sukardi",
-        "email": "sukardi.family@gmail.com",
+        "email": "su***ly@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80",
         "amount": 1500000,
         "date": "2026-09-12T08:08:00Z",
@@ -1318,7 +1370,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-010-6",
         "name": "Fajar Nugraha",
-        "email": "fajar.nugraha@outlook.com",
+        "email": "fa***ha@outlook.com",
         "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
         "amount": 200000,
         "date": "2026-09-11T11:25:00Z",
@@ -1329,7 +1381,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-010-7",
         "name": "Dewi Anggraini",
-        "email": "dewi.anggraini@gmail.com",
+        "email": "de***ni@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
         "amount": 300000,
         "date": "2026-09-10T14:42:00Z",
@@ -1351,7 +1403,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-010-9",
         "name": "Siti Maryam",
-        "email": "siti.maryam@gmail.com",
+        "email": "si***am@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80",
         "amount": 250000,
         "date": "2026-09-07T08:16:00Z",
@@ -1362,7 +1414,7 @@ export const CAMPAIGNS = [
       {
         "id": "don-camp-010-10",
         "name": "Ahmad Fauzi",
-        "email": "ahmad.fauzi@gmail.com",
+        "email": "ah***zi@gmail.com",
         "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
         "amount": 500000,
         "date": "2026-09-06T11:33:00Z",
@@ -1395,14 +1447,17 @@ export const CAMPAIGNS = [
         "date": "2026-08-12",
         "title": "Penutupan Posko Medis & Penyaluran Paket Sembako Terakhir",
         "content": "Posko medis relawan YGSM telah resmi menyelesaikan masa tugas dan menyalurkan sisa bantuan logistik tahap akhir kepada warga hunian sementara.",
-        "disbursedAmount": 51200000
+        "disbursedAmount": 51200000,
+        "images": [
+          "https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80"
+        ]
       }
     ],
     "recentDonors": [
       {
         "id": "don-camp-011-1",
         "name": "Keluarga dr. Maya Anggraini",
-        "email": "maya.anggraini@rs-islam.co.id",
+        "email": "ma***ni@rs-islam.co.id",
         "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
         "amount": 1000000,
         "date": "2026-08-05T09:12:00Z",
@@ -1440,12 +1495,23 @@ export const CAMPAIGNS = [
     "bannerUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80",
     "excerpt": "Investasikan tabungan akhirat Anda melalui wakaf abadi pembebasan lahan seluas 1.200 m² untuk asrama santriwati yatim dhuafa.",
     "story": "Wakaf tanah dan fasilitas pendidikan adalah salah satu amalan yang pahalanya terus mengalir bahkan setelah seorang insan berpulang.\n\nPesantren Tahfidz Putri YGSM membutuhkan perluasan area asrama agar dapat menampung 80 santriwati dhuafa dari berbagai pelosok Indonesia.",
-    "updates": [],
+    "updates": [
+      {
+        "id": "upd-012-1",
+        "date": "2026-08-30",
+        "title": "Pembayaran Uang Muka Pembebasan Lahan Asrama Putri",
+        "content": "Alhamdulillah, dana wakaf sebesar Rp 75.000.000 telah diserahkan kepada pemilik tanah sebagai pembayaran termin pertama pembebasan lahan asrama seluas 1.200 m².",
+        "disbursedAmount": 75000000,
+        "images": [
+          "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"
+        ]
+      }
+    ],
     "recentDonors": [
       {
         "id": "don-camp-012-1",
         "name": "Prof. H. Bambang Soediro",
-        "email": "bambang.soediro@ui.ac.id",
+        "email": "ba***ro@ui.ac.id",
         "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
         "amount": 5000000,
         "date": "2026-09-15T10:00:00Z",
@@ -1472,7 +1538,18 @@ export const CAMPAIGNS = [
     "bannerUrl": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80",
     "excerpt": "Dukung pengadaan 100 set mushaf Al-Qur'an Braille lengkap 30 juz agar sahabat difabel netra dapat menghafal kalam Ilahi dengan mandiri.",
     "story": "Membaca Al-Qur'an adalah hak setiap insan muslim tanpa terkecuali. Sayangnya, mushaf Al-Qur'an Braille masih sangat terbatas ketersediaannya dan memiliki biaya cetak yang cukup tinggi.\n\nMelalui program ini, YGSM memfasilitasi 100 set Al-Qur'an Braille standar Kemenag untuk disalurkan ke panti asuhan difabel dan komunitas tahfidz netra.",
-    "updates": [],
+    "updates": [
+      {
+        "id": "upd-013-1",
+        "date": "2026-09-01",
+        "title": "Uji Coba Cetak & Penyerahan 5 Mushaf Braille Pertama",
+        "content": "Alhamdulillah, tahap percontohan 5 set mushaf Al-Qur'an Braille telah selesai dicetak dan diserahkan ke Rumah Sahabat Difabel Netra.",
+        "disbursedAmount": 3500000,
+        "images": [
+          "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&fit=crop&w=800&q=80"
+        ]
+      }
+    ],
     "recentDonors": []
   }
 ];

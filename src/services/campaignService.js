@@ -1,28 +1,34 @@
 import prisma from "@/lib/prisma";
 import { CAMPAIGNS } from "@/data/campaigns";
 import { isCampaignClosed } from "@/lib/formatters";
+import { maskEmail } from "@/lib/security";
 
 function formatCampaignFromDb(c) {
   if (!c) return null;
-  const paidDonations = (c.donations || []).map((d) => ({
-    id: d.id,
-    name: d.isAnonymous ? "Hamba Allah" : d.donorName,
-    amount: Number(d.amount || 0),
-    email: d.isAnonymous
+  const paidDonations = (c.donations || []).map((d) => {
+    const isAnon = Boolean(d.isAnonymous);
+    const rawEmail = isAnon
       ? "hamba.allah***@gmail.com"
-      : (d.donorEmail || (d.donorName ? `${d.donorName.toLowerCase().replace(/[^a-z0-9]/g, ".")}@gmail.com` : "donatur@ygsm.id")),
-    avatar: d.isAnonymous ? null : (d.donorAvatar || null),
-    date: d.paidAt
-      ? d.paidAt instanceof Date
-        ? d.paidAt.toISOString()
-        : d.paidAt
-      : d.createdAt instanceof Date
-      ? d.createdAt.toISOString()
-      : d.createdAt,
-    prayer: d.prayer || "",
-    aminCount: 0,
-    isAnonymous: Boolean(d.isAnonymous),
-  }));
+      : (d.donorEmail || (d.donorName ? `${d.donorName.toLowerCase().replace(/[^a-z0-9]/g, ".")}@gmail.com` : "donatur@ygsm.id"));
+
+    return {
+      id: d.id,
+      name: isAnon ? "Hamba Allah" : d.donorName,
+      amount: Number(d.amount || 0),
+      email: maskEmail(rawEmail),
+      avatar: isAnon ? null : (d.donorAvatar || null),
+      date: d.paidAt
+        ? d.paidAt instanceof Date
+          ? d.paidAt.toISOString()
+          : d.paidAt
+        : d.createdAt instanceof Date
+        ? d.createdAt.toISOString()
+        : d.createdAt,
+      prayer: d.prayer || "",
+      aminCount: 0,
+      isAnonymous: isAnon,
+    };
+  });
 
   return {
     ...c,
@@ -33,10 +39,26 @@ function formatCampaignFromDb(c) {
     updatedAt: c.updatedAt instanceof Date ? c.updatedAt.toISOString() : c.updatedAt,
     categoryName: c.category?.name || "Program Umum",
     categorySlug: c.category?.slug || "",
-    updates: (c.updates || []).map((u) => ({
-      ...u,
-      date: u.date instanceof Date ? u.date.toISOString().split("T")[0] : u.date,
-    })),
+    updates: (c.updates || []).map((u) => {
+      const seedCampaign = CAMPAIGNS.find((sc) => sc.id === c.id || sc.slug === c.slug);
+      const seedUpdate = (seedCampaign?.updates || []).find((su) => su.id === u.id || su.title === u.title);
+      const resolvedImages =
+        Array.isArray(u.images) && u.images.length > 0
+          ? u.images
+          : seedUpdate?.images && seedUpdate.images.length > 0
+          ? seedUpdate.images
+          : u.image
+          ? [u.image]
+          : seedUpdate?.image
+          ? [seedUpdate.image]
+          : [];
+
+      return {
+        ...u,
+        date: u.date instanceof Date ? u.date.toISOString().split("T")[0] : u.date,
+        images: resolvedImages,
+      };
+    }),
     recentDonors: paidDonations,
   };
 }
@@ -180,7 +202,17 @@ export async function getCampaignBySlug(slug) {
   } catch (error) {
     console.warn("Prisma getCampaignBySlug fallback:", error.message);
   }
-  return CAMPAIGNS.find((c) => c.slug === slug) || null;
+  const found = CAMPAIGNS.find((c) => c.slug === slug) || null;
+  if (!found) return null;
+  return {
+    ...found,
+    recentDonors: (found.recentDonors || []).map((d) => ({
+      ...d,
+      name: d.isAnonymous ? "Hamba Allah" : d.name,
+      avatar: d.isAnonymous ? null : d.avatar,
+      email: maskEmail(d.email),
+    })),
+  };
 }
 
 export async function getCampaignDonationsPaginated({ campaignSlug, skip = 0, limit = 20 }) {
@@ -225,21 +257,26 @@ export async function getCampaignDonationsPaginated({ campaignSlug, skip = 0, li
       }),
     ]);
 
-    const formattedDonations = dbDonations.map((d) => ({
-      id: d.id,
-      name: d.isAnonymous ? "Hamba Allah" : d.donorName,
-      amount: Number(d.amount || 0),
-      email: d.isAnonymous
+    const formattedDonations = dbDonations.map((d) => {
+      const isAnon = Boolean(d.isAnonymous);
+      const rawEmail = isAnon
         ? "hamba.allah***@gmail.com"
-        : (d.donorEmail || (d.donorName ? `${d.donorName.toLowerCase().replace(/[^a-z0-9]/g, ".")}@gmail.com` : "donatur@ygsm.id")),
-      avatar: d.isAnonymous ? null : (d.donorAvatar || null),
-      date: d.paidAt
-        ? (d.paidAt instanceof Date ? d.paidAt.toISOString() : d.paidAt)
-        : (d.createdAt instanceof Date ? d.createdAt.toISOString() : d.createdAt),
-      prayer: d.prayer || "",
-      aminCount: 0,
-      isAnonymous: Boolean(d.isAnonymous),
-    }));
+        : (d.donorEmail || (d.donorName ? `${d.donorName.toLowerCase().replace(/[^a-z0-9]/g, ".")}@gmail.com` : "donatur@ygsm.id"));
+
+      return {
+        id: d.id,
+        name: isAnon ? "Hamba Allah" : d.donorName,
+        amount: Number(d.amount || 0),
+        email: maskEmail(rawEmail),
+        avatar: isAnon ? null : (d.donorAvatar || null),
+        date: d.paidAt
+          ? (d.paidAt instanceof Date ? d.paidAt.toISOString() : d.paidAt)
+          : (d.createdAt instanceof Date ? d.createdAt.toISOString() : d.createdAt),
+        prayer: d.prayer || "",
+        aminCount: 0,
+        isAnonymous: isAnon,
+      };
+    });
 
     return {
       donations: formattedDonations,
@@ -455,19 +492,34 @@ export async function getCampaignUpdates() {
       },
     });
     if (updates && updates.length > 0) {
-      return updates.map((u) => ({
-        id: u.id,
-        title: u.title,
-        content: u.content,
-        date: u.date instanceof Date ? u.date.toISOString().split("T")[0] : u.date,
-        images: u.images || [],
-        imageCaptions: u.imageCaptions || [],
-        spentAmount: u.spentAmount || 0,
-        beneficiaryCount: u.beneficiaryCount || 0,
-        location: u.location || "Wilayah Binaan YGSM",
-        spentBreakdown: u.spentBreakdown || [],
-        campaign: u.campaign,
-      }));
+      return updates.map((u) => {
+        const seedCampaign = CAMPAIGNS.find((sc) => sc.id === u.campaignId || sc.slug === u.campaign?.slug);
+        const seedUpdate = (seedCampaign?.updates || []).find((su) => su.id === u.id || su.title === u.title);
+        const resolvedImages =
+          Array.isArray(u.images) && u.images.length > 0
+            ? u.images
+            : seedUpdate?.images && seedUpdate.images.length > 0
+            ? seedUpdate.images
+            : u.image
+            ? [u.image]
+            : seedUpdate?.image
+            ? [seedUpdate.image]
+            : [];
+
+        return {
+          id: u.id,
+          title: u.title,
+          content: u.content,
+          date: u.date instanceof Date ? u.date.toISOString().split("T")[0] : u.date,
+          images: resolvedImages,
+          imageCaptions: u.imageCaptions || [],
+          spentAmount: u.spentAmount || 0,
+          beneficiaryCount: u.beneficiaryCount || 0,
+          location: u.location || "Wilayah Binaan YGSM",
+          spentBreakdown: u.spentBreakdown || [],
+          campaign: u.campaign,
+        };
+      });
     }
   } catch (error) {
     console.warn("Prisma getCampaignUpdates fallback:", error.message);

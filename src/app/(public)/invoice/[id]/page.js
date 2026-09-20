@@ -1,4 +1,7 @@
-import { notFound } from "next/navigation";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { ChevronRight } from "lucide-react";
 import { getDonationByInvoiceId } from "@/services/donationService";
 import { InvoiceDisplay } from "@/components/modules/InvoiceDisplay";
 
@@ -10,42 +13,36 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function InvoicePage({ params }) {
+export default async function InvoicePage({ params, searchParams }) {
   const { id } = await params;
-  const donation = await getDonationByInvoiceId(id);
+  const { token } = (await searchParams) || {};
 
-  if (!donation) {
-    // If not found in memory (e.g. direct URL visit with non-existent id), fallback to demo mock
-    const fallbackDonation = {
-      id: "don-fallback",
-      invoiceId: id,
-      campaignTitle: "Sedekah Umum Generasi Qur'ani",
-      campaignSlug: "beasiswa-santri-penghafal-quran",
-      amount: 100000,
-      uniqueCode: 124,
-      adminFee: 0,
-      totalAmount: 100124,
-      paymentChannelId: "qris",
-      paymentChannelName: "QRIS (Semua Bank & E-Wallet)",
-      paymentChannelType: "QRIS",
-      virtualAccountNumber: "",
-      donorName: "Hamba Allah",
-      isAnonymous: true,
-      status: "PENDING",
-      createdAt: "2026-09-18T10:00:00.000Z",
-      expiredAt: "2026-09-19T10:00:00.000Z",
-    };
+  const cookieStore = await cookies();
+  const cookieToken = cookieStore.get(`ygsm_inv_${id}`)?.value || null;
 
-    return (
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6">
-        <InvoiceDisplay donation={fallbackDonation} />
-      </main>
-    );
+  if (!token && cookieToken) {
+    redirect(`/invoice/${id}?token=${cookieToken}`);
+  }
+
+  const effectiveToken = token || cookieToken || null;
+  const donation = await getDonationByInvoiceId(id, effectiveToken);
+
+  if (!donation || !donation.isAuthorized) {
+    notFound();
   }
 
   return (
-    <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
+      <nav aria-label="Breadcrumb" className="text-xs sm:text-sm text-slate-600 flex items-center gap-1.5 sm:gap-2 flex-wrap font-normal">
+        <Link href="/" className="hover:text-primary hover:underline transition-colors">Beranda</Link>
+        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" strokeWidth={2} />
+        <Link href="/program" className="hover:text-primary hover:underline transition-colors">Program</Link>
+        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" strokeWidth={2} />
+        <span className="text-slate-900 font-medium truncate" aria-current="page">Instruksi Pembayaran</span>
+      </nav>
+
       <InvoiceDisplay donation={donation} />
     </main>
   );
 }
+

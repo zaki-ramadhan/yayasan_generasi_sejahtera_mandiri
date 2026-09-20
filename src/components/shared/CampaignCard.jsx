@@ -111,8 +111,8 @@ export function CampaignCard({
         <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-1.5 min-w-0">
             <Users className="w-4 h-4 text-slate-600 shrink-0" />
-            <span className="text-sm text-slate-800 font-medium truncate">
-              <strong className="text-slate-950 font-bold">{totalDonors}</strong> donatur
+            <span className="text-sm text-slate-800 font-semibold truncate">
+              <strong className="text-slate-950 font-semibold">{totalDonors}</strong> donatur
             </span>
           </div>
 

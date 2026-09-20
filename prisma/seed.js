@@ -210,6 +210,12 @@ async function main() {
     // Seed Campaign Updates if any
     if (camp.updates && Array.isArray(camp.updates)) {
       for (const upd of camp.updates) {
+        const images = Array.isArray(upd.images)
+          ? upd.images
+          : upd.image
+          ? [upd.image]
+          : [];
+
         await prisma.campaignUpdate.upsert({
           where: { id: upd.id },
           update: {
@@ -217,6 +223,7 @@ async function main() {
             content: upd.content,
             disbursedAmount: upd.disbursedAmount,
             date: new Date(upd.date),
+            images,
           },
           create: {
             id: upd.id,
@@ -225,6 +232,7 @@ async function main() {
             content: upd.content,
             disbursedAmount: upd.disbursedAmount,
             date: new Date(upd.date),
+            images,
           },
         });
       }

@@ -48,14 +48,24 @@ export async function registerVolunteer({
     });
     return {
       success: true,
-      data: created,
+      data: {
+        id: created.id,
+        fullName: created.fullName,
+        city: created.city,
+        status: created.status,
+      },
       message: "Pendaftaran relawan berhasil dikirim!",
     };
   } catch (error) {
     console.warn("Prisma registerVolunteer fallback:", error.message);
     return {
       success: true,
-      data: { id: `vol-${Date.now()}`, ...cleanData, createdAt: new Date() },
+      data: {
+        id: `vol-${Date.now()}`,
+        fullName: cleanData.fullName,
+        city: cleanData.city,
+        status: cleanData.status,
+      },
       message: "Pendaftaran relawan berhasil dikirim (Mock mode)!",
     };
   }

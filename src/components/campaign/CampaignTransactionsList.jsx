@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CheckCircle2, ChevronDown, ChevronUp, Loader2, User } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/formatters";
+import { maskEmail } from "@/lib/security";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
@@ -51,8 +52,8 @@ export function CampaignTransactionsList({
 
   if (!donorList || donorList.length === 0) {
     return (
-      <div className="py-8 text-center text-slate-500 text-sm">
-        Belum ada riwayat transaksi donasi yang tercatat.
+      <div className="py-12 text-center text-slate-500 text-sm sm:text-base">
+        Belum ada data
       </div>
     );
   }
@@ -106,7 +107,7 @@ export function CampaignTransactionsList({
                     </span>
                   </div>
                   <span className="text-sm text-slate-600 block mt-0.5 font-normal truncate">
-                    {item.email || (isAnon ? "hamba.allah***@gmail.com" : "donatur@ygsm.id")}
+                    {maskEmail(item.email || (isAnon ? "hamba.allah***@gmail.com" : "donatur@ygsm.id"))}
                   </span>
                 </div>
               </div>

@@ -41,11 +41,11 @@ export function CampaignSidebarDonate({ campaign, progress, daysLeft }) {
         {hasEndDate ? (
           <div className="grid grid-cols-2 divide-x divide-slate-200 py-3.5 border-y border-slate-200 text-center">
             <div className="pr-3">
-              <span className="block font-bold text-slate-950 text-xl sm:text-2xl">{campaign.donorCount}</span>
+              <span className="block font-semibold text-slate-950 text-xl sm:text-2xl">{campaign.donorCount}</span>
               <span className="text-sm text-slate-700">Orang Baik</span>
             </div>
             <div className="pl-3">
-              <span className="block font-bold text-slate-950 text-xl sm:text-2xl">
+              <span className="block font-semibold text-slate-950 text-xl sm:text-2xl">
                 {isClosed ? "Selesai" : (daysLeft > 0 ? daysLeft : 0)}
               </span>
               <span className="text-sm text-slate-700">
@@ -55,7 +55,7 @@ export function CampaignSidebarDonate({ campaign, progress, daysLeft }) {
           </div>
         ) : (
           <div className="py-3.5 border-y border-slate-200 text-center">
-            <span className="block font-bold text-slate-950 text-xl sm:text-2xl">{campaign.donorCount}</span>
+            <span className="block font-semibold text-slate-950 text-xl sm:text-2xl">{campaign.donorCount}</span>
             <span className="text-sm text-slate-700">Orang Baik Telah Berdonasi</span>
           </div>
         )}

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { MessageSquareHeart, ChevronDown, Check } from "lucide-react";
+import { useState, useMemo, useSyncExternalStore } from "react";
+import { ChevronDown, Check } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { PrayerCard } from "@/components/modules/PrayerCard";
+import { PostDonationPrayerForm } from "@/components/donation/PostDonationPrayerForm";
+import { getPendingDonationForCampaign, PRAYER_SUBMITTED_EVENT } from "@/lib/donorStorage";
 import { usePrayersSync } from "@/hooks/usePrayersSync";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +20,39 @@ const SORT_OPTIONS = [
   { value: "terpopuler", label: "Paling Banyak Diaminkan" },
 ];
 
+function subscribePendingDonation(callback) {
+  window.addEventListener(PRAYER_SUBMITTED_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(PRAYER_SUBMITTED_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+function getInvoicesSnapshot() {
+  return localStorage.getItem("ygsm_donor_invoices") || "[]";
+}
+
+function getServerInvoicesSnapshot() {
+  return "[]";
+}
+
 export function CampaignPrayersFeed({ initialDonors = [], campaignSlug, campaignTitle }) {
-  const { donors, aminedSet, handleToggleAmin } = usePrayersSync(initialDonors);
+  const { donors, aminedSet, handleToggleAmin, addNewPrayer } = usePrayersSync(initialDonors);
   const [sortBy, setSortBy] = useState("terbaru"); // "terbaru" | "terpopuler"
   const [visibleCount, setVisibleCount] = useState(6);
+
+  const invoicesRaw = useSyncExternalStore(
+    subscribePendingDonation,
+    getInvoicesSnapshot,
+    getServerInvoicesSnapshot
+  );
+
+  const pendingDonation = useMemo(() => {
+    if (!campaignSlug) return null;
+    return getPendingDonationForCampaign(campaignSlug, invoicesRaw);
+  }, [campaignSlug, invoicesRaw]);
+
 
   const sortedDonors = useMemo(() => {
     const list = [...donors];
@@ -37,6 +68,14 @@ export function CampaignPrayersFeed({ initialDonors = [], campaignSlug, campaign
   }, [sortedDonors]);
 
   const visiblePrayers = prayersOnly.slice(0, visibleCount);
+
+  if (prayersOnly.length === 0 && !pendingDonation) {
+    return (
+      <div className="text-center py-12 text-slate-500 text-sm sm:text-base">
+        Belum ada data
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -84,6 +123,30 @@ export function CampaignPrayersFeed({ initialDonors = [], campaignSlug, campaign
         </div>
       </div>
 
+      {/* Post-Donation Prayer Form - Hanya muncul jika donatur belum menitipkan doa dan hilang begitu terkirim */}
+      {pendingDonation && (
+        <PostDonationPrayerForm
+          invoiceId={pendingDonation.invoiceId}
+          campaignSlug={campaignSlug}
+          donorName={pendingDonation.donorName}
+          defaultAnonymous={pendingDonation.isAnonymous}
+          onSuccess={(data) => {
+            if (addNewPrayer) {
+              addNewPrayer({
+                id: data.id || `prayer-${Date.now()}`,
+                name: data.isAnonymous ? "Hamba Allah" : (data.donorName || pendingDonation.donorName || "Donatur"),
+                amount: data.amount || 0,
+                date: new Date().toISOString(),
+                prayer: data.prayer,
+                aminCount: 0,
+                isAnonymous: Boolean(data.isAnonymous),
+              });
+            }
+            setPendingDonation(null);
+          }}
+        />
+      )}
+
       {/* ONLY THIS PARENT IS SCROLLABLE: 2-Card Grid */}
       <div className="max-h-[500px] sm:max-h-[540px] overflow-y-auto pr-2 pt-3 pb-3">
         {visiblePrayers.length > 0 ? (
@@ -99,16 +162,8 @@ export function CampaignPrayersFeed({ initialDonors = [], campaignSlug, campaign
             ))}
           </div>
         ) : (
-          <div className="text-center py-10 px-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-            <MessageSquareHeart className="w-10 h-10 text-slate-400 mx-auto" />
-            <div className="space-y-1">
-              <h4 className="font-semibold text-slate-900 text-sm sm:text-base">
-                Belum Ada Titipan Doa
-              </h4>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto">
-                Jadilah donatur pertama yang menitipkan doa dan harapan berkah untuk program ini.
-              </p>
-            </div>
+          <div className="text-center py-12 text-slate-500 text-sm sm:text-base">
+            Belum ada data
           </div>
         )}
 
