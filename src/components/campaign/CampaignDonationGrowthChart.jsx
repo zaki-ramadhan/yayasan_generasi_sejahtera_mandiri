@@ -26,6 +26,12 @@ const TIME_RANGE_OPTIONS = [
   { value: "7d", label: "7 Hari Terakhir" },
 ];
 
+const VIEW_MODE_OPTIONS = [
+  { value: "all", label: "Grafik Gabungan (Dual Axis)" },
+  { value: "daily", label: "Donasi Harian" },
+  { value: "cumulative", label: "Total Akumulasi" },
+];
+
 const chartConfig = {
   cumulativeAmount: {
     label: "Total Terkumpul",
@@ -189,47 +195,39 @@ export function CampaignDonationGrowthChart({
           </p>
         </div>
 
-        {/* Controls: Segmented View Mode + Range Selector */}
+        {/* Controls: View Mode Selector + Range Selector */}
         <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
-          {/* Segmented View Mode Tabs */}
-          <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5 text-xs font-medium text-slate-600 select-none">
-            <button
-              type="button"
-              onClick={() => setViewMode("all")}
-              className={cn(
-                "rounded-md px-2.5 py-1.5 transition-all cursor-pointer",
-                viewMode === "all"
-                  ? "bg-white text-slate-950 shadow-2xs font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
-              )}
-            >
-              Dual Axis
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("daily")}
-              className={cn(
-                "rounded-md px-2.5 py-1.5 transition-all cursor-pointer",
-                viewMode === "daily"
-                  ? "bg-white text-emerald-700 shadow-2xs font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
-              )}
-            >
-              Harian
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("cumulative")}
-              className={cn(
-                "rounded-md px-2.5 py-1.5 transition-all cursor-pointer",
-                viewMode === "cumulative"
-                  ? "bg-white text-blue-700 shadow-2xs font-semibold"
-                  : "text-slate-600 hover:text-slate-900"
-              )}
-            >
-              Akumulasi
-            </button>
-          </div>
+          {/* View Mode Selector Dropdown */}
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[165px] sm:min-w-[195px]"
+              >
+                <span className="truncate">
+                  {VIEW_MODE_OPTIONS.find((opt) => opt.value === viewMode)?.label || "Pilih Tampilan"}
+                </span>
+                <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-white border border-slate-200 shadow-md rounded-lg p-1 z-50">
+              {VIEW_MODE_OPTIONS.map((opt) => (
+                <DropdownMenuItem
+                  key={opt.value}
+                  onClick={() => setViewMode(opt.value)}
+                  className={cn(
+                    "flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors",
+                    viewMode === opt.value
+                      ? "bg-slate-100 font-semibold text-primary"
+                      : "text-slate-800 hover:bg-slate-100"
+                  )}
+                >
+                  <span>{opt.label}</span>
+                  {viewMode === opt.value && <Check className="w-4 h-4 text-primary shrink-0 ml-1.5" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Range Selector */}
           <DropdownMenu modal={false}>

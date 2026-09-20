@@ -180,17 +180,21 @@ export function calculateDaysLeft(endDateInput) {
 export function formatCompactNumber(num) {
   if (typeof num !== "number" || isNaN(num)) return "0";
   const abs = Math.abs(num);
+  if (abs >= 1_000_000_000_000) {
+    const val = num / 1_000_000_000_000;
+    return `${val % 1 === 0 ? val : Number(val.toFixed(1))} T`;
+  }
   if (abs >= 1_000_000_000) {
     const val = num / 1_000_000_000;
-    return `${val % 1 === 0 ? val : val.toFixed(1)}B`;
+    return `${val % 1 === 0 ? val : Number(val.toFixed(1))} M`;
   }
   if (abs >= 1_000_000) {
     const val = num / 1_000_000;
-    return `${val % 1 === 0 ? val : val.toFixed(1)}M`;
+    return `${val % 1 === 0 ? val : Number(val.toFixed(1))} Jt`;
   }
   if (abs >= 1_000) {
     const val = num / 1_000;
-    return `${val % 1 === 0 ? val : val.toFixed(1)}K`;
+    return `${val % 1 === 0 ? val : Number(val.toFixed(1))} rb`;
   }
   return String(num);
 }
