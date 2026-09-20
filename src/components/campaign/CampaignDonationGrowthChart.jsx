@@ -182,6 +182,49 @@ export function CampaignDonationGrowthChart({
     };
   }, [viewMode]);
 
+  const renderActiveDot = React.useCallback(
+    (direction = "left") =>
+      // eslint-disable-next-line react/display-name
+      (dotProps) => {
+        const { cx, cy, stroke } = dotProps;
+        if (typeof cx !== "number" || typeof cy !== "number") return null;
+
+        return (
+          <g key={`activedot-${direction}-${cx}-${cy}`} className="pointer-events-none">
+            {/* Garis putus-putus horizontal proyeksi langsung ke koordinat Y */}
+            <line
+              x1={direction === "right" ? cx : 0}
+              y1={cy}
+              x2={direction === "right" ? "100%" : cx}
+              y2={cy}
+              stroke={stroke || "#94a3b8"}
+              strokeWidth={1.25}
+              strokeDasharray="4 4"
+              strokeOpacity={0.85}
+            />
+            {/* Outer Glow */}
+            <circle
+              cx={cx}
+              cy={cy}
+              r={6}
+              fill={stroke || "#2563eb"}
+              fillOpacity={0.25}
+            />
+            {/* Center Core Dot */}
+            <circle
+              cx={cx}
+              cy={cy}
+              r={4}
+              fill={stroke || "#2563eb"}
+              stroke="#ffffff"
+              strokeWidth={2}
+            />
+          </g>
+        );
+      },
+    []
+  );
+
   return (
     <div className="space-y-5">
       {/* Header & Filter Controls */}
@@ -394,6 +437,7 @@ export function CampaignDonationGrowthChart({
                 stroke="#10b981"
                 strokeWidth={2}
                 name="dailyAmount"
+                activeDot={renderActiveDot(viewMode === "all" ? "right" : "left")}
               />
             )}
 
@@ -407,6 +451,7 @@ export function CampaignDonationGrowthChart({
                 stroke="#2563eb"
                 strokeWidth={2.5}
                 name="cumulativeAmount"
+                activeDot={renderActiveDot("left")}
               />
             )}
 
