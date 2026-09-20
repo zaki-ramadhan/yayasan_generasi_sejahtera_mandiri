@@ -27,7 +27,7 @@ const TIME_RANGE_OPTIONS = [
 ];
 
 const VIEW_MODE_OPTIONS = [
-  { value: "all", label: "Grafik Gabungan (Dual Axis)" },
+  { value: "all", label: "Grafik Gabungan" },
   { value: "daily", label: "Donasi Harian" },
   { value: "cumulative", label: "Total Akumulasi" },
 ];
@@ -182,49 +182,6 @@ export function CampaignDonationGrowthChart({
     };
   }, [viewMode]);
 
-  const renderActiveDot = React.useCallback(
-    (direction = "left") =>
-      // eslint-disable-next-line react/display-name
-      (dotProps) => {
-        const { cx, cy, stroke } = dotProps;
-        if (typeof cx !== "number" || typeof cy !== "number") return null;
-
-        return (
-          <g key={`activedot-${direction}-${cx}-${cy}`} className="pointer-events-none">
-            {/* Garis putus-putus horizontal proyeksi langsung ke koordinat Y */}
-            <line
-              x1={direction === "right" ? cx : 0}
-              y1={cy}
-              x2={direction === "right" ? "100%" : cx}
-              y2={cy}
-              stroke={stroke || "#94a3b8"}
-              strokeWidth={1.25}
-              strokeDasharray="4 4"
-              strokeOpacity={0.85}
-            />
-            {/* Outer Glow */}
-            <circle
-              cx={cx}
-              cy={cy}
-              r={6}
-              fill={stroke || "#2563eb"}
-              fillOpacity={0.25}
-            />
-            {/* Center Core Dot */}
-            <circle
-              cx={cx}
-              cy={cy}
-              r={4}
-              fill={stroke || "#2563eb"}
-              stroke="#ffffff"
-              strokeWidth={2}
-            />
-          </g>
-        );
-      },
-    []
-  );
-
   return (
     <div className="space-y-5">
       {/* Header & Filter Controls */}
@@ -245,21 +202,21 @@ export function CampaignDonationGrowthChart({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[165px] sm:min-w-[195px]"
+                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 w-fit whitespace-nowrap"
               >
-                <span className="truncate">
+                <span>
                   {VIEW_MODE_OPTIONS.find((opt) => opt.value === viewMode)?.label || "Pilih Tampilan"}
                 </span>
                 <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-white border border-slate-200 shadow-md rounded-lg p-1 z-50">
+            <DropdownMenuContent align="end" className="w-auto min-w-[var(--radix-dropdown-menu-trigger-width)] max-w-xs bg-white border border-slate-200 shadow-md rounded-lg p-1 z-50 whitespace-nowrap">
               {VIEW_MODE_OPTIONS.map((opt) => (
                 <DropdownMenuItem
                   key={opt.value}
                   onClick={() => setViewMode(opt.value)}
                   className={cn(
-                    "flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors",
+                    "flex items-center justify-between gap-3 px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors whitespace-nowrap",
                     viewMode === opt.value
                       ? "bg-slate-100 font-semibold text-primary"
                       : "text-slate-800 hover:bg-slate-100"
@@ -277,21 +234,21 @@ export function CampaignDonationGrowthChart({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[130px] sm:min-w-[145px]"
+                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 w-fit whitespace-nowrap"
               >
-                <span className="truncate">
+                <span>
                   {TIME_RANGE_OPTIONS.find((opt) => opt.value === timeRange)?.label || "Pilih Rentang"}
                 </span>
                 <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-white border border-slate-200 shadow-md rounded-lg p-1">
+            <DropdownMenuContent align="end" className="w-auto min-w-[var(--radix-dropdown-menu-trigger-width)] max-w-xs bg-white border border-slate-200 shadow-md rounded-lg p-1 z-50 whitespace-nowrap">
               {TIME_RANGE_OPTIONS.map((opt) => (
                 <DropdownMenuItem
                   key={opt.value}
                   onClick={() => setTimeRange(opt.value)}
                   className={cn(
-                    "flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors",
+                    "flex items-center justify-between gap-3 px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors whitespace-nowrap",
                     timeRange === opt.value
                       ? "bg-slate-100 font-semibold text-primary"
                       : "text-slate-800 hover:bg-slate-100"
@@ -307,7 +264,7 @@ export function CampaignDonationGrowthChart({
       </div>
 
       {/* KPI Highlight Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 rounded-xl border border-slate-200 bg-slate-50/70 text-xs sm:text-sm overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 border border-x-0 border-slate-200 bg-slate-50/70 text-xs sm:text-sm overflow-hidden">
         <div className="p-3.5 sm:p-4 space-y-0.5">
           <span className="text-slate-600 font-medium">Total Akumulasi</span>
           <p className="text-base sm:text-lg font-semibold text-slate-950">
@@ -437,7 +394,6 @@ export function CampaignDonationGrowthChart({
                 stroke="#10b981"
                 strokeWidth={2}
                 name="dailyAmount"
-                activeDot={renderActiveDot(viewMode === "all" ? "right" : "left")}
               />
             )}
 
@@ -451,7 +407,6 @@ export function CampaignDonationGrowthChart({
                 stroke="#2563eb"
                 strokeWidth={2.5}
                 name="cumulativeAmount"
-                activeDot={renderActiveDot("left")}
               />
             )}
 
