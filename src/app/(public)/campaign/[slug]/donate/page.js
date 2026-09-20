@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { getCampaignBySlug } from "@/services/campaignService";
 import { isCampaignClosed } from "@/lib/formatters";
+import { sanitizePrayer } from "@/lib/security";
 import { DonationCheckoutForm } from "@/components/modules/DonationCheckoutForm";
 
 export async function generateMetadata({ params }) {
@@ -62,6 +63,11 @@ export default async function DonatePage({ params, searchParams }) {
   const rawAmount = sanitized ? Number(sanitized) : null;
   const initialAmount = rawAmount && !isNaN(rawAmount) && rawAmount > 0 ? rawAmount : 50000;
 
+  const rawPrayer = sParams?.prayer;
+  const initialPrayer = typeof rawPrayer === "string"
+    ? sanitizePrayer(rawPrayer.trim()).slice(0, 150)
+    : "";
+
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
       {/* Back button & Title */}
@@ -85,9 +91,10 @@ export default async function DonatePage({ params, searchParams }) {
 
       {/* Checkout Form */}
       <DonationCheckoutForm
-        key={`${campaign.slug}-${initialAmount}`}
+        key={`${campaign.slug}-${initialAmount}-${initialPrayer || ""}`}
         campaign={campaign}
         initialAmount={initialAmount}
+        initialPrayer={initialPrayer}
       />
     </main>
   );

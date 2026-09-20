@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useState, useEffect, useSyncExternalStore } from "react";
@@ -35,7 +36,7 @@ function getPrayersServerSnapshot() {
   return "[]";
 }
 
-export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
+export function DonationCheckoutForm({ campaign, initialAmount = 50000, initialPrayer = "" }) {
   const router = useRouter();
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const isPresetInitial = NOMINAL_PRESETS.includes(initialAmount);
@@ -48,9 +49,28 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
   const [donorName, setDonorName] = useState("");
   const [donorPhone, setDonorPhone] = useState("");
   const [donorEmail, setDonorEmail] = useState("");
-  const [prayer, setPrayer] = useState("");
+  const [prayer, setPrayer] = useState(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const urlPrayer = sp.get("prayer");
+      if (urlPrayer) return sanitizePrayer(urlPrayer.trim()).slice(0, 150);
+    }
+    return initialPrayer ? sanitizePrayer(initialPrayer.trim()).slice(0, 150) : "";
+  });
   const [selectedChannelId, setSelectedChannelId] = useState("qris");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (initialPrayer) {
+      setPrayer(sanitizePrayer(initialPrayer.trim()).slice(0, 150));
+    } else if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const urlPrayer = sp.get("prayer");
+      if (urlPrayer) {
+        setPrayer(sanitizePrayer(urlPrayer.trim()).slice(0, 150));
+      }
+    }
+  }, [initialPrayer]);
 
   useEffect(() => {
     const initSessionAndDraft = async () => {
@@ -61,6 +81,11 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
           typeof window !== "undefined"
             ? window.location.pathname + window.location.search
             : `/campaign/${campaign?.slug}/donate`;
+        const queryPrayer =
+          typeof window !== "undefined"
+            ? new URLSearchParams(window.location.search).get("prayer")
+            : "";
+        const effectivePrayer = prayer || initialPrayer || queryPrayer || "";
         saveDonationDraft(campaign?.slug, {
           amount,
           isCustomMode,
@@ -69,7 +94,7 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
           donorName,
           donorPhone,
           donorEmail,
-          prayer,
+          prayer: effectivePrayer,
           selectedChannelId,
         });
         router.replace(
@@ -87,7 +112,13 @@ export function DonationCheckoutForm({ campaign, initialAmount = 50000 }) {
           setCustomAmountInput(draft.customAmountInput ?? "");
         }
         if (draft.isAnonymous !== undefined) setIsAnonymous(draft.isAnonymous);
-        if (draft.prayer) setPrayer(draft.prayer);
+        const hasFreshPrayer = Boolean(
+          initialPrayer ||
+          (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("prayer"))
+        );
+        if (draft.prayer && !hasFreshPrayer) {
+          setPrayer(draft.prayer);
+        }
         if (draft.selectedChannelId) setSelectedChannelId(draft.selectedChannelId);
         // Identitas donatur dari draft hanya jika user belum ada datanya
         if (draft.donorPhone) setDonorPhone(draft.donorPhone);

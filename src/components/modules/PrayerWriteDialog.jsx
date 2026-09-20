@@ -1,0 +1,192 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Send, HeartHandshake } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
+import { sanitizePrayer } from "@/lib/security";
+import { cn } from "@/lib/utils";
+
+export function PrayerWriteDialog({
+  isOpen,
+  onOpenChange,
+  campaignSlug = "",
+  onPrayerSubmitted,
+}) {
+  const [donorName, setDonorName] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [prayer, setPrayer] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handlePrayerChange = (e) => {
+    const clean = sanitizePrayer(e.target.value);
+    if (clean.length <= 150) {
+      setPrayer(clean);
+      if (errorMessage) setErrorMessage("");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const cleanText = prayer.trim().replace(/\s+/g, " ");
+
+    if (!cleanText) {
+      setErrorMessage("Pesan doa tidak boleh kosong.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const displayName = isAnonymous
+        ? "Hamba Allah"
+        : (donorName.trim() || "Hamba Allah");
+
+      const newPrayerItem = {
+        id: `prayer-${Date.now()}`,
+        name: displayName,
+        prayer: cleanText,
+        amount: 0,
+        date: new Date().toISOString(),
+        aminCount: 0,
+        isAnonymous,
+      };
+
+      if (onPrayerSubmitted) {
+        onPrayerSubmitted(newPrayerItem);
+      }
+
+      toast.success("Doa kebaikan Anda berhasil dikirim.");
+      setPrayer("");
+      setDonorName("");
+      setIsAnonymous(false);
+      onOpenChange(false);
+    } catch {
+      setErrorMessage("Terjadi kendala saat mengirim doa. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md p-5 sm:p-6">
+        <DialogHeader className="space-y-1">
+          <DialogTitle className="text-base sm:text-lg font-semibold text-slate-950 flex items-center gap-2">
+            <HeartHandshake className="w-5 h-5 text-primary shrink-0" />
+            <span>Titipkan Doa Kebaikan</span>
+          </DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm text-slate-600">
+            Untaian doa tulus Anda akan dicantumkan di halaman program untuk diaminkan bersama donatur lainnya.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+          {/* Input Nama Donatur / Pengirim */}
+          <div className="space-y-1.5">
+            <label htmlFor="prayer-donor-name" className="text-xs font-medium text-slate-800">
+              Nama Anda
+            </label>
+            <Input
+              id="prayer-donor-name"
+              type="text"
+              autoComplete="name"
+              disabled={isAnonymous}
+              placeholder={isAnonymous ? "Hamba Allah" : "Nama lengkap / panggilan"}
+              value={donorName}
+              onChange={(e) => setDonorName(e.target.value)}
+              className="h-9 text-xs sm:text-sm"
+              maxLength={40}
+            />
+
+            {/* Opsi Anonim */}
+            <label className="flex items-center gap-2 pt-0.5 cursor-pointer select-none">
+              <input
+                id="prayer-anonymous-checkbox"
+                type="checkbox"
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+                className="w-3.5 h-3.5 text-primary rounded border-slate-300 focus:ring-primary cursor-pointer"
+              />
+              <span className="text-xs text-slate-600 font-normal">
+                Sembunyikan nama saya (sebagai Hamba Allah)
+              </span>
+            </label>
+          </div>
+
+          {/* Input Pesan Doa */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label htmlFor="prayer-message-text" className="text-xs font-medium text-slate-800">
+                Untaian Doa &amp; Harapan
+              </label>
+              <span
+                className={`text-[11px] tabular-nums ${
+                  prayer.length >= 140 ? "text-amber-600 font-semibold" : "text-slate-400"
+                }`}
+              >
+                {prayer.length}/150
+              </span>
+            </div>
+            <textarea
+              id="prayer-message-text"
+              rows={3}
+              maxLength={150}
+              placeholder="Tuliskan doa terbaik untuk saudara kita yang membutuhkan..."
+              value={prayer}
+              onChange={handlePrayerChange}
+              className={cn(
+                "w-full rounded-lg border bg-white p-2.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors resize-none font-normal",
+                errorMessage
+                  ? "border-rose-400 focus:ring-rose-200"
+                  : "border-slate-300 focus:ring-primary/20 focus:border-primary"
+              )}
+            />
+            {errorMessage && (
+              <p className="text-xs text-rose-600 font-medium" role="alert">
+                {errorMessage}
+              </p>
+            )}
+          </div>
+
+          {/* Aksi Kirim */}
+          <div className="pt-2 flex flex-col gap-2.5">
+            <Button
+              type="submit"
+              disabled={isSubmitting || !prayer.trim()}
+              className="w-full h-10 text-xs sm:text-sm font-medium bg-primary hover:bg-primary-hover text-white gap-2 cursor-pointer"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>{isSubmitting ? "Mengirim Doa..." : "Kirimkan Doa"}</span>
+            </Button>
+
+            {/* Subtle callout to donate */}
+            {campaignSlug && (
+              <p className="text-center text-xs text-slate-500">
+                Ingin sekaligus berdonasi?{" "}
+                <Link
+                  href={`/campaign/${campaignSlug}/donate`}
+                  className="font-medium text-primary hover:underline"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Salurkan donasi sekarang
+                </Link>
+              </p>
+            )}
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -89,28 +89,26 @@ export function DonorIdentitySection({
           <label className="text-sm font-semibold text-slate-800 block">
             Doa atau Titipan Harapan (Opsional)
           </label>
-          {!hasExistingPrayer && (
-            <span className="text-sm text-slate-500 font-normal">
-              {prayer.length}/150 karakter
-            </span>
-          )}
+          <span className="text-sm text-slate-500 font-normal">
+            {prayer.length}/150 karakter
+          </span>
         </div>
 
-        {hasExistingPrayer ? (
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 font-normal">
-            Anda telah menitipkan doa untuk program ini sebelumnya (Maks. 1 doa per orang).
+        {hasExistingPrayer && !prayer && (
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-600 font-normal">
+            Anda telah menitipkan doa untuk program ini sebelumnya. Tuliskan pesan di bawah jika ingin memperbarui doa Anda.
           </div>
-        ) : (
-          <textarea
-            rows={3}
-            maxLength={150}
-            value={prayer}
-            onChange={onPrayerChange}
-            onBlur={() => setPrayer((prev) => prev.trim().replace(/\s+/g, " "))}
-            placeholder="Tuliskan doa atau permohonan kebaikan Anda..."
-            className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors font-normal resize-none"
-          />
         )}
+
+        <textarea
+          rows={3}
+          maxLength={150}
+          value={prayer}
+          onChange={onPrayerChange}
+          onBlur={() => setPrayer((prev) => prev.trim().replace(/\s+/g, " "))}
+          placeholder="Tuliskan doa atau permohonan kebaikan Anda..."
+          className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors font-normal resize-none"
+        />
 
         <p className="text-sm text-slate-700 font-normal">
           Untaian doa Anda akan ditampilkan di tab doa program untuk diaminkan bersama donatur lainnya.

@@ -19,8 +19,8 @@ import {
 const ITEMS_PER_PAGE = 8;
 
 const SORT_OPTIONS = [
-  { value: "terbaru", label: "Paling Baru" },
-  { value: "terpopuler", label: "Paling Banyak Disukai" },
+  { value: "terbaru", label: "Terbaru" },
+  { value: "terpopuler", label: "Terbanyak Disukai" },
   { value: "a-z", label: "Judul (A-Z)" },
 ];
 
@@ -142,7 +142,7 @@ export function ArticleCatalog({ initialArticles = [], categories = ARTICLE_CATE
                 className="h-11 px-3.5 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-900 hover:bg-slate-50 hover:border-slate-400 transition-colors flex items-center gap-2 min-w-[190px] justify-between cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary shadow-2xs"
               >
                 <span className="truncate">
-                  {SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || "Paling Baru"}
+                  {SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || "Terbaru"}
                 </span>
                 <ChevronDown className="w-4 h-4 text-slate-500 shrink-0" />
               </button>

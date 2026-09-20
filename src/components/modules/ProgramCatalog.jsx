@@ -21,9 +21,9 @@ import { cn } from "@/lib/utils";
 const ITEMS_PER_PAGE = 9;
 
 const SORT_OPTIONS = [
-  { value: "terbaru", label: "Paling Baru" },
-  { value: "mendesak", label: "Paling Mendesak" },
-  { value: "terpopuler", label: "Paling Banyak Donasi" },
+  { value: "terbaru", label: "Terbaru" },
+  { value: "mendesak", label: "Termendesak" },
+  { value: "terpopuler", label: "Terbanyak Donasi" },
   { value: "dana-terbanyak", label: "Dana Terkumpul Terbanyak" },
 ];
 

@@ -1,11 +1,62 @@
 "use client";
 
-import { useState } from "react";
-import { CheckCircle2, ChevronDown, ChevronUp, Loader2, User } from "lucide-react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { Loader2, User } from "lucide-react";
 import { formatRupiah, formatDate } from "@/lib/formatters";
 import { maskEmail } from "@/lib/security";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+
+const INITIAL_PAGE_SIZE = 12;
+const BATCH_SIZE = 10;
+
+function getDateKey(dateInput) {
+  if (!dateInput) return "unknown";
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return "unknown";
+  const wibTime = new Date(date.getTime() + (7 * 60 + date.getTimezoneOffset()) * 60000);
+  const y = wibTime.getFullYear();
+  const m = String(wibTime.getMonth() + 1).padStart(2, "0");
+  const d = String(wibTime.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function getDateBadgeLabel(dateInput) {
+  if (!dateInput) return "Lainnya";
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return "Lainnya";
+
+  const now = new Date();
+  const nowWIB = new Date(now.getTime() + (7 * 60 + now.getTimezoneOffset()) * 60000);
+  const targetWIB = new Date(date.getTime() + (7 * 60 + date.getTimezoneOffset()) * 60000);
+
+  const isSameDay = (d1, d2) =>
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+
+  const yesterdayWIB = new Date(nowWIB);
+  yesterdayWIB.setDate(yesterdayWIB.getDate() - 1);
+
+  if (isSameDay(targetWIB, nowWIB)) {
+    return "Hari Ini";
+  }
+  if (isSameDay(targetWIB, yesterdayWIB)) {
+    return "Kemarin";
+  }
+
+  return formatDate(date, { month: "long", withDay: true });
+}
+
+function formatTimeOnly(dateInput) {
+  if (!dateInput) return "Baru saja";
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return "Baru saja";
+  const wibTime = new Date(date.getTime() + (7 * 60 + date.getTimezoneOffset()) * 60000);
+  const hours = String(wibTime.getHours()).padStart(2, "0");
+  const minutes = String(wibTime.getMinutes()).padStart(2, "0");
+  const seconds = String(wibTime.getSeconds()).padStart(2, "0");
+  return `${hours}:${minutes}:${seconds} WIB`;
+}
 
 export function CampaignTransactionsList({
   donors = [],
@@ -13,42 +64,93 @@ export function CampaignTransactionsList({
   campaignSlug = "",
 }) {
   const [donorList, setDonorList] = useState(donors);
-  const [visibleCount, setVisibleCount] = useState(15);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const scrollRef = useRef(null);
 
   // Urutkan donatur berdasarkan tanggal terbaru
-  const sortedDonors = [...donorList].sort(
-    (a, b) => new Date(b.date || 0) - new Date(a.date || 0)
-  );
+  const sortedDonors = useMemo(() => {
+    return [...donorList].sort(
+      (a, b) => new Date(b.date || 0) - new Date(a.date || 0)
+    );
+  }, [donorList]);
 
   const visibleDonors = sortedDonors.slice(0, visibleCount);
   const hasLocalMore = sortedDonors.length > visibleCount;
   const canFetchRemote = Boolean(campaignSlug && donorList.length < totalDonorsCount);
+  const hasMore = hasLocalMore || canFetchRemote;
 
-  const handleFetchMore = async () => {
-    if (isLoadingMore || !campaignSlug) return;
-    setIsLoadingMore(true);
-    try {
-      const res = await fetch(
-        `/api/donations?campaignSlug=${encodeURIComponent(campaignSlug)}&skip=${donorList.length}&limit=30`
-      );
-      const json = await res.json();
-      if (json?.success && Array.isArray(json?.data?.donations)) {
-        const newItems = json.data.donations;
-        setDonorList((prev) => {
-          const existingIds = new Set(prev.map((d) => d.id));
-          const filtered = newItems.filter((item) => !existingIds.has(item.id));
-          const updated = [...prev, ...filtered];
-          setVisibleCount(updated.length);
-          return updated;
-        });
+  // Kelompokkan data yang tampil per tanggal (seperti WhatsApp)
+  const groupedDonors = useMemo(() => {
+    const groups = [];
+    const groupMap = new Map();
+
+    for (const item of visibleDonors) {
+      const key = getDateKey(item.date);
+      if (!groupMap.has(key)) {
+        const groupObj = {
+          key,
+          label: getDateBadgeLabel(item.date),
+          items: [],
+        };
+        groupMap.set(key, groupObj);
+        groups.push(groupObj);
       }
-    } catch (err) {
-      console.warn("Gagal memuat riwayat donasi tambahan:", err);
-    } finally {
-      setIsLoadingMore(false);
+      groupMap.get(key).items.push(item);
     }
-  };
+
+    return groups;
+  }, [visibleDonors]);
+
+  // Listener scroll ke bawah untuk muat lebih banyak transaksi
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      if (el.scrollHeight - el.scrollTop - el.clientHeight >= 80) return;
+      if (isLoadingMore || !hasMore) return;
+
+      // 1. Prioritaskan tampilkan sisa data lokal terlebih dahulu
+      if (hasLocalMore) {
+        setIsLoadingMore(true);
+        setTimeout(() => {
+          setVisibleCount((prev) => Math.min(prev + BATCH_SIZE, donorList.length));
+          setIsLoadingMore(false);
+        }, 400);
+        return;
+      }
+
+      // 2. Jika data lokal habis namun server masih ada data
+      if (canFetchRemote) {
+        setIsLoadingMore(true);
+        fetch(
+          `/api/donations?campaignSlug=${encodeURIComponent(campaignSlug)}&skip=${donorList.length}&limit=20`
+        )
+          .then((res) => res.json())
+          .then((json) => {
+            if (json?.success && Array.isArray(json?.data?.donations)) {
+              const newItems = json.data.donations;
+              setDonorList((prev) => {
+                const existingIds = new Set(prev.map((d) => d.id));
+                const filtered = newItems.filter((item) => !existingIds.has(item.id));
+                return [...prev, ...filtered];
+              });
+              setVisibleCount((prev) => prev + (newItems.length || BATCH_SIZE));
+            }
+          })
+          .catch((err) => {
+            console.warn("Gagal memuat riwayat donasi tambahan:", err);
+          })
+          .finally(() => {
+            setIsLoadingMore(false);
+          });
+      }
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [isLoadingMore, hasMore, hasLocalMore, canFetchRemote, donorList.length, campaignSlug]);
 
   if (!donorList || donorList.length === 0) {
     return (
@@ -70,125 +172,80 @@ export function CampaignTransactionsList({
             Catatan mutasi donasi masuk yang telah berhasil terverifikasi oleh sistem.
           </p>
         </div>
-        <span className="text-xs sm:text-sm font-medium text-slate-700 bg-slate-100 px-3 py-1 rounded-full self-start sm:self-auto border border-slate-200">
-          {totalDonorsCount || donorList.length} Donasi Masuk
+        <span className="text-xs sm:text-sm font-medium text-slate-700">
+          ({totalDonorsCount || donorList.length} Donasi Masuk)
         </span>
       </div>
 
-      {/* Transaction List Container (Scrollable Max Height) */}
-      <div className="max-h-[500px] sm:max-h-[620px] overflow-y-auto pr-1 sm:pr-2 focus:outline-none divide-y divide-slate-100">
-        {visibleDonors.map((item, index) => {
-          const isAnon = !item.name || item.name.toLowerCase().includes("hamba allah");
-          const initial = isAnon ? "HA" : item.name.slice(0, 2).toUpperCase();
-
-          return (
-            <div
-              key={item.id || `tx-${index}`}
-              className="py-3.5 first:pt-2 last:pb-1 flex items-start sm:items-center justify-between gap-3"
-            >
-              {/* Left: Avatar & Donor Info */}
-              <div className="flex items-center gap-3 min-w-0">
-                <Avatar className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 text-slate-700 shrink-0 overflow-hidden">
-                  {item.avatar && (
-                    <AvatarImage src={item.avatar} alt={item.name || "Donatur"} className="object-cover" />
-                  )}
-                  <AvatarFallback className="text-xs font-semibold bg-slate-100 text-slate-700">
-                    {isAnon ? <User className="w-4 h-4 text-slate-500" /> : initial}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm sm:text-base font-medium text-slate-900 truncate">
-                      {item.name || "Hamba Allah"}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                      Terverifikasi
-                    </span>
-                  </div>
-                  <span className="text-sm text-slate-600 block mt-0.5 font-normal truncate">
-                    {maskEmail(item.email || (isAnon ? "hamba.allah***@gmail.com" : "donatur@ygsm.id"))}
-                  </span>
-                </div>
-              </div>
-
-              {/* Right: Donation Amount & Full Date Details */}
-              <div className="text-right shrink-0">
-                <span className="text-sm sm:text-base font-semibold text-slate-950 block">
-                  {formatRupiah(item.amount)}
-                </span>
-                <span className="text-sm text-slate-600 block mt-0.5 font-normal">
-                  {item.date
-                    ? formatDate(item.date, {
-                        withDay: true,
-                        withTime: true,
-                        withSeconds: true,
-                      })
-                    : "Baru saja"}
-                </span>
-              </div>
+      {/* Transaction List Container with Date Groups */}
+      <div
+        ref={scrollRef}
+        className="max-h-[460px] sm:max-h-[520px] overflow-y-auto pr-1 sm:pr-2 focus:outline-none space-y-4"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e1 transparent" }}
+      >
+        {groupedDonors.map((group) => (
+          <div key={group.key} className="space-y-2">
+            {/* WhatsApp-Style Sticky Date Badge */}
+            <div className="sticky top-0 z-10 flex justify-center py-1 pointer-events-none">
+              <span className="inline-flex items-center px-3 py-1 rounded-md text-xs bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white border border-slate-800 shadow-xs pointer-events-auto select-none">
+                {group.label}
+              </span>
             </div>
-          );
-        })}
+
+            {/* 2-Column Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2.5">
+              {group.items.map((item, index) => {
+                const isAnon = !item.name || item.name.toLowerCase().includes("hamba allah");
+                const initial = isAnon ? "HA" : item.name.slice(0, 2).toUpperCase();
+
+                return (
+                  <div
+                    key={item.id || `tx-${group.key}-${index}`}
+                    className="p-2 flex items-center justify-between gap-2.5 shadow-2xs"
+                  >
+                    {/* Left: Avatar & Donor Info */}
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Avatar className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-slate-700 shrink-0 overflow-hidden">
+                        {item.avatar && (
+                          <AvatarImage src={item.avatar} alt={item.name || "Donatur"} className="object-cover" />
+                        )}
+                        <AvatarFallback className="text-xs font-medium bg-slate-100 text-slate-700">
+                          {isAnon ? <User className="w-5 h-5 text-slate-500" /> : initial}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <span className="text-xs sm:text-sm font-medium text-slate-900 truncate block">
+                          {item.name || "Hamba Allah"}
+                        </span>
+                        <span className="text-xs text-slate-600 block mt-0.5 font-normal truncate">
+                          {maskEmail(item.email || (isAnon ? "hamba.allah***@gmail.com" : "donatur@ygsm.id"))}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right: Donation Amount & Time Details */}
+                    <div className="text-right shrink-0">
+                      <span className="text-xs sm:text-sm font-medium text-slate-950 block">
+                        {formatRupiah(item.amount)}
+                      </span>
+                      <span className="text-xs text-slate-600 block mt-0.5 font-normal">
+                        {formatTimeOnly(item.date)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+
+        {/* Loading indicator saat scroll reload */}
+        {isLoadingMore && (
+          <div className="flex justify-center py-4">
+            <Loader2 className="w-[18px] h-[18px] text-primary animate-spin" />
+          </div>
+        )}
       </div>
-
-      {/* Action Buttons: Local Expand or Remote Pagination */}
-      <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
-        {hasLocalMore && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setVisibleCount(sortedDonors.length)}
-            className="text-xs sm:text-sm font-medium text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer rounded-lg px-4 py-2"
-          >
-            <span>Tampilkan Semua ({sortedDonors.length} Donasi Terunduh)</span>
-            <ChevronDown className="w-4 h-4 ml-1.5" />
-          </Button>
-        )}
-
-        {canFetchRemote && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={isLoadingMore}
-            onClick={handleFetchMore}
-            className="text-xs sm:text-sm font-medium text-primary border-primary/30 hover:bg-primary/5 cursor-pointer rounded-lg px-4 py-2"
-          >
-            {isLoadingMore ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-1.5 animate-spin text-primary" />
-                <span>Memuat Riwayat Tambahan...</span>
-              </>
-            ) : (
-              <>
-                <span>Muat Donasi Berikutnya (+30)</span>
-                <ChevronDown className="w-4 h-4 ml-1.5" />
-              </>
-            )}
-          </Button>
-        )}
-
-        {sortedDonors.length > 15 && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setVisibleCount(15)}
-            className="text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-100 cursor-pointer rounded-lg px-3 py-2"
-          >
-            <span>Persempit ke 15 Terbaru</span>
-            <ChevronUp className="w-4 h-4 ml-1" />
-          </Button>
-        )}
-      </div>
-
-      {!canFetchRemote && totalDonorsCount > 15 && (
-        <p className="text-center text-xs text-slate-600 pt-1">
-          Seluruh {totalDonorsCount} riwayat transaksi mutasi telah berhasil dimuat.
-        </p>
-      )}
     </div>
   );
 }
