@@ -40,7 +40,7 @@ export function DonorIdentitySection({
 
       {!isAnonymous && (
         <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-slate-800 block">Nama Lengkap *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Nama Lengkap <span className="text-rose-500">*</span></label>
           <Input
             type="text"
             required={!isAnonymous}
@@ -54,7 +54,7 @@ export function DonorIdentitySection({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-slate-800 block">Nomor WhatsApp *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Nomor WhatsApp <span className="text-rose-500">*</span></label>
           <Input
             type="tel"
             inputMode="tel"

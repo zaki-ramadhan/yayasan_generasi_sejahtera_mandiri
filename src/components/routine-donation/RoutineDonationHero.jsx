@@ -24,7 +24,7 @@ export function RoutineDonationHero() {
             Atur Jadwal Donasi Rutin
           </h1>
           <p className="text-sm sm:text-base text-slate-600 mt-1">
-            Atur pengingat WhatsApp atau jadwal sedekah rutin berkala untuk program kebaikan pilihan Anda.
+            Atur pengingat WhatsApp atau jadwal sedekah berkala untuk program donasi pilihan Anda.
           </p>
         </div>
       </div>

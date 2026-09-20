@@ -46,7 +46,7 @@ export function RoutineDonorIdentity({
       {!isAnonymous && (
         <div className="space-y-1.5">
           <label className="text-sm font-semibold text-slate-800 block">
-            Nama Lengkap *
+            Nama Lengkap <span className="text-rose-500">*</span>
           </label>
           <div className="flex gap-2.5">
             {/* Sapaan Dropdown (modal={false} - Zero Scroll Lock) */}
@@ -105,7 +105,7 @@ export function RoutineDonorIdentity({
       <div className={cn("grid grid-cols-1 gap-4", setEmail ? "sm:grid-cols-2" : "")}>
         <div className="space-y-1.5">
           <label className="text-sm font-semibold text-slate-800 block">
-            Nomor WhatsApp *
+            Nomor WhatsApp <span className="text-rose-500">*</span>
           </label>
           <Input
             type="tel"

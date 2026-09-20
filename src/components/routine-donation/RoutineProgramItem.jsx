@@ -67,7 +67,7 @@ export function RoutineProgramItem({
       {/* Program Picker (DropdownMenu modal={false} - Zero Scroll Lock) */}
       <div className="space-y-1.5">
         <label className="text-sm font-semibold text-slate-800 block">
-          Pilih program kebaikan
+          Pilih program donasi
         </label>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
@@ -112,7 +112,7 @@ export function RoutineProgramItem({
       {/* Frequency Picker (DropdownMenu modal={false} - Zero Scroll Lock) */}
       <div className="space-y-1.5">
         <label className="text-sm font-semibold text-slate-800 block">
-          Frekuensi donasi rutin
+          Jadwal donasi rutin
         </label>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>

@@ -79,7 +79,7 @@ export function VolunteerForm() {
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-xl border border-border-subtle space-y-4 shadow-sm">
       <div className="space-y-1.5">
-        <label className="text-sm font-semibold text-slate-800 block">Nama Lengkap *</label>
+        <label className="text-sm font-semibold text-slate-800 block">Nama Lengkap <span className="text-rose-500">*</span></label>
         <Input
           type="text"
           required
@@ -92,7 +92,7 @@ export function VolunteerForm() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-slate-800 block">Nomor WhatsApp *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Nomor WhatsApp <span className="text-rose-500">*</span></label>
           <Input
             type="tel"
             inputMode="tel"
@@ -118,7 +118,7 @@ export function VolunteerForm() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-slate-800 block">Kota / Kabupaten Domisili *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Kota / Kabupaten Domisili <span className="text-rose-500">*</span></label>
           <Input
             type="text"
             required
@@ -130,7 +130,7 @@ export function VolunteerForm() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-semibold text-slate-800 block">Peminatan Aksi *</label>
+          <label className="text-sm font-semibold text-slate-800 block">Peminatan Aksi <span className="text-rose-500">*</span></label>
           <select
             value={interest}
             onChange={(e) => setInterest(e.target.value)}

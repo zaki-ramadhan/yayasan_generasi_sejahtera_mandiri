@@ -28,7 +28,7 @@ export function DonorDashboardView() {
               <div className="space-y-1">
                 <span className="text-xs font-bold text-slate-900 block">{sch.program}</span>
                 <div className="flex items-center gap-3 text-xs text-slate-600">
-                  <span>Frekuensi: <strong>{sch.freq}</strong></span>
+                  <span>Jadwal: <strong>{sch.freq}</strong></span>
                   <span>Jadwal Berikutnya: <strong className="text-primary">{sch.nextDate}</strong></span>
                 </div>
               </div>

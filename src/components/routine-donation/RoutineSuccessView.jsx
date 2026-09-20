@@ -57,24 +57,17 @@ export function RoutineSuccessView({
                 key={p.id}
                 className="pb-3.5 border-b border-slate-100 last:border-0 last:pb-0 text-sm space-y-1"
               >
-                <div className="flex justify-between items-start gap-2">
-                  {/* List Outside Numbering & Font-Medium Title */}
-                  <div className="flex items-start gap-1.5 min-w-0 flex-1">
-                    <span className="text-sm font-medium text-slate-900 shrink-0 select-none">
-                      {idx + 1}.
-                    </span>
-                    <span className="text-sm font-medium text-slate-900 line-clamp-2">
-                      {camp.title}
-                    </span>
-                  </div>
-                  {!isReminderOnly && (
-                    <span className="font-medium text-slate-950 shrink-0 text-sm sm:text-base">
-                      {formatRupiah(nominal)}
-                    </span>
-                  )}
+                {/* Program Title */}
+                <div className="flex items-start gap-1.5 min-w-0">
+                  <span className="text-sm font-semibold text-slate-900 shrink-0 select-none">
+                    {idx + 1}.
+                  </span>
+                  <span className="text-sm font-medium text-slate-900 line-clamp-2 leading-snug">
+                    {camp.title}
+                  </span>
                 </div>
 
-                {/* Tree structure: Enter Icon + Bell in Circle + Vertical Separator */}
+                {/* Tree structure: Enter Icon + Bell in Circle + Vertical Separator + Nominal */}
                 <div className="pl-4 flex items-center gap-2 flex-wrap pt-0.5">
                   <CornerDownRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
@@ -87,6 +80,14 @@ export function RoutineSuccessView({
                   <span className="text-xs text-slate-500 font-medium">
                     {isReminderOnly ? "Pengingat WA Saja" : "Donasi Otomatis"}
                   </span>
+                  {!isReminderOnly && (
+                    <>
+                      <span className="text-xs text-slate-300 select-none">|</span>
+                      <span className="text-xs sm:text-sm font-bold text-primary">
+                        {formatRupiah(nominal)}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             );
