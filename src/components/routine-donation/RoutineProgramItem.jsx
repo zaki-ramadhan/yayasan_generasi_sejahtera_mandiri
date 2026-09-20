@@ -20,7 +20,7 @@ import {
 import { CAMPAIGNS } from "@/data/campaigns";
 import { PAYMENT_CHANNELS } from "@/data/paymentChannels";
 import { PaymentChannelPicker } from "@/components/donation/PaymentChannelPicker";
-import { formatRupiah, formatNumber } from "@/lib/formatters";
+import { formatRupiah, formatNumber, isCampaignClosed } from "@/lib/formatters";
 import { DONATION_LIMITS } from "@/lib/security";
 import { cn } from "@/lib/utils";
 
@@ -346,7 +346,8 @@ export function RoutineProgramItem({
   onRemove,
   onChange,
 }) {
-  const campaignList = campaigns && campaigns.length > 0 ? campaigns : CAMPAIGNS;
+  const rawList = campaigns && campaigns.length > 0 ? campaigns : CAMPAIGNS;
+  const campaignList = rawList.filter((c) => !isCampaignClosed(c));
   const selectedCampaign = campaignList.find((c) => c.id === item.campaignId) || campaignList[0];
   const currentFrequency = normalizeFrequency(item.frequency);
   const selectedFreq =

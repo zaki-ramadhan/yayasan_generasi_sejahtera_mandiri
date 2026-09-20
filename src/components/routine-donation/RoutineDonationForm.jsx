@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { DONATION_LIMITS, validateName, validatePhone } from "@/lib/security";
-import { formatRupiah } from "@/lib/formatters";
+import { formatRupiah, isCampaignClosed } from "@/lib/formatters";
 import { getStoredUser } from "@/services/authService";
 import { RoutineDonationHero } from "@/components/routine-donation/RoutineDonationHero";
 import { RoutineDonorIdentity } from "@/components/routine-donation/RoutineDonorIdentity";
@@ -21,7 +21,10 @@ export function RoutineDonationForm({ campaigns = [] }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const defaultCampaignId = campaigns[0]?.id || "camp-001";
+  const activeCampaigns = (campaigns && campaigns.length > 0 ? campaigns : []).filter(
+    (c) => !isCampaignClosed(c)
+  );
+  const defaultCampaignId = activeCampaigns[0]?.id || campaigns[0]?.id || "camp-001";
 
   // Pre-fill user data from session if authenticated
   useEffect(() => {
@@ -63,7 +66,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
       return;
     }
     const nextCampaign =
-      campaigns[selectedPrograms.length % (campaigns.length || 1)] || campaigns[0];
+      activeCampaigns[selectedPrograms.length % (activeCampaigns.length || 1)] || activeCampaigns[0];
     setSelectedPrograms((prev) => [
       ...prev,
       {
@@ -174,7 +177,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
         fullName={fullName}
         whatsapp={whatsapp}
         selectedPrograms={selectedPrograms}
-        campaigns={campaigns}
+        campaigns={activeCampaigns}
         onReset={() => {
           setIsSubmitted(false);
         }}
@@ -217,7 +220,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
                 item={item}
                 index={index}
                 totalItems={selectedPrograms.length}
-                campaigns={campaigns}
+                campaigns={activeCampaigns}
                 onRemove={handleRemoveProgram}
                 onChange={handleProgramChange}
               />
@@ -244,7 +247,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
             selectedPrograms={selectedPrograms}
             totalPerCommitment={totalPerCommitment}
             isSubmitting={isSubmitting}
-            campaigns={campaigns}
+            campaigns={activeCampaigns}
           />
         </div>
       </form>

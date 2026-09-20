@@ -427,9 +427,10 @@ export const CAMPAIGNS = [
     "categoryId": "yatim",
     "categoryName": "Kemandirian Yatim",
     "targetAmount": 50000000,
-    "collectedAmount": 48900000,
-    "donorCount": 195,
+    "collectedAmount": 52850000,
+    "donorCount": 218,
     "endDate": "2026-10-30T23:59:59Z",
+    "status": "ACTIVE",
     "isUrgent": false,
     "isFeatured": true,
     "location": "Lebak, Banten",
@@ -833,16 +834,25 @@ export const CAMPAIGNS = [
     "categoryId": "pendidikan",
     "categoryName": "Pendidikan & Santri",
     "targetAmount": 95000000,
-    "collectedAmount": 68300000,
+    "collectedAmount": 96500000,
     "donorCount": 245,
-    "endDate": "2026-11-30T23:59:59Z",
+    "endDate": "2026-08-31T23:59:59Z",
+    "status": "COMPLETED",
     "isUrgent": false,
     "isFeatured": false,
     "location": "Pandeglang, Banten",
     "bannerUrl": "https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=800&q=80",
     "excerpt": "Perbaiki atap bocor dan perluas ruang belajar tahfidz agar 60 santri yatim dhuafa dapat menghafal Quran dengan nyaman.",
     "story": "Kondisi asrama santri binaan di Pandeglang mengalami kerusakan atap dan lantai yang lembab saat musim hujan tiba.\n\nRenovasi ini mencakup:\n- Penggantian genteng dan plafon tahan air.\n- Pembangunan ruang belajar berlantai keramik dan rak kitab.\n- Ventilasi udara sehat dan sanitasi kamar mandi yang bersih.",
-    "updates": [],
+    "updates": [
+      {
+        "id": "upd-007-1",
+        "date": "2026-09-05",
+        "title": "Renovasi Asrama Selesai 100% & Syukuran Bersama Santri",
+        "content": "Alhamdulillah, seluruh pekerjaan atap plafon dan lantai ruang belajar telah selesai 100%. Santri kini belajar dengan tenang dan nyaman.",
+        "disbursedAmount": 95000000
+      }
+    ],
     "recentDonors": [
       {
         "id": "don-camp-007-1",
@@ -1361,5 +1371,108 @@ export const CAMPAIGNS = [
         "isAnonymous": false
       }
     ]
+  },
+  {
+    "id": "camp-011",
+    "slug": "tanggap-darurat-gempa-bumi-pasaman",
+    "title": "Tanggap Darurat: Bantuan Medis & Dapur Umum Gempa Bumi Pasaman",
+    "categoryId": "bencana",
+    "categoryName": "Tanggap Bencana",
+    "targetAmount": 60000000,
+    "collectedAmount": 51200000,
+    "donorCount": 215,
+    "endDate": "2026-08-10T23:59:59Z",
+    "status": "CLOSED",
+    "isUrgent": false,
+    "isFeatured": false,
+    "location": "Pasaman Barat, Sumatera Barat",
+    "bannerUrl": "https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80",
+    "excerpt": "Masa tanggap darurat pasca bencana gempa bumi telah selesai. Seluruh bantuan logistik pangan dan obat-obatan telah disalurkan kepada 150 KK.",
+    "story": "Penyaluran bantuan darurat berupa posko dapur umum, tenda evakuasi, dan distribusi sembako untuk masyarakat terdampak gempa Pasaman Barat telah terlaksana dengan baik.\n\nDengan berakhirnya masa tanggap bencana, program penggalangan dana ini resmi ditutup. Terima kasih tak terhingga atas empati dan kepedulian para muhsinin.",
+    "updates": [
+      {
+        "id": "upd-011-1",
+        "date": "2026-08-12",
+        "title": "Penutupan Posko Medis & Penyaluran Paket Sembako Terakhir",
+        "content": "Posko medis relawan YGSM telah resmi menyelesaikan masa tugas dan menyalurkan sisa bantuan logistik tahap akhir kepada warga hunian sementara.",
+        "disbursedAmount": 51200000
+      }
+    ],
+    "recentDonors": [
+      {
+        "id": "don-camp-011-1",
+        "name": "Keluarga dr. Maya Anggraini",
+        "email": "maya.anggraini@rs-islam.co.id",
+        "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
+        "amount": 1000000,
+        "date": "2026-08-05T09:12:00Z",
+        "prayer": "Semoga warga yang terdampak diberikan ketabahan dan kesehatan selalu.",
+        "aminCount": 42,
+        "isAnonymous": false
+      },
+      {
+        "id": "don-camp-011-2",
+        "name": "Hamba Allah",
+        "email": "hamba.allah***@gmail.com",
+        "avatar": null,
+        "amount": 250000,
+        "date": "2026-08-04T15:20:00Z",
+        "prayer": "Aamiin ya Rabbal alamin.",
+        "aminCount": 15,
+        "isAnonymous": true
+      }
+    ]
+  },
+  {
+    "id": "camp-012",
+    "slug": "wakaf-pembangunan-asrama-tahfidz-putri",
+    "title": "Wakaf Pembebasan Lahan & Asrama Santriwati Penghafal Al-Qur'an",
+    "categoryId": "zakat",
+    "categoryName": "ZISWAF",
+    "targetAmount": 300000000,
+    "collectedAmount": 112500000,
+    "donorCount": 390,
+    "endDate": null,
+    "status": "ACTIVE",
+    "isUrgent": false,
+    "isFeatured": false,
+    "location": "Cianjur, Jawa Barat",
+    "bannerUrl": "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80",
+    "excerpt": "Investasikan tabungan akhirat Anda melalui wakaf abadi pembebasan lahan seluas 1.200 m² untuk asrama santriwati yatim dhuafa.",
+    "story": "Wakaf tanah dan fasilitas pendidikan adalah salah satu amalan yang pahalanya terus mengalir bahkan setelah seorang insan berpulang.\n\nPesantren Tahfidz Putri YGSM membutuhkan perluasan area asrama agar dapat menampung 80 santriwati dhuafa dari berbagai pelosok Indonesia.",
+    "updates": [],
+    "recentDonors": [
+      {
+        "id": "don-camp-012-1",
+        "name": "Prof. H. Bambang Soediro",
+        "email": "bambang.soediro@ui.ac.id",
+        "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+        "amount": 5000000,
+        "date": "2026-09-15T10:00:00Z",
+        "prayer": "Wakaf untuk almarhumah ibunda tercinta. Semoga menjadi penerang kubur beliau.",
+        "aminCount": 68,
+        "isAnonymous": false
+      }
+    ]
+  },
+  {
+    "id": "camp-013",
+    "slug": "pengadaan-mushaf-alquran-braille-difabel-netra",
+    "title": "Pengadaan Mushaf Al-Qur'an Braille untuk Sahabat Difabel Netra",
+    "categoryId": "pendidikan",
+    "categoryName": "Pendidikan & Santri",
+    "targetAmount": 35000000,
+    "collectedAmount": 0,
+    "donorCount": 0,
+    "endDate": "2026-12-25T23:59:59Z",
+    "status": "ACTIVE",
+    "isUrgent": false,
+    "isFeatured": false,
+    "location": "Nasional",
+    "bannerUrl": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80",
+    "excerpt": "Dukung pengadaan 100 set mushaf Al-Qur'an Braille lengkap 30 juz agar sahabat difabel netra dapat menghafal kalam Ilahi dengan mandiri.",
+    "story": "Membaca Al-Qur'an adalah hak setiap insan muslim tanpa terkecuali. Sayangnya, mushaf Al-Qur'an Braille masih sangat terbatas ketersediaannya dan memiliki biaya cetak yang cukup tinggi.\n\nMelalui program ini, YGSM memfasilitasi 100 set Al-Qur'an Braille standar Kemenag untuk disalurkan ke panti asuhan difabel dan komunitas tahfidz netra.",
+    "updates": [],
+    "recentDonors": []
   }
 ];

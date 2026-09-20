@@ -1,7 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
+import { isCampaignClosed } from "@/lib/formatters";
 
 export function CampaignCTA({ campaign }) {
+  if (isCampaignClosed(campaign)) {
+    return null;
+  }
+
   return (
     <div className="relative overflow-hidden rounded-xl border border-slate-700/70 bg-slate-950 text-white p-5 sm:p-6 shadow-md mt-6">
       {/* Atmospheric Background image + radial gradient overlay */}

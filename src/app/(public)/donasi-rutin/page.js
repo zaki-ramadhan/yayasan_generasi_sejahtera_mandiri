@@ -1,4 +1,5 @@
 import { getCampaigns } from "@/services/campaignService";
+import { isCampaignClosed } from "@/lib/formatters";
 import { RoutineDonationForm } from "@/components/routine-donation/RoutineDonationForm";
 
 export const metadata = {
@@ -7,7 +8,9 @@ export const metadata = {
 };
 
 export default async function DonasiRutinPage() {
-  const campaigns = await getCampaigns();
+  const allCampaigns = await getCampaigns();
+  const activeCampaigns = allCampaigns.filter((c) => !isCampaignClosed(c));
 
-  return <RoutineDonationForm campaigns={campaigns} />;
+  return <RoutineDonationForm campaigns={activeCampaigns} />;
 }
+

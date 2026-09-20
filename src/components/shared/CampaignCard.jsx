@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Clock, MapPin, Users, Infinity } from "lucide-react";
-import { formatRupiah, calculateProgress, calculateDaysLeft } from "@/lib/formatters";
+import { Clock, MapPin, Users } from "lucide-react";
+import { formatRupiah, calculateProgress, calculateDaysLeft, isCampaignClosed } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { SafeImage } from "@/components/ui/safe-image";
@@ -19,6 +19,7 @@ export function CampaignCard({
   const progress = hasTarget ? calculateProgress(campaign.collectedAmount, campaign.targetAmount) : 0;
   const daysLeft = calculateDaysLeft(campaign.endDate);
   const totalDonors = campaign.donorCount || 0;
+  const isClosed = isCampaignClosed(campaign);
 
   return (
     <div className={cn("flex flex-col h-full w-full rounded-xl border border-slate-300 bg-white hover:border-slate-400 transition-colors overflow-hidden", className)}>
@@ -83,16 +84,25 @@ export function CampaignCard({
               </div>
             </>
           ) : (
-            <div className="flex justify-between items-center py-1">
-              <div>
-                <span className="text-xs sm:text-sm text-slate-600 font-medium block">Total Terkumpul</span>
-                <span className="font-bold text-slate-950 text-base sm:text-lg">
-                  {formatRupiah(campaign.collectedAmount)}
-                </span>
+            <div className="space-y-1.5">
+              {/* Subtle continuous indicator bar */}
+              <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full w-full bg-emerald-500/25 rounded-full" />
               </div>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md">
-                Berkelanjutan
-              </span>
+              <div className="flex justify-between items-baseline text-sm">
+                <div>
+                  <span className="text-xs sm:text-sm text-slate-600 font-medium block">Total Terkumpul</span>
+                  <span className="font-bold text-slate-950 text-base sm:text-lg">
+                    {formatRupiah(campaign.collectedAmount)}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs sm:text-sm text-slate-600 font-medium block">Penyaluran</span>
+                  <span className="text-slate-800 font-medium text-sm sm:text-base">
+                    Berkelanjutan
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -107,24 +117,33 @@ export function CampaignCard({
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
-            {campaign.endDate && daysLeft !== null ? (
-              <span className="text-sm font-semibold text-slate-900 flex items-center gap-1.5 shrink-0">
-                <Clock className="w-4 h-4 text-slate-700 shrink-0 stroke-[2]" />
-                <span>{daysLeft > 0 ? `${daysLeft} hr` : "Selesai"}</span>
-              </span>
-            ) : (
-              <span className="text-sm font-semibold text-emerald-700 flex items-center gap-1 shrink-0">
-                <Infinity className="w-4 h-4 shrink-0" />
-                <span>Rutin</span>
+            {campaign.endDate && daysLeft !== null && (
+              <span className={cn(
+                "text-sm font-semibold flex items-center gap-1.5 shrink-0",
+                isClosed ? "text-slate-600" : "text-slate-900"
+              )}>
+                <Clock className="w-4 h-4 text-slate-600 shrink-0 stroke-[2]" />
+                <span>{isClosed ? "Selesai" : `${daysLeft} hr`}</span>
               </span>
             )}
+
             <Link href={`/campaign/${campaign.slug}`}>
-              <Button
-                size="sm"
-                className="h-8.5 px-4 rounded-md text-sm font-semibold bg-primary hover:bg-primary-hover text-white shadow-none cursor-pointer"
-              >
-                Donasi
-              </Button>
+              {isClosed ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8.5 px-3.5 rounded-md text-sm font-medium border-slate-300 text-slate-700 bg-white hover:bg-slate-100 shadow-none cursor-pointer"
+                >
+                  Lihat Detail
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="h-8.5 px-4 rounded-md text-sm font-semibold bg-primary hover:bg-primary-hover text-white shadow-none cursor-pointer"
+                >
+                  Donasi
+                </Button>
+              )}
             </Link>
           </div>
         </div>
@@ -132,3 +151,4 @@ export function CampaignCard({
     </div>
   );
 }
+

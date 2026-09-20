@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { CAMPAIGNS } from "@/data/campaigns";
+import { isCampaignClosed } from "@/lib/formatters";
 
 function formatCampaignFromDb(c) {
   if (!c) return null;
@@ -40,11 +41,12 @@ function formatCampaignFromDb(c) {
   };
 }
 
-export async function getCampaigns({ category = "all", search = "", sort = "terbaru" } = {}) {
+export async function getCampaigns({ category = "all", search = "", sort = "terbaru", status } = {}) {
   try {
-    const where = {
-      status: "ACTIVE",
-    };
+    const where = {};
+    if (status) {
+      where.status = status;
+    }
 
     if (category && category !== "all" && category !== "semua") {
       where.OR = [
@@ -90,6 +92,10 @@ export async function getCampaigns({ category = "all", search = "", sort = "terb
 
   // Fallback to static data
   let filtered = [...CAMPAIGNS];
+
+  if (status) {
+    filtered = filtered.filter((c) => (c.status || "ACTIVE") === status);
+  }
 
   if (category && category !== "all" && category !== "semua") {
     filtered = filtered.filter(
@@ -482,10 +488,12 @@ export function getQuickDonateTargetSlug(campaigns = []) {
 
   // 1. Filter hanya program aktif yang belum 100% mencapai target dana (atau program berkelanjutan tanpa target)
   const unfulfilled = campaigns.filter(
-    (c) => c.status === "ACTIVE" && (!c.targetAmount || Number(c.collectedAmount || 0) < Number(c.targetAmount || 0))
+    (c) =>
+      !isCampaignClosed(c) &&
+      (!c.targetAmount || Number(c.collectedAmount || 0) < Number(c.targetAmount || 0))
   );
 
-  const pool = unfulfilled.length > 0 ? unfulfilled : campaigns.filter((c) => c.status === "ACTIVE");
+  const pool = unfulfilled.length > 0 ? unfulfilled : campaigns.filter((c) => !isCampaignClosed(c));
 
   // 2. Prioritas 1: Program Urgent yang belum capai target
   const urgent = pool.find((c) => c.isUrgent);

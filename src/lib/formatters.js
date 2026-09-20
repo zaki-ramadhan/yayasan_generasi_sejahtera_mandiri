@@ -178,6 +178,16 @@ export function calculateDaysLeft(endDateInput) {
   return Math.max(0, diffDays);
 }
 
+export function isCampaignClosed(campaign) {
+  if (!campaign) return false;
+  if (campaign.status === "CLOSED" || campaign.status === "COMPLETED") return true;
+  if (campaign.endDate) {
+    const days = calculateDaysLeft(campaign.endDate);
+    if (days !== null && days <= 0) return true;
+  }
+  return false;
+}
+
 export function formatCompactNumber(num) {
   if (typeof num !== "number" || isNaN(num)) return "0";
   const abs = Math.abs(num);

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Infinity } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { formatRupiah } from "@/lib/formatters";
 
@@ -62,8 +62,8 @@ export function CampaignHeader({ campaign, progress }) {
                 {formatRupiah(campaign.collectedAmount)}
               </span>
             </div>
-            <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md">
-              <Infinity className="w-3.5 h-3.5 shrink-0" /> Berkelanjutan
+            <span className="text-xs sm:text-sm font-medium text-slate-600">
+              Program Berkelanjutan
             </span>
           </div>
         )}
