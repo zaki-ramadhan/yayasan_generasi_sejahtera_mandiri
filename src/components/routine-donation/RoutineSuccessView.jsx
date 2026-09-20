@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Bell } from "lucide-react";
+import { CheckCircle2, Bell, CornerDownRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CAMPAIGNS } from "@/data/campaigns";
 import { formatRupiah } from "@/lib/formatters";
@@ -74,15 +74,16 @@ export function RoutineSuccessView({
                   )}
                 </div>
 
-                {/* Frequency with Bell in Circle Shape (No Badge / Chip / Card) */}
-                <div className="pl-4 flex items-center gap-2 flex-wrap">
+                {/* Tree structure: Enter Icon + Bell in Circle + Vertical Separator */}
+                <div className="pl-4 flex items-center gap-2 flex-wrap pt-0.5">
+                  <CornerDownRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
                     <div className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
                       <Bell className="w-3 h-3 text-slate-600" />
                     </div>
                     <span>{freqLabel}</span>
                   </div>
-                  <span className="text-xs text-slate-400">•</span>
+                  <span className="text-xs text-slate-300 select-none">|</span>
                   <span className="text-xs text-slate-500 font-medium">
                     {isReminderOnly ? "Pengingat WA Saja" : "Donasi Otomatis"}
                   </span>

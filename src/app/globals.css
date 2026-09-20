@@ -39,3 +39,21 @@ body {
 :focus-visible {
   outline: none;
 }
+
+/* Prevent Radix UI / react-remove-scroll from locking body scroll unintentionally */
+body[data-scroll-locked] {
+  overflow: visible !important;
+  margin-right: 0 !important;
+}
+
+/* Recharts click & focus outline reset */
+.recharts-wrapper,
+.recharts-surface,
+.recharts-wrapper:focus,
+.recharts-surface:focus,
+.recharts-wrapper *:focus,
+.recharts-surface *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+

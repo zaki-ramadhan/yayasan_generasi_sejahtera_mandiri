@@ -21,9 +21,9 @@ import { formatRupiah, formatCompactNumber } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 const TIME_RANGE_OPTIONS = [
+  { value: "90d", label: "90 Hari Terakhir" },
   { value: "30d", label: "30 Hari Terakhir" },
   { value: "7d", label: "7 Hari Terakhir" },
-  { value: "90d", label: "90 Hari Terakhir" },
 ];
 
 const chartConfig = {
@@ -50,6 +50,7 @@ export function CampaignDonationGrowthChart({
   campaign = {},
 }) {
   const [timeRange, setTimeRange] = React.useState("30d");
+  const [viewMode, setViewMode] = React.useState("all"); // 'all' | 'daily' | 'cumulative'
 
   // Generate runtun tanggal harian kontinu (tanpa bolong) untuk rentang waktu terpilih
   const chartData = React.useMemo(() => {
@@ -146,9 +147,38 @@ export function CampaignDonationGrowthChart({
     };
   }, [chartData, campaign]);
 
+  const currentChartConfig = React.useMemo(() => {
+    if (viewMode === "all") {
+      return {
+        cumulativeAmount: {
+          label: "Total Terkumpul (Kiri)",
+          color: "#2563eb",
+        },
+        dailyAmount: {
+          label: "Donasi Harian (Kanan)",
+          color: "#10b981",
+        },
+      };
+    }
+    if (viewMode === "daily") {
+      return {
+        dailyAmount: {
+          label: "Donasi Harian",
+          color: "#10b981",
+        },
+      };
+    }
+    return {
+      cumulativeAmount: {
+        label: "Total Terkumpul",
+        color: "#2563eb",
+      },
+    };
+  }, [viewMode]);
+
   return (
     <div className="space-y-5">
-      {/* Header & Filter Range */}
+      {/* Header & Filter Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-0.5">
           <h3 className="text-base sm:text-lg font-semibold text-slate-950">
@@ -159,13 +189,54 @@ export function CampaignDonationGrowthChart({
           </p>
         </div>
 
-        {/* Range Selector */}
-        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+        {/* Controls: Segmented View Mode + Range Selector */}
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
+          {/* Segmented View Mode Tabs */}
+          <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5 text-xs font-medium text-slate-600 select-none">
+            <button
+              type="button"
+              onClick={() => setViewMode("all")}
+              className={cn(
+                "rounded-md px-2.5 py-1.5 transition-all cursor-pointer",
+                viewMode === "all"
+                  ? "bg-white text-slate-950 shadow-2xs font-semibold"
+                  : "text-slate-600 hover:text-slate-900"
+              )}
+            >
+              Dual Axis
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("daily")}
+              className={cn(
+                "rounded-md px-2.5 py-1.5 transition-all cursor-pointer",
+                viewMode === "daily"
+                  ? "bg-white text-emerald-700 shadow-2xs font-semibold"
+                  : "text-slate-600 hover:text-slate-900"
+              )}
+            >
+              Harian
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("cumulative")}
+              className={cn(
+                "rounded-md px-2.5 py-1.5 transition-all cursor-pointer",
+                viewMode === "cumulative"
+                  ? "bg-white text-blue-700 shadow-2xs font-semibold"
+                  : "text-slate-600 hover:text-slate-900"
+              )}
+            >
+              Akumulasi
+            </button>
+          </div>
+
+          {/* Range Selector */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[150px]"
+                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[130px] sm:min-w-[145px]"
               >
                 <span className="truncate">
                   {TIME_RANGE_OPTIONS.find((opt) => opt.value === timeRange)?.label || "Pilih Rentang"}
@@ -173,7 +244,7 @@ export function CampaignDonationGrowthChart({
                 <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 bg-white border border-slate-200 shadow-md rounded-lg p-1">
+            <DropdownMenuContent align="end" className="w-48 bg-white border border-slate-200 shadow-md rounded-lg p-1">
               {TIME_RANGE_OPTIONS.map((opt) => (
                 <DropdownMenuItem
                   key={opt.value}
@@ -218,13 +289,21 @@ export function CampaignDonationGrowthChart({
         </div>
       </div>
 
-      {/* Interactive Area Chart */}
+      {/* Interactive Dual-Axis Area Chart */}
       <div className="pt-2">
         <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[260px] sm:h-[300px] w-full"
+          config={currentChartConfig}
+          className="aspect-auto h-[260px] sm:h-[300px] w-full outline-none focus:outline-none select-none [&_*]:outline-none [&_*]:focus:outline-none"
         >
-          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+          <AreaChart
+            data={chartData}
+            margin={{
+              top: 10,
+              right: viewMode === "all" ? -5 : 10,
+              left: -15,
+              bottom: 0,
+            }}
+          >
             <defs>
               <linearGradient id="fillCumulative" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#2563eb" stopOpacity={0.35} />
@@ -251,12 +330,31 @@ export function CampaignDonationGrowthChart({
                 });
               }}
             />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => formatCompactNumber(value)}
-            />
+
+            {/* Sumbu Y Kiri: Akumulasi Total */}
+            {viewMode !== "daily" && (
+              <YAxis
+                yAxisId="cumulative"
+                orientation="left"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => formatCompactNumber(value)}
+              />
+            )}
+
+            {/* Sumbu Y Kanan (atau Kiri jika single mode): Donasi Harian */}
+            {viewMode !== "cumulative" && (
+              <YAxis
+                yAxisId="daily"
+                orientation={viewMode === "all" ? "right" : "left"}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => formatCompactNumber(value)}
+              />
+            )}
+
             <ChartTooltip
               cursor={{ stroke: "#94a3b8", strokeWidth: 1, strokeDasharray: "4 4" }}
               content={
@@ -272,7 +370,8 @@ export function CampaignDonationGrowthChart({
                     });
                   }}
                   formatter={(value, name) => {
-                    const label = name === "cumulativeAmount" ? "Total Terkumpul" : "Donasi Harian";
+                    const isCum = name === "cumulativeAmount";
+                    const label = isCum ? "Total Terkumpul" : "Donasi Harian";
                     return (
                       <div className="flex items-center justify-between w-full gap-4 text-xs">
                         <span className="text-slate-600">{label}:</span>
@@ -286,22 +385,33 @@ export function CampaignDonationGrowthChart({
                 />
               }
             />
-            <Area
-              dataKey="dailyAmount"
-              type="monotone"
-              fill="url(#fillDaily)"
-              stroke="#10b981"
-              strokeWidth={2}
-              name="dailyAmount"
-            />
-            <Area
-              dataKey="cumulativeAmount"
-              type="monotone"
-              fill="url(#fillCumulative)"
-              stroke="#2563eb"
-              strokeWidth={2.5}
-              name="cumulativeAmount"
-            />
+
+            {/* Area Donasi Harian (Sumbu Y Independen 'daily') */}
+            {viewMode !== "cumulative" && (
+              <Area
+                yAxisId="daily"
+                dataKey="dailyAmount"
+                type="monotone"
+                fill="url(#fillDaily)"
+                stroke="#10b981"
+                strokeWidth={2}
+                name="dailyAmount"
+              />
+            )}
+
+            {/* Area Total Akumulasi (Sumbu Y Independen 'cumulative') */}
+            {viewMode !== "daily" && (
+              <Area
+                yAxisId="cumulative"
+                dataKey="cumulativeAmount"
+                type="monotone"
+                fill="url(#fillCumulative)"
+                stroke="#2563eb"
+                strokeWidth={2.5}
+                name="cumulativeAmount"
+              />
+            )}
+
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
         </ChartContainer>

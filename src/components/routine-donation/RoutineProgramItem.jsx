@@ -244,20 +244,62 @@ export function RoutineProgramItem({
         )}
       </div>
 
-      {/* Jam Pengingat (24 Jam Format WIB) */}
+      {/* Jam Pengingat (Format Murni 24 Jam WIB - Tanpa AM/PM) */}
       <div className="space-y-1.5 pt-2 border-t border-slate-100">
         <label className="text-sm font-semibold text-slate-800 block">
           Jam pengingat
         </label>
-        <div className="relative max-w-xs">
-          <input
-            type="time"
-            step="60"
-            value={item.reminderTime || "05:00"}
-            onChange={(e) => onChange(item.id, "reminderTime", e.target.value)}
-            className="w-full h-11 px-3.5 pr-12 rounded-lg border border-slate-300 text-sm sm:text-base font-normal text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors bg-white cursor-pointer"
-          />
-          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-500 pointer-events-none select-none">
+        <div className="flex items-center gap-2 max-w-xs">
+          {/* Jam (00 - 23) */}
+          <div className="relative flex-1">
+            <select
+              aria-label="Pilih Jam Pengingat"
+              value={(() => {
+                const parts = (item.reminderTime || "05:00").split(":");
+                return parts[0] || "05";
+              })()}
+              onChange={(e) => {
+                const currentMin = (item.reminderTime || "05:00").split(":")[1] || "00";
+                onChange(item.id, "reminderTime", `${e.target.value}:${currentMin}`);
+              }}
+              className="w-full h-11 px-3 pr-8 rounded-lg border border-slate-300 text-sm sm:text-base font-medium text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer appearance-none text-center"
+            >
+              {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")).map((h) => (
+                <option key={h} value={h}>
+                  {h}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
+          </div>
+
+          <span className="text-base font-bold text-slate-400 select-none">:</span>
+
+          {/* Menit (00 - 55 kelipatan 5) */}
+          <div className="relative flex-1">
+            <select
+              aria-label="Pilih Menit Pengingat"
+              value={(() => {
+                const parts = (item.reminderTime || "05:00").split(":");
+                return parts[1] || "00";
+              })()}
+              onChange={(e) => {
+                const currentHr = (item.reminderTime || "05:00").split(":")[0] || "05";
+                onChange(item.id, "reminderTime", `${currentHr}:${e.target.value}`);
+              }}
+              className="w-full h-11 px-3 pr-8 rounded-lg border border-slate-300 text-sm sm:text-base font-medium text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer appearance-none text-center"
+            >
+              {Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0")).map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
+          </div>
+
+          {/* Suffix Badge WIB */}
+          <span className="h-11 px-3.5 bg-slate-100 border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg flex items-center justify-center shrink-0 select-none">
             WIB
           </span>
         </div>
