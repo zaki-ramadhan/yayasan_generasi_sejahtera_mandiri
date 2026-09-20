@@ -55,8 +55,8 @@ export function RoutineDonationForm({ campaigns = [] }) {
   ]);
 
   const handleAddProgram = () => {
-    if (selectedPrograms.length >= 3) {
-      toast.error("Maksimal 3 program dalam satu jadwal donasi rutin.");
+    if (selectedPrograms.length >= 2) {
+      toast.error("Maksimal 2 program dalam satu jadwal donasi rutin.");
       return;
     }
     const nextCampaign =
@@ -206,7 +206,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
                 </h2>
               </div>
               <span className="text-sm text-slate-600 font-normal">
-                {selectedPrograms.length} dari 3 program
+                {selectedPrograms.length} dari 2 program
               </span>
             </div>
 
@@ -222,15 +222,15 @@ export function RoutineDonationForm({ campaigns = [] }) {
               />
             ))}
 
-            {/* Add program button (max 3) */}
-            {selectedPrograms.length < 3 && (
+            {/* Add program button (max 2) */}
+            {selectedPrograms.length < 2 && (
               <button
                 type="button"
                 onClick={handleAddProgram}
                 className="w-full h-11 px-4 rounded-lg border border-dashed border-slate-300 hover:border-primary text-slate-700 hover:text-primary bg-white hover:bg-slate-50 font-medium text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
               >
                 <Plus className="w-4 h-4" />
-                <span>Tambah Program Lain (Maks. 3)</span>
+                <span>Tambah Program Lain (Maks. 2)</span>
               </button>
             )}
           </div>
