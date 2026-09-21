@@ -62,7 +62,7 @@ export default async function CampaignDetailPage({ params }) {
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
         {/* Left Column: Media, Header, Tabs, CTA */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-4">
           <CampaignMedia bannerUrl={campaign.bannerUrl} title={campaign.title} />
           <CampaignHeader campaign={campaign} progress={progress} />
 
