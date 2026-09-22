@@ -2,14 +2,14 @@ import { ORG_PROFILE } from "@/data/orgProfile";
 
 export function AboutVisionMission() {
   return (
-    <section className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4">
+    <section className="p-4 sm:p-5 space-y-4">
       <h2 className="text-lg sm:text-xl font-semibold text-slate-950">
         Visi &amp; Misi
       </h2>
 
       {/* Visi */}
-      <div className="p-4 bg-slate-50 border-l-4 border-slate-300 rounded-r-lg space-y-1">
-        <span className="text-xs sm:text-sm font-semibold text-primary">
+      <div className="p-3.5 sm:p-4 bg-slate-50 border-l-4 border-primary rounded-r-md space-y-1.5">
+        <span className="text-xs sm:text-sm font-medium text-primary block">
           Visi
         </span>
         <p className="text-sm sm:text-base font-medium text-slate-900 leading-relaxed">
@@ -18,13 +18,13 @@ export function AboutVisionMission() {
       </div>
 
       {/* Misi */}
-      <div className="space-y-2.5 pt-1">
-        <span className="text-xs sm:text-sm font-semibold text-primary">
+      <div className="space-y-3 pt-1">
+        <span className="text-xs sm:text-sm font-medium text-primary block">
           Misi
         </span>
-        <ol className="space-y-2.5 list-decimal list-inside text-sm sm:text-base text-slate-800">
+        <ol className="space-y-2.5 list-decimal list-outside pl-5 text-sm sm:text-base text-slate-800">
           {ORG_PROFILE.missions.map((m, idx) => (
-            <li key={idx} className="leading-relaxed pl-1">
+            <li key={idx} className="leading-relaxed">
               <span className="font-normal">{m}</span>
             </li>
           ))}
@@ -33,3 +33,4 @@ export function AboutVisionMission() {
     </section>
   );
 }
+

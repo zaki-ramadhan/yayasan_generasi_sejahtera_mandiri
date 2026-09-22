@@ -6,7 +6,7 @@ export function AboutSidebarInfo() {
   const whatsappUrl = `https://wa.me/${ORG_PROFILE.contacts.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Assalamu'alaikum YGSM, mohon info program yayasan.")}`;
 
   return (
-    <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4 shadow-2xs">
+    <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-300 space-y-4 shadow-2xs">
       {/* 1. Legalitas & Akreditasi */}
       <div className="space-y-3.5">
         <div className="flex items-center gap-2">
@@ -17,7 +17,7 @@ export function AboutSidebarInfo() {
 
         <div className="space-y-3 text-sm text-slate-700">
           <div>
-            <span className="text-xs sm:text-sm font-semibold text-primary block">
+            <span className="text-xs sm:text-sm font-medium text-primary block">
               SK Kemenkumham RI
             </span>
             <p className="font-medium text-slate-900 mt-0.5">
@@ -26,7 +26,7 @@ export function AboutSidebarInfo() {
           </div>
 
           <div>
-            <span className="text-xs sm:text-sm font-semibold text-primary block">
+            <span className="text-xs sm:text-sm font-medium text-primary block">
               Izin Operasional LKS
             </span>
             <p className="font-medium text-slate-900 mt-0.5">
@@ -35,7 +35,7 @@ export function AboutSidebarInfo() {
           </div>
 
           <div>
-            <span className="text-xs sm:text-sm font-semibold text-primary block">
+            <span className="text-xs sm:text-sm font-medium text-primary block">
               Nomor Pokok Wajib Pajak (NPWP)
             </span>
             <p className="font-medium text-slate-900 mt-0.5 font-mono">
@@ -44,7 +44,7 @@ export function AboutSidebarInfo() {
           </div>
 
           <div className="pt-2 border-t border-slate-100 space-y-1.5">
-            <span className="text-xs sm:text-sm font-semibold text-primary block">
+            <span className="text-xs sm:text-sm font-medium text-primary block">
               Kepatuhan &amp; Akuntabilitas
             </span>
             <div className="flex items-center gap-2 text-emerald-800 text-xs sm:text-sm font-medium">
