@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
 	ChevronDown,
 	LayoutDashboard,
@@ -151,10 +152,10 @@ export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
 												onClose
 											}
 											className={cn(
-												"flex items-center justify-between py-2 px-2.5 text-sm rounded-md transition-colors",
+												"flex items-center justify-between py-2 px-2.5 text-sm font-medium rounded-md transition-colors",
 												isItemActive
 													? "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white shadow-xs hover:bg-gradient-to-r hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 hover:text-white cursor-default select-none pointer-events-none"
-													: "font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100",
+													: "text-slate-700 hover:text-slate-950 hover:bg-slate-100",
 											)}
 										>
 											<span>
@@ -256,10 +257,10 @@ export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
 												onClose
 											}
 											className={cn(
-												"flex items-center justify-between py-2 px-2.5 text-sm rounded-md transition-colors",
+												"flex items-center justify-between py-2 px-2.5 text-sm font-medium rounded-md transition-colors",
 												isItemActive
 													? "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white shadow-xs hover:bg-gradient-to-r hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 hover:text-white cursor-default select-none pointer-events-none"
-													: "font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100",
+													: "text-slate-700 hover:text-slate-950 hover:bg-slate-100",
 											)}
 										>
 											<span>
@@ -298,16 +299,13 @@ export function NavMobileDrawer({ pathname, currentUser, onClose, onLogout }) {
 						<div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
 							<div className="relative w-10 h-10 rounded-full overflow-hidden bg-slate-900 border border-slate-200 shrink-0 flex items-center justify-center">
 								{currentUser.avatar ? (
-									<img
-										src={
-											currentUser.avatar
-										}
-										alt={
-											currentUser.name ||
-											"User Avatar"
-										}
+									<Image
+										src={currentUser.avatar}
+										alt={currentUser.name || "User Avatar"}
+										width={40}
+										height={40}
+										unoptimized
 										className="w-full h-full object-cover"
-										referrerPolicy="no-referrer"
 									/>
 								) : (
 									<span className="font-bold text-sm text-white">

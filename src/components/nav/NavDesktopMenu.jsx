@@ -200,10 +200,10 @@ export function NavDesktopMenu({ pathname }) {
 											handleProgramItemClick(item.href);
 										}}
 										className={cn(
-											"group flex items-center justify-between px-3 py-2.5 text-sm rounded-md transition-colors",
+											"group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
 											isActive
 												? "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white shadow-xs hover:bg-gradient-to-r hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 hover:text-white focus:bg-blue-700 focus:text-white cursor-default select-none pointer-events-none"
-												: "text-slate-800 hover:bg-slate-100 hover:text-slate-950 focus:bg-slate-100 focus:text-slate-950 font-medium cursor-pointer",
+												: "text-slate-800 hover:bg-slate-100 hover:text-slate-950 focus:bg-slate-100 focus:text-slate-950 cursor-pointer",
 										)}
 									>
 										<span>
@@ -311,10 +311,10 @@ export function NavDesktopMenu({ pathname }) {
 											handleInformasiItemClick(item.href);
 										}}
 										className={cn(
-											"group flex items-center justify-between px-3 py-2.5 text-sm rounded-md transition-colors",
+											"group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
 											isActive
 												? "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white shadow-xs hover:bg-gradient-to-r hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 hover:text-white focus:bg-blue-700 focus:text-white cursor-default select-none pointer-events-none"
-												: "text-slate-800 hover:bg-slate-100 hover:text-slate-950 focus:bg-slate-100 focus:text-slate-950 font-medium cursor-pointer",
+												: "text-slate-800 hover:bg-slate-100 hover:text-slate-950 focus:bg-slate-100 focus:text-slate-950 cursor-pointer",
 										)}
 									>
 										<span>

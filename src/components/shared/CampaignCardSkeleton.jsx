@@ -28,7 +28,7 @@ export function CampaignCardSkeleton() {
 
         {/* Progress Bar Skeleton */}
         <div className="space-y-2 pt-3 mt-auto">
-          <Skeleton className="h-2.5 w-full rounded-full" />
+          <Skeleton className="h-2 w-full rounded-md" />
           <div className="flex justify-between items-center">
             <Skeleton className="h-4 w-28" />
             <Skeleton className="h-4 w-20" />

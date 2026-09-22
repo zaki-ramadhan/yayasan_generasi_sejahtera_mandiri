@@ -22,7 +22,7 @@ export function CampaignCard({
   const isClosed = isCampaignClosed(campaign);
 
   return (
-    <div className={cn("flex flex-col h-full w-full rounded-xl border border-slate-300 bg-white hover:border-slate-400 transition-colors overflow-hidden", className)}>
+    <div className={cn("flex flex-col h-full w-full rounded-xl border border-slate-300 bg-white overflow-hidden", className)}>
       {/* Visual Header / Thumbnail with SafeImage & Category RibbonBadge */}
       <Link href={`/campaign/${campaign.slug}`} className="block relative aspect-video w-full bg-slate-100 overflow-hidden border-b border-slate-200 group">
         <SafeImage
@@ -71,7 +71,7 @@ export function CampaignCard({
               <div className="flex justify-between items-baseline text-sm">
                 <div>
                   <span className="text-xs sm:text-sm text-slate-600 font-medium block">Terkumpul</span>
-                  <span className="font-bold text-slate-950 text-base sm:text-lg">
+                  <span className="font-semibold text-slate-950 text-sm sm:text-base">
                     {formatRupiah(campaign.collectedAmount)}
                   </span>
                 </div>
@@ -85,14 +85,15 @@ export function CampaignCard({
             </>
           ) : (
             <div className="space-y-1.5">
-              {/* Subtle continuous indicator bar */}
-              <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-                <div className="h-full w-full bg-emerald-500/25 rounded-full" />
-              </div>
+              {/* Program tanpa target: terisi penuh (100%) jika sudah ada donasi (> 0), kosong (0%) jika belum ada donasi */}
+              <Progress
+                value={Number(campaign.collectedAmount || 0) > 0 ? 100 : 0}
+                className="h-2"
+              />
               <div className="flex justify-between items-baseline text-sm">
                 <div>
                   <span className="text-xs sm:text-sm text-slate-600 font-medium block">Total Terkumpul</span>
-                  <span className="font-bold text-slate-950 text-base sm:text-lg">
+                  <span className="font-semibold text-slate-950 text-sm sm:text-base">
                     {formatRupiah(campaign.collectedAmount)}
                   </span>
                 </div>
@@ -117,15 +118,21 @@ export function CampaignCard({
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
-            {campaign.endDate && daysLeft !== null && (
-              <span className={cn(
+            <span
+              className={cn(
                 "text-sm font-semibold flex items-center gap-1.5 shrink-0",
                 isClosed ? "text-slate-600" : "text-slate-900"
-              )}>
-                <Clock className="w-4 h-4 text-slate-600 shrink-0 stroke-[2]" />
-                <span>{isClosed ? "Selesai" : `${daysLeft} hr`}</span>
+              )}
+            >
+              <Clock className="w-4 h-4 text-slate-600 shrink-0 stroke-[2]" />
+              <span>
+                {isClosed
+                  ? "Selesai"
+                  : campaign.endDate && daysLeft !== null
+                  ? `${daysLeft} hr`
+                  : "-"}
               </span>
-            )}
+            </span>
 
             <Link href={`/campaign/${campaign.slug}`}>
               {isClosed ? (

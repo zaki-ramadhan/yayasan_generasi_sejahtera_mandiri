@@ -186,3 +186,14 @@ export function maskPhone(phone) {
   return `${digits.slice(0, 4)}-****-${digits.slice(-4)}`;
 }
 
+/**
+ * Sanitasi kata kunci pencarian dari karakter berbahaya (mencegah XSS, SQLi, ekspresi regex jahat, dan emoji).
+ */
+export function sanitizeSearchQuery(query) {
+  if (typeof query !== "string") return "";
+  return stripEmojis(query)
+    .replace(/[<>'";\\`$={}[\]()]/g, "")
+    .replace(/\s{2,}/g, " ")
+    .slice(0, 80);
+}
+
