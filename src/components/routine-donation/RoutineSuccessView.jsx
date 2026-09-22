@@ -101,7 +101,8 @@ export function RoutineSuccessView({
       <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
         <Button
           onClick={() => router.push("/")}
-          className="h-11 px-6 text-sm font-semibold text-white bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700 border-t border-t-blue-400 border-x border-x-blue-600 border-b-2 border-b-blue-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_6px_rgba(29,78,216,0.25)] rounded-lg cursor-pointer"
+          variant="primary3d"
+          className="h-11 px-6 text-sm rounded-lg"
         >
           Kembali ke Beranda
         </Button>

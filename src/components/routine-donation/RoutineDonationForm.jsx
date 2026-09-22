@@ -189,8 +189,8 @@ export function RoutineDonationForm({ campaigns = [] }) {
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
-      <RoutineDonationHero onStartTour={startRoutineTour} />
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+      <RoutineDonationHero />
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         {/* Left Column (7 Cols): Donor Identity & Program Selection */}
@@ -251,6 +251,7 @@ export function RoutineDonationForm({ campaigns = [] }) {
             totalPerCommitment={totalPerCommitment}
             isSubmitting={isSubmitting}
             campaigns={activeCampaigns}
+            onStartTour={startRoutineTour}
           />
         </div>
       </form>
