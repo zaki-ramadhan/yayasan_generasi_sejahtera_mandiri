@@ -1,65 +1,167 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { getStoredUser } from "@/services/authService";
-import { ZakatProfesiTab } from "@/components/zakat/ZakatProfesiTab";
-import { ZakatMaalTab } from "@/components/zakat/ZakatMaalTab";
-import { ZakatFidyahTab } from "@/components/zakat/ZakatFidyahTab";
-import { ZakatInfakTab } from "@/components/zakat/ZakatInfakTab";
+import { DEFAULT_GOLD_PRICE_PER_GRAM } from "@/lib/zakat/constants";
+import {
+  calculateZakatPenghasilan,
+  calculateZakatMaal,
+  calculateZakatPerusahaan,
+  calculateZakatPerdagangan,
+  calculateZakatEmas,
+} from "@/lib/zakat/calculations";
+import { ZakatModeSelector } from "@/components/zakat/ZakatModeSelector";
+import { ZakatResultPanel } from "@/components/zakat/ZakatResultPanel";
+import { ZakatPenghasilanForm } from "@/components/zakat/forms/ZakatPenghasilanForm";
+import { ZakatMaalForm } from "@/components/zakat/forms/ZakatMaalForm";
+import { ZakatPerusahaanForm } from "@/components/zakat/forms/ZakatPerusahaanForm";
+import { ZakatPerdaganganForm } from "@/components/zakat/forms/ZakatPerdaganganForm";
+import { ZakatEmasForm } from "@/components/zakat/forms/ZakatEmasForm";
 
-// Harga acuan emas per gram tahun 2026 (standar acuan BAZNAS)
-const GOLD_PRICE_PER_GRAM = 1350000;
-const NISAB_GOLD_ANNUAL_GRAMS = 85;
-const NISAB_ANNUAL = GOLD_PRICE_PER_GRAM * NISAB_GOLD_ANNUAL_GRAMS; // Rp 114.750.000 / thn
-const NISAB_MONTHLY = Math.round(NISAB_ANNUAL / 12); // ~Rp 9.562.500 / bln
-const FIDYAH_RATE_PER_DAY = 45000; // Rp 45.000 per porsi makan dhuafa
+const INITIAL_PENGHASILAN = { gaji: 0, penghasilanLain: 0 };
+const INITIAL_MAAL = {
+  uangTunaiTabungan: 0,
+  deposito: 0,
+  investasi: 0,
+  piutang: 0,
+  hartaLain: 0,
+  utangJatuhTempo: 0,
+  isHaulMet: true,
+};
+const INITIAL_PERUSAHAAN = {
+  submode: "jasa",
+  pendapatanSebelumPajak: 0,
+  aktivaLancar: 0,
+  pasivaLancar: 0,
+  labaUsaha: 0,
+};
+const INITIAL_PERDAGANGAN = {
+  asetLancar: 0,
+  laba: 0,
+  isHaulMet: true,
+};
+const INITIAL_EMAS = {
+  jumlahGram: 0,
+  hargaPerGram: DEFAULT_GOLD_PRICE_PER_GRAM,
+  isHaulMet: true,
+};
 
 export function ZakatCalculator() {
   const router = useRouter();
 
-  // 1. State Zakat Penghasilan
-  const [incomeMonthly, setIncomeMonthly] = useState(12000000);
-  const [otherIncomeMonthly, setOtherIncomeMonthly] = useState(0);
-  const [debtMonthly, setDebtMonthly] = useState(2000000);
+  // State mode aktif
+  const [activeMode, setActiveMode] = useState("penghasilan");
 
-  // 2. State Zakat Maal / Tabungan
-  const [savingsTotal, setSavingsTotal] = useState(150000000);
-  const [goldGrams, setGoldGrams] = useState(0);
-  const [shortDebt, setShortDebt] = useState(0);
+  // State form tiap mode
+  const [penghasilan, setPenghasilan] = useState(INITIAL_PENGHASILAN);
+  const [maal, setMaal] = useState(INITIAL_MAAL);
+  const [perusahaan, setPerusahaan] = useState(INITIAL_PERUSAHAAN);
+  const [perdagangan, setPerdagangan] = useState(INITIAL_PERDAGANGAN);
+  const [emas, setEmas] = useState(INITIAL_EMAS);
 
-  // 3. State Fidyah
-  const [fidyahDays, setFidyahDays] = useState(7);
+  // Status perhitungan tiap mode
+  const [calculatedState, setCalculatedState] = useState({
+    penghasilan: false,
+    maal: false,
+    perusahaan: false,
+    perdagangan: false,
+    emas: false,
+  });
 
-  // 4. State Infak Bebas
-  const [infakAmount, setInfakAmount] = useState(100000);
+  // Hidrasi sesi dari sessionStorage
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("zakat_calculator_state");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.activeMode) setActiveMode(parsed.activeMode);
+        if (parsed.penghasilan) setPenghasilan(parsed.penghasilan);
+        if (parsed.maal) setMaal(parsed.maal);
+        if (parsed.perusahaan) setPerusahaan(parsed.perusahaan);
+        if (parsed.perdagangan) setPerdagangan(parsed.perdagangan);
+        if (parsed.emas) setEmas(parsed.emas);
+        if (parsed.calculatedState) setCalculatedState(parsed.calculatedState);
+      }
+    } catch {
+      // Abaikan jika parsing gagal
+    }
+  }, []);
 
-  // Kalkulasi 1: Zakat Penghasilan
-  const { netIncome, zakatIncomeAmount, isIncomeNisabMet } = useMemo(() => {
-    const net = Math.max(0, incomeMonthly + otherIncomeMonthly - debtMonthly);
-    const isMet = net >= NISAB_MONTHLY;
-    const zakat = isMet ? Math.round(net * 0.025) : 0;
-    return { netIncome: net, zakatIncomeAmount: zakat, isIncomeNisabMet: isMet };
-  }, [incomeMonthly, otherIncomeMonthly, debtMonthly]);
+  // Simpan sinkronisasi sesi ke sessionStorage
+  useEffect(() => {
+    try {
+      const dataToSave = {
+        activeMode,
+        penghasilan,
+        maal,
+        perusahaan,
+        perdagangan,
+        emas,
+        calculatedState,
+      };
+      sessionStorage.setItem("zakat_calculator_state", JSON.stringify(dataToSave));
+    } catch {
+      // Abaikan jika kuota penuh
+    }
+  }, [activeMode, penghasilan, maal, perusahaan, perdagangan, emas, calculatedState]);
 
-  // Kalkulasi 2: Zakat Maal
-  const { netMaal, zakatMaalAmount, isMaalNisabMet } = useMemo(() => {
-    const goldValue = goldGrams * GOLD_PRICE_PER_GRAM;
-    const net = Math.max(0, savingsTotal + goldValue - shortDebt);
-    const isMet = net >= NISAB_ANNUAL;
-    const zakat = isMet ? Math.round(net * 0.025) : 0;
-    return { netMaal: net, zakatMaalAmount: zakat, isMaalNisabMet: isMet };
-  }, [savingsTotal, goldGrams, shortDebt]);
+  // Handler update field per mode
+  const updateField = (setter) => (field, value) => {
+    setter((prev) => ({ ...prev, [field]: value }));
+  };
 
-  // Kalkulasi 3: Fidyah
-  const fidyahTotal = useMemo(() => {
-    return Math.max(0, fidyahDays * FIDYAH_RATE_PER_DAY);
-  }, [fidyahDays]);
+  // Handler kalkulasi
+  const handleCalculate = (mode) => {
+    setCalculatedState((prev) => ({ ...prev, [mode]: true }));
+  };
 
-  const handlePay = (amt, zakatType) => {
-    if (amt <= 0) return;
-    const targetUrl = `/campaign/zakat-penghasilan-pemberdayaan-mustahik/donate?amount=${amt}&type=${zakatType}`;
+  // Handler reset
+  const handleReset = (mode) => {
+    setCalculatedState((prev) => ({ ...prev, [mode]: false }));
+    switch (mode) {
+      case "penghasilan":
+        setPenghasilan(INITIAL_PENGHASILAN);
+        break;
+      case "maal":
+        setMaal(INITIAL_MAAL);
+        break;
+      case "perusahaan":
+        setPerusahaan(INITIAL_PERUSAHAAN);
+        break;
+      case "perdagangan":
+        setPerdagangan(INITIAL_PERDAGANGAN);
+        break;
+      case "emas":
+        setEmas(INITIAL_EMAS);
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Hasil perhitungan terderivasi
+  const currentResult = useMemo(() => {
+    switch (activeMode) {
+      case "penghasilan":
+        return calculateZakatPenghasilan(penghasilan);
+      case "maal":
+        return calculateZakatMaal(maal);
+      case "perusahaan":
+        return calculateZakatPerusahaan(perusahaan);
+      case "perdagangan":
+        return calculateZakatPerdagangan(perdagangan);
+      case "emas":
+        return calculateZakatEmas(emas);
+      default:
+        return null;
+    }
+  }, [activeMode, penghasilan, maal, perusahaan, perdagangan, emas]);
+
+  // Handler donasi zakat
+  const handlePay = () => {
+    if (!currentResult || currentResult.zakatAmount <= 0) return;
+    const targetUrl = `/campaign/zakat-penghasilan-pemberdayaan-mustahik/donate?amount=${currentResult.zakatAmount}&type=${currentResult.categoryKey}`;
     const user = getStoredUser();
 
     if (!user) {
@@ -73,73 +175,74 @@ export function ZakatCalculator() {
   };
 
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="penghasilan" className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto h-auto p-1.5 bg-slate-100 rounded-xl gap-1">
-          <TabsTrigger value="penghasilan" className="rounded-lg text-xs sm:text-sm py-2 px-3">
-            Zakat Penghasilan
-          </TabsTrigger>
-          <TabsTrigger value="maal" className="rounded-lg text-xs sm:text-sm py-2 px-3">
-            Zakat Maal / Emas
-          </TabsTrigger>
-          <TabsTrigger value="fidyah" className="rounded-lg text-xs sm:text-sm py-2 px-3">
-            Fidyah Puasa
-          </TabsTrigger>
-          <TabsTrigger value="infak" className="rounded-lg text-xs sm:text-sm py-2 px-3">
-            Sedekah Bebas
-          </TabsTrigger>
-        </TabsList>
+    <div className="space-y-4">
+      {/* 1. Kategori Tab Navigasi (5 Mode) */}
+      <div className="flex justify-center">
+        <ZakatModeSelector
+          activeMode={activeMode}
+          onSelectMode={setActiveMode}
+        />
+      </div>
 
-        <TabsContent value="penghasilan" className="space-y-6 pt-4">
-          <ZakatProfesiTab
-            nisabMonthly={NISAB_MONTHLY}
-            incomeMonthly={incomeMonthly}
-            setIncomeMonthly={setIncomeMonthly}
-            otherIncomeMonthly={otherIncomeMonthly}
-            setOtherIncomeMonthly={setOtherIncomeMonthly}
-            debtMonthly={debtMonthly}
-            setDebtMonthly={setDebtMonthly}
-            netIncome={netIncome}
-            zakatIncomeAmount={zakatIncomeAmount}
-            isIncomeNisabMet={isIncomeNisabMet}
+      {/* 2. Grid Finansial 2 Kolom ala Earnest */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+        {/* Kolom Kiri: Form Input Aktif */}
+        <div className="lg:col-span-7 bg-white p-6 sm:p-7 rounded-lg border border-slate-200 shadow-xs">
+          {activeMode === "penghasilan" && (
+            <ZakatPenghasilanForm
+              values={penghasilan}
+              onChange={updateField(setPenghasilan)}
+              onSubmit={() => handleCalculate("penghasilan")}
+              onReset={() => handleReset("penghasilan")}
+            />
+          )}
+
+          {activeMode === "maal" && (
+            <ZakatMaalForm
+              values={maal}
+              onChange={updateField(setMaal)}
+              onSubmit={() => handleCalculate("maal")}
+              onReset={() => handleReset("maal")}
+            />
+          )}
+
+          {activeMode === "perusahaan" && (
+            <ZakatPerusahaanForm
+              values={perusahaan}
+              onChange={updateField(setPerusahaan)}
+              onSubmit={() => handleCalculate("perusahaan")}
+              onReset={() => handleReset("perusahaan")}
+            />
+          )}
+
+          {activeMode === "perdagangan" && (
+            <ZakatPerdaganganForm
+              values={perdagangan}
+              onChange={updateField(setPerdagangan)}
+              onSubmit={() => handleCalculate("perdagangan")}
+              onReset={() => handleReset("perdagangan")}
+            />
+          )}
+
+          {activeMode === "emas" && (
+            <ZakatEmasForm
+              values={emas}
+              onChange={updateField(setEmas)}
+              onSubmit={() => handleCalculate("emas")}
+              onReset={() => handleReset("emas")}
+            />
+          )}
+        </div>
+
+        {/* Kolom Kanan: Panel Metrik & Ledger Hasil ala Earnest */}
+        <div className="lg:col-span-5 sticky top-24">
+          <ZakatResultPanel
+            result={currentResult}
+            hasCalculated={calculatedState[activeMode]}
             onPay={handlePay}
           />
-        </TabsContent>
-
-        <TabsContent value="maal" className="space-y-6 pt-4">
-          <ZakatMaalTab
-            nisabAnnual={NISAB_ANNUAL}
-            savingsTotal={savingsTotal}
-            setSavingsTotal={setSavingsTotal}
-            goldGrams={goldGrams}
-            setGoldGrams={setGoldGrams}
-            shortDebt={shortDebt}
-            setShortDebt={setShortDebt}
-            netMaal={netMaal}
-            zakatMaalAmount={zakatMaalAmount}
-            isMaalNisabMet={isMaalNisabMet}
-            onPay={handlePay}
-          />
-        </TabsContent>
-
-        <TabsContent value="fidyah" className="space-y-6 pt-4">
-          <ZakatFidyahTab
-            fidyahRatePerDay={FIDYAH_RATE_PER_DAY}
-            fidyahDays={fidyahDays}
-            setFidyahDays={setFidyahDays}
-            fidyahTotal={fidyahTotal}
-            onPay={handlePay}
-          />
-        </TabsContent>
-
-        <TabsContent value="infak" className="space-y-6 pt-4">
-          <ZakatInfakTab
-            infakAmount={infakAmount}
-            setInfakAmount={setInfakAmount}
-            onPay={handlePay}
-          />
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 }
