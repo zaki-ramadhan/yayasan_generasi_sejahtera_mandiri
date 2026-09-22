@@ -1,5 +1,6 @@
 import { PARTNERS } from "@/data/partners";
 import { PartnerLogo } from "@/components/home/PartnerLogo";
+import { SectionHeader } from "@/components/shared/SectionHeader";
 
 /**
  * Section mitra & lembaga terkait yayasan.
@@ -13,14 +14,9 @@ export function HomePartnersSection({
   if (!partners || partners.length === 0) return null;
 
   return (
-    <section className="bg-slate-50 border-y border-slate-200 py-10 sm:py-12">
+    <section className="py-6 sm:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="text-center max-w-2xl mx-auto space-y-1.5">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight">
-            {title}
-          </h2>
-          <p className="text-sm sm:text-base text-slate-700">{subtitle}</p>
-        </div>
+        <SectionHeader title={title} subtitle={subtitle} align="center" />
 
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
           {partners.map((partner) => (

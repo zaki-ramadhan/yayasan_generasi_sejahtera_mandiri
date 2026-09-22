@@ -17,7 +17,7 @@ export function HomeCtaSection({ defaultCampaignSlug = "beasiswa-santri-penghafa
               Siap Berbagi Kebaikan untuk Generasi Masa Depan?
             </h2>
 
-            <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl font-normal">
+            <p className="text-base text-slate-300 leading-relaxed max-w-xl font-normal">
               Salurkan kepedulian Anda melalui program pendidikan Al-Qur&apos;an dan kemandirian santri yatim secara amanah, transparan, dan tepat sasaran.
             </p>
 

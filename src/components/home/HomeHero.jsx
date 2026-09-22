@@ -79,7 +79,7 @@ export function HomeHero({ defaultCampaignSlug }) {
               Penyaluran Zakat, Infak, dan Sedekah untuk Santri &amp; Dhuafa
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-800 leading-relaxed max-w-xl">
+            <p className="text-base text-slate-800 leading-relaxed max-w-xl font-normal">
               Yayasan Generasi Sejahtera Mandiri mengelola dan menyalurkan dana amanah untuk pembinaan hafalan Al-Qur&apos;an, kemandirian anak yatim, dan bantuan kemanusiaan secara transparan.
             </p>
 
@@ -87,7 +87,8 @@ export function HomeHero({ defaultCampaignSlug }) {
               <Link href="/program">
                 <Button
                   size="lg"
-                  className="h-12 px-6 rounded-lg text-base font-semibold text-white bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700 border-t border-t-blue-400 border-x border-x-blue-500 border-b-2 border-b-blue-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_3px_6px_rgba(30,58,138,0.25)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all cursor-pointer"
+                  variant="primary3d"
+                  className="h-12 px-6 rounded-lg"
                 >
                   Lihat Program Donasi
                 </Button>
@@ -95,26 +96,27 @@ export function HomeHero({ defaultCampaignSlug }) {
               <Link href="/kalkulator-zakat">
                 <Button
                   size="lg"
-                  className="h-12 px-6 rounded-lg text-base font-semibold text-slate-900 bg-gradient-to-b from-white via-slate-50 to-slate-100 hover:from-slate-50 hover:to-slate-200 border-t border-t-white border-x border-x-slate-200 border-b-2 border-b-slate-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_3px_6px_rgba(0,0,0,0.06)] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                  variant="secondary3d"
+                  className="h-12 px-6 rounded-lg"
                 >
                   Kalkulator ZISWAF
                 </Button>
               </Link>
             </div>
 
-            {/* Verified Metrics Summary */}
+            {/* Donor Perks & Trust Highlights */}
             <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-300/80 text-sm text-slate-700">
               <div>
-                <span className="block font-semibold text-slate-950 text-base">Opini WTP</span>
-                <span className="text-xs sm:text-sm">Audit KAP Independen</span>
+                <span className="block font-semibold text-slate-950 text-base">Mulai Rp 10.000</span>
+                <span className="text-xs sm:text-sm">Nominal bebas</span>
               </div>
               <div>
-                <span className="block font-semibold text-slate-950 text-base">32.400+ Jiwa</span>
-                <span className="text-xs sm:text-sm">Penerima Manfaat</span>
+                <span className="block font-semibold text-slate-950 text-base">QRIS &amp; Transfer Bank</span>
+                <span className="text-xs sm:text-sm">Semua e-wallet &amp; bank</span>
               </div>
               <div>
-                <span className="block font-semibold text-slate-950 text-base">QRIS &amp; VA</span>
-                <span className="text-xs sm:text-sm">Verifikasi Otomatis</span>
+                <span className="block font-semibold text-slate-950 text-base">Konfirmasi Otomatis</span>
+                <span className="text-xs sm:text-sm">Bukti donasi instan</span>
               </div>
             </div>
           </div>
