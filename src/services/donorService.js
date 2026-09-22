@@ -370,3 +370,332 @@ export async function updateDonorPassword({ userEmail, oldPassword, newPassword 
 
   return { success: true, message: "Kata sandi berhasil diperbarui." };
 }
+
+export async function getDonorDashboardOverview({ userEmail, userName, year }) {
+  const currentYear = parseInt(year, 10) || new Date().getFullYear();
+  const userCondition = buildUserWhereClause(userEmail, userName);
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+  const defaultMonthly = monthNames.map((m) => ({ month: m, donasi: 0 }));
+
+  if (!userCondition) {
+    return {
+      metrics: { totalNominal: 0, totalTransactions: 0, totalPrograms: 0 },
+      monthlyTrend: defaultMonthly,
+      categoryDistribution: [],
+      currentMonthAchieved: 0,
+      currentMonthTarget: 1000000,
+      recentReports: [],
+      recentItems: [],
+      routineDonations: [],
+    };
+  }
+
+  const basePaidWhere = {
+    status: "PAID",
+    AND: [userCondition],
+  };
+
+  try {
+    const startOfYear = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0));
+    const endOfYear = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59, 999));
+
+    const now = new Date();
+    const startOfMonth = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1, 0, 0, 0));
+    const endOfMonth = new Date(Date.UTC(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999));
+
+    const [
+      aggregates,
+      distinctCampaigns,
+      donationsInYear,
+      allUserDonations,
+      monthAggregate,
+      recentReportsData,
+      recentDonationsData,
+      routineDonationsData,
+    ] = await Promise.all([
+      prisma.donation.aggregate({
+        where: {
+          status: "PAID",
+          AND: [userCondition],
+        },
+        _sum: { amount: true },
+        _count: { id: true },
+      }),
+      prisma.donation.findMany({
+        where: {
+          status: "PAID",
+          AND: [userCondition],
+        },
+        select: { campaignId: true, donationType: true },
+        distinct: ["campaignId", "donationType"],
+      }),
+      prisma.donation.findMany({
+        where: {
+          status: "PAID",
+          AND: [
+            userCondition,
+            {
+              OR: [
+                { paidAt: { gte: startOfYear, lte: endOfYear } },
+                { AND: [{ paidAt: null }, { createdAt: { gte: startOfYear, lte: endOfYear } }] },
+              ],
+            },
+          ],
+        },
+        select: { amount: true, paidAt: true, createdAt: true },
+      }),
+      prisma.donation.findMany({
+        where: {
+          status: "PAID",
+          AND: [userCondition],
+        },
+        select: {
+          amount: true,
+          donationType: true,
+          campaign: {
+            select: {
+              title: true,
+              category: { select: { name: true } },
+            },
+          },
+        },
+      }),
+      prisma.donation.aggregate({
+        where: {
+          status: "PAID",
+          AND: [
+            userCondition,
+            {
+              OR: [
+                { paidAt: { gte: startOfMonth, lte: endOfMonth } },
+                { AND: [{ paidAt: null }, { createdAt: { gte: startOfMonth, lte: endOfMonth } }] },
+              ],
+            },
+          ],
+        },
+        _sum: { amount: true },
+      }),
+      prisma.campaignUpdate.findMany({
+        where: {
+          campaign: {
+            donations: {
+              some: {
+                status: "PAID",
+                AND: [userCondition],
+              },
+            },
+          },
+        },
+        orderBy: { date: "desc" },
+        take: 3,
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          disbursedAmount: true,
+          date: true,
+          campaign: {
+            select: {
+              title: true,
+              slug: true,
+              category: { select: { name: true } },
+            },
+          },
+        },
+      }),
+      prisma.donation.findMany({
+        where: basePaidWhere,
+        include: {
+          campaign: {
+            select: {
+              title: true,
+              slug: true,
+            },
+          },
+        },
+        orderBy: { paidAt: "desc" },
+        take: 5,
+      }),
+      prisma.routineDonation.findMany({
+        where: {
+          AND: [userCondition],
+        },
+        include: {
+          campaign: {
+            select: {
+              title: true,
+              slug: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      }),
+    ]);
+
+    const totalNominal = aggregates._sum.amount || 0;
+    const totalTransactions = aggregates._count.id || 0;
+    const totalPrograms = distinctCampaigns.length;
+
+    const monthlyMap = {};
+    for (let i = 0; i < 12; i++) monthlyMap[i] = 0;
+    donationsInYear.forEach((d) => {
+      const dateObj = d.paidAt || d.createdAt;
+      if (dateObj) {
+        const m = new Date(dateObj).getMonth();
+        if (m >= 0 && m < 12) {
+          monthlyMap[m] += d.amount;
+        }
+      }
+    });
+    const monthlyTrend = monthNames.map((m, idx) => ({
+      month: m,
+      donasi: monthlyMap[idx],
+    }));
+
+    const catMap = {};
+    allUserDonations.forEach((d) => {
+      let catName = d.campaign?.category?.name || "";
+      if (!catName || catName.toUpperCase().includes("ZISWAF")) {
+        if (d.donationType === "ZAKAT") catName = "Zakat Maal & Fitrah";
+        else if (d.donationType === "INFAK_SUBUH") catName = "Sedekah Subuh";
+        else if (d.donationType === "WAKAF") catName = "Wakaf Produktif";
+        else catName = "Program Kemanusiaan";
+      }
+      catMap[catName] = (catMap[catName] || 0) + d.amount;
+    });
+
+    const categoryDistribution = Object.entries(catMap)
+      .map(([name, value]) => ({
+        name,
+        value,
+        percentage: totalNominal > 0 ? Math.round((value / totalNominal) * 100) : 0,
+      }))
+      .sort((a, b) => b.value - a.value);
+
+    const recentItems = recentDonationsData.map((d, index) => {
+      const effectiveProgramTitle =
+        d.campaign?.title ||
+        (d.donationType === "ZAKAT"
+          ? "Zakat Maal & Fitrah"
+          : d.donationType === "INFAK_SUBUH"
+          ? "Sedekah Subuh"
+          : d.donationType === "WAKAF"
+          ? "Wakaf Produktif"
+          : "Program Kemanusiaan");
+
+      return {
+        id: d.id,
+        no: index + 1,
+        invoiceId: d.invoiceId,
+        donorName: d.isAnonymous ? "Hamba Allah" : d.donorName,
+        amount: d.amount,
+        programTitle: effectiveProgramTitle,
+        campaignSlug: d.campaign?.slug || "",
+        paymentChannel: d.paymentChannel || "QRIS",
+        date: (d.paidAt || d.createdAt).toISOString(),
+        status: d.status,
+      };
+    });
+
+    const recentReports = recentReportsData.map((rep) => ({
+      id: rep.id,
+      title: rep.title,
+      content: rep.content,
+      disbursedAmount: rep.disbursedAmount,
+      date: rep.date.toISOString(),
+      categoryName: rep.campaign?.category?.name || "Program Kebaikan",
+      campaignTitle: rep.campaign?.title || "",
+      campaignSlug: rep.campaign?.slug || "",
+    }));
+
+    const currentMonthAchieved = monthAggregate._sum.amount || 0;
+    const currentMonthTarget = 1000000;
+
+    const routineDonations = (routineDonationsData || []).map((r) => ({
+      id: r.id,
+      programTitle: r.campaign?.title || r.programTitle || "Program Kebaikan Rutin",
+      amount: r.amount,
+      frequency: r.frequency,
+      routineType: r.routineType,
+      status: r.status,
+      reminderTime: r.reminderTime || "05:00",
+      createdAt: r.createdAt.toISOString(),
+    }));
+
+    return {
+      metrics: {
+        totalNominal,
+        totalTransactions,
+        totalPrograms,
+      },
+      monthlyTrend,
+      categoryDistribution,
+      currentMonthAchieved,
+      currentMonthTarget,
+      recentReports,
+      recentItems,
+      routineDonations,
+    };
+  } catch (error) {
+    console.error("Error getDonorDashboardOverview:", error);
+    throw error;
+  }
+}
+
+export async function getDonorMonthlyTrend({ userEmail, userName, year }) {
+  const currentYear = parseInt(year, 10) || new Date().getFullYear();
+  const userCondition = buildUserWhereClause(userEmail, userName);
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+  const defaultMonthly = monthNames.map((m) => ({ month: m, donasi: 0 }));
+
+  if (!userCondition) {
+    return { monthlyTrend: defaultMonthly };
+  }
+
+  try {
+    const startOfYear = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0));
+    const endOfYear = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59, 999));
+
+    const donationsInYear = await prisma.donation.findMany({
+      where: {
+        status: "PAID",
+        AND: [
+          userCondition,
+          {
+            OR: [
+              { paidAt: { gte: startOfYear, lte: endOfYear } },
+              { AND: [{ paidAt: null }, { createdAt: { gte: startOfYear, lte: endOfYear } }] },
+            ],
+          },
+        ],
+      },
+      select: { amount: true, paidAt: true, createdAt: true },
+    });
+
+    const monthlyMap = {};
+    for (let i = 0; i < 12; i++) monthlyMap[i] = 0;
+    donationsInYear.forEach((d) => {
+      const dateObj = d.paidAt || d.createdAt;
+      if (dateObj) {
+        const m = new Date(dateObj).getMonth();
+        if (m >= 0 && m < 12) {
+          monthlyMap[m] += d.amount;
+        }
+      }
+    });
+
+    const monthlyTrend = monthNames.map((m, idx) => ({
+      month: m,
+      donasi: monthlyMap[idx],
+    }));
+
+    return { monthlyTrend };
+  } catch (error) {
+    console.error("Error getDonorMonthlyTrend in donorService:", error);
+    throw error;
+  }
+}
+

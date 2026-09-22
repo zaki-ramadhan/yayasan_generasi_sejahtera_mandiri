@@ -1,9 +1,9 @@
 import { formatRupiah, formatDate } from "@/lib/formatters";
+import { TableRow, TableCell } from "@/components/ui/table";
 
 /**
  * Single table row for financial transactions.
  * Strictly adheres to font size >= text-sm and font weight <= font-medium.
- * Avoids gimmick dots and pill-shape spam.
  *
  * @param {object} props
  * @param {object} props.transaction - Transaction data object
@@ -13,41 +13,41 @@ export function FinancialTransactionRow({ transaction }) {
   const absAmount = Math.abs(transaction.amount);
 
   return (
-    <tr className="border-b border-slate-100 hover:bg-slate-50/70 transition-colors">
+    <TableRow>
       {/* Date */}
-      <td className="py-3.5 px-4 text-sm font-medium text-slate-800 whitespace-nowrap">
+      <TableCell className="font-medium text-slate-800 whitespace-nowrap">
         {formatDate(transaction.date, { month: "short" })}
-      </td>
+      </TableCell>
 
       {/* Source */}
-      <td className="py-3.5 px-4 text-sm font-normal text-slate-600 whitespace-nowrap">
+      <TableCell className="font-normal text-slate-600 whitespace-nowrap">
         {transaction.source}
-      </td>
+      </TableCell>
 
       {/* Type */}
-      <td className="py-3.5 px-4 text-sm font-normal text-slate-700 whitespace-nowrap">
+      <TableCell className="font-normal text-slate-700 whitespace-nowrap">
         {transaction.typeLabel || (isIncome ? "Donasi Masuk" : "Penyaluran")}
-      </td>
+      </TableCell>
 
       {/* Description */}
-      <td className="py-3.5 px-4 text-sm font-normal text-slate-800 max-w-xs truncate" title={transaction.description}>
+      <TableCell className="font-normal text-slate-800 max-w-xs truncate" title={transaction.description}>
         {transaction.description}
-      </td>
+      </TableCell>
 
       {/* Category */}
-      <td className="py-3.5 px-4 text-sm font-normal text-slate-600 whitespace-nowrap">
+      <TableCell className="font-normal text-slate-600 whitespace-nowrap">
         {transaction.category}
-      </td>
+      </TableCell>
 
       {/* Amount */}
-      <td className="py-3.5 px-4 text-sm font-medium whitespace-nowrap text-right">
+      <TableCell className="font-medium whitespace-nowrap text-right">
         <span className={isIncome ? "text-emerald-700" : "text-slate-900"}>
           {isIncome ? `+${formatRupiah(absAmount)}` : `-${formatRupiah(absAmount)}`}
         </span>
-      </td>
+      </TableCell>
 
       {/* Status */}
-      <td className="py-3.5 px-4 text-sm whitespace-nowrap text-right">
+      <TableCell className="whitespace-nowrap text-right">
         <span
           className={
             isIncome
@@ -57,7 +57,7 @@ export function FinancialTransactionRow({ transaction }) {
         >
           {transaction.statusLabel || (isIncome ? "Diterima" : "Tersalurkan")}
         </span>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 }

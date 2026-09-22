@@ -4,11 +4,20 @@ import { useState, useMemo } from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SortDropdown } from "@/components/shared/SortDropdown";
-import { Pagination } from "@/components/ui/pagination";
 import { formatRupiah } from "@/lib/formatters";
 import { exportTransactionsToCsv } from "@/lib/exportCsv";
 import { FinancialMetricCard } from "@/components/reports/FinancialMetricCard";
 import { FinancialTransactionRow } from "@/components/reports/FinancialTransactionRow";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableSortHeader,
+  TableEmptyRow,
+  TablePaginationFooter,
+  useTableSort,
+} from "@/components/ui/table";
 
 const PERIOD_OPTIONS = [
   { label: "7 Hari Terakhir", value: "7d" },
@@ -63,6 +72,16 @@ export function AdminTransactionLedger({
     });
   }, [transactions, selectedPeriod, selectedType]);
 
+  const {
+    items: sortedTransactions,
+    sortBy,
+    sortOrder,
+    handleSort,
+  } = useTableSort(filteredTransactions, {
+    initialSortBy: "date",
+    initialSortOrder: "desc",
+  });
+
   const metrics = useMemo(() => {
     let totalIncome = 0;
     let totalExpenses = 0;
@@ -84,11 +103,11 @@ export function AdminTransactionLedger({
     };
   }, [filteredTransactions]);
 
-  const totalPages = Math.ceil(filteredTransactions.length / PAGE_SIZE) || 1;
+  const totalPages = Math.ceil(sortedTransactions.length / PAGE_SIZE) || 1;
   const paginatedTransactions = useMemo(() => {
     const startIndex = (currentPage - 1) * PAGE_SIZE;
-    return filteredTransactions.slice(startIndex, startIndex + PAGE_SIZE);
-  }, [filteredTransactions, currentPage]);
+    return sortedTransactions.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [sortedTransactions, currentPage]);
 
   const handlePeriodChange = (val) => {
     setSelectedPeriod(val);
@@ -101,79 +120,66 @@ export function AdminTransactionLedger({
   };
 
   const handleExportCsv = () => {
-    exportTransactionsToCsv(
-      filteredTransactions,
-      `laporan-transaksi-admin-${selectedPeriod}-${selectedType.toLowerCase()}.csv`
-    );
+    exportTransactionsToCsv(sortedTransactions, "rekap-buku-besar.csv");
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {/* Top Header & Filters Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1.5">
-          <h2 className="text-xl sm:text-2xl font-semibold text-slate-950 tracking-tight leading-tight">
-            Buku Kas &amp; Riwayat Transaksi (Admin)
-          </h2>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
-            Kelola mutasi arus kas donasi masuk, pencatatan penyaluran, dan pembukuan yayasan.
-          </p>
-        </div>
-
-        {/* Filters Dropdown Controls */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <SortDropdown
-            options={PERIOD_OPTIONS}
-            value={selectedPeriod}
-            onChange={handlePeriodChange}
-            label="Periode"
-            className="h-10 px-3.5 text-sm font-normal border-slate-300 text-slate-800"
-            align="end"
-          />
-          <SortDropdown
-            options={TYPE_OPTIONS}
-            value={selectedType}
-            onChange={handleTypeChange}
-            label="Kategori"
-            className="h-10 px-3.5 text-sm font-normal border-slate-300 text-slate-800"
-            align="end"
-          />
-        </div>
-      </div>
-
-      {/* 4 Summary Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-6">
+      {/* Top Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FinancialMetricCard
           label="Total Donasi Masuk"
-          value={formatRupiah(metrics.totalIncome)}
-          subtext="Periode aktif terpilih"
+          value={metrics.totalIncome}
+          type="INCOME"
         />
         <FinancialMetricCard
           label="Total Penyaluran"
-          value={formatRupiah(metrics.totalExpenses)}
-          subtext="Distribusi program amanah"
+          value={metrics.totalExpenses}
+          type="EXPENSE"
         />
         <FinancialMetricCard
-          label="Saldo Kas Terkini"
-          value={formatRupiah(metrics.netBalance)}
-          subtext="Sisa dana amanah"
-        />
-        <FinancialMetricCard
-          label="Penyaluran Mendatang"
-          value={nextDistributionDate}
-          subtext="Jadwal distribusi terdekat"
+          label="Saldo Kas Bersih"
+          value={metrics.netBalance}
+          type="NET"
         />
       </div>
 
-      {/* Transactions Section */}
-      <div className="space-y-4">
+      {/* Main Ledger Content Card */}
+      <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-5">
+        {/* Controls Row */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm font-medium text-slate-700">Filter Transaksi:</span>
+            <SortDropdown
+              options={PERIOD_OPTIONS}
+              value={selectedPeriod}
+              onChange={handlePeriodChange}
+              label="Periode"
+              className="h-10 px-3.5 text-sm font-normal border-slate-300 text-slate-800"
+            />
+            <SortDropdown
+              options={TYPE_OPTIONS}
+              value={selectedType}
+              onChange={handleTypeChange}
+              label="Tipe Transaksi"
+              className="h-10 px-3.5 text-sm font-normal border-slate-300 text-slate-800"
+            />
+          </div>
+
+          <div className="text-sm font-normal text-slate-600 bg-slate-50 border border-slate-200 px-3.5 py-2 rounded-lg self-start lg:self-auto">
+            Estimasi penyaluran berikutnya:{" "}
+            <span className="font-medium text-slate-900">{nextDistributionDate}</span>
+          </div>
+        </div>
+
+        {/* Action & Result Summary */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="space-y-0.5">
             <h3 className="text-lg sm:text-xl font-semibold text-slate-950">
               Riwayat Transaksi
             </h3>
             <p className="text-sm font-normal text-slate-600">
-              Menampilkan {paginatedTransactions.length} dari {filteredTransactions.length} transaksi
+              Menampilkan {paginatedTransactions.length} dari {sortedTransactions.length} transaksi
             </p>
           </div>
 
@@ -191,41 +197,80 @@ export function AdminTransactionLedger({
         </div>
 
         {/* Transactions Table */}
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-2xs">
-          <table className="w-full text-left border-collapse min-w-[700px]">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="py-3 px-4 text-sm font-medium text-slate-700">Tanggal</th>
-                <th className="py-3 px-4 text-sm font-medium text-slate-700">Sumber</th>
-                <th className="py-3 px-4 text-sm font-medium text-slate-700">Tipe</th>
-                <th className="py-3 px-4 text-sm font-medium text-slate-700">Deskripsi</th>
-                <th className="py-3 px-4 text-sm font-medium text-slate-700">Kategori</th>
-                <th className="py-3 px-4 text-sm font-medium text-slate-700 text-right">Nominal</th>
-                <th className="py-3 px-4 text-sm font-medium text-slate-700 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
+        <div className="rounded-lg border border-slate-200/90 bg-white overflow-hidden shadow-2xs">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableSortHeader
+                  label="Tanggal"
+                  sortKey="date"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Sumber"
+                  sortKey="source"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Tipe"
+                  sortKey="type"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Deskripsi"
+                  sortKey="description"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Kategori"
+                  sortKey="category"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Nominal"
+                  sortKey="amount"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                  align="right"
+                />
+                <TableSortHeader
+                  label="Status"
+                  sortKey="status"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                  align="right"
+                />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {paginatedTransactions.length > 0 ? (
                 paginatedTransactions.map((tx) => (
                   <FinancialTransactionRow key={tx.id} transaction={tx} />
                 ))
               ) : (
-                <tr>
-                  <td colSpan={7} className="py-10 text-center text-sm font-normal text-slate-500">
-                    Tidak ada catatan transaksi pada periode dan filter yang dipilih.
-                  </td>
-                </tr>
+                <TableEmptyRow colSpan={7} message="Belum ada data" />
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {totalPages > 1 && (
-          <Pagination
+          <TablePaginationFooter
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
-            className="pt-2"
           />
         )}
       </div>

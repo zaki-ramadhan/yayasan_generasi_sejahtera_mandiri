@@ -5,11 +5,31 @@ import { CAMPAIGNS } from "@/data/campaigns";
 import { formatRupiah, formatDate } from "@/lib/formatters";
 import { RECENT_TRANSACTIONS, VOLUNTEER_APPLICANTS } from "@/data/adminMockData";
 import { cn } from "@/lib/utils";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableSortHeader,
+  TableEmptyRow,
+  useTableSort,
+} from "@/components/ui/table";
 
 export function AdminDashboardView({ userRole, stats }) {
   const transactions = stats?.recentTransactions || RECENT_TRANSACTIONS;
   const volunteers = stats?.volunteerApplicants || VOLUNTEER_APPLICANTS;
   const campaigns = stats?.campaigns || CAMPAIGNS.slice(0, 3);
+
+  const {
+    items: sortedTransactions,
+    sortBy,
+    sortOrder,
+    handleSort,
+  } = useTableSort(transactions, {
+    initialSortBy: "date",
+    initialSortOrder: "desc",
+  });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -27,41 +47,83 @@ export function AdminDashboardView({ userRole, stats }) {
           </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-700">
-            <thead className="bg-slate-50 text-slate-900 uppercase font-semibold border-y border-slate-200">
-              <tr>
-                <th className="py-2.5 px-3">Invoice</th>
-                <th className="py-2.5 px-3">Donatur</th>
-                <th className="py-2.5 px-3">Nominal</th>
-                <th className="py-2.5 px-3">Metode</th>
-                <th className="py-2.5 px-3">Waktu</th>
-                <th className="py-2.5 px-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
-              {transactions.map((tx) => (
-                <tr key={tx.id} className="hover:bg-slate-50/80">
-                  <td className="py-3 px-3 font-mono text-slate-900">{tx.id}</td>
-                  <td className="py-3 px-3">{tx.donor}</td>
-                  <td className="py-3 px-3 font-bold text-slate-900">{formatRupiah(tx.amount)}</td>
-                  <td className="py-3 px-3 text-slate-500">{tx.channel}</td>
-                  <td className="py-3 px-3 text-slate-500 whitespace-nowrap">{formatDate(tx.date, { withTime: true })}</td>
-                  <td className="py-3 px-3">
-                    <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold ${
-                        tx.status === "PAID"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-amber-50 text-amber-800"
-                      }`}
-                    >
-                      {tx.status === "PAID" ? "Lunas" : "Pending"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="rounded-lg border border-slate-200/90 overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableSortHeader
+                  label="Invoice"
+                  sortKey="id"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Donatur"
+                  sortKey="donor"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Nominal"
+                  sortKey="amount"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                  align="right"
+                />
+                <TableSortHeader
+                  label="Metode"
+                  sortKey="channel"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Waktu"
+                  sortKey="date"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Status"
+                  sortKey="status"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                  align="center"
+                />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedTransactions.length === 0 ? (
+                <TableEmptyRow colSpan={6} message="Belum ada data" />
+              ) : (
+                sortedTransactions.map((tx) => (
+                  <TableRow key={tx.id}>
+                    <TableCell className="font-mono text-slate-900 font-medium">{tx.id}</TableCell>
+                    <TableCell className="font-normal text-slate-800">{tx.donor}</TableCell>
+                    <TableCell className="font-medium text-emerald-800 text-right">{formatRupiah(tx.amount)}</TableCell>
+                    <TableCell className="font-normal text-slate-600">{tx.channel}</TableCell>
+                    <TableCell className="font-normal text-slate-600 whitespace-nowrap">{formatDate(tx.date, { withTime: true })}</TableCell>
+                    <TableCell className="text-center">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
+                          tx.status === "PAID"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-amber-50 text-amber-800"
+                        }`}
+                      >
+                        {tx.status === "PAID" ? "Lunas" : "Pending"}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
       </div>
 

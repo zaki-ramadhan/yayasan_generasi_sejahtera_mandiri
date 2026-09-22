@@ -26,7 +26,8 @@ export function DonorHistoryDashboard() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isTableLoading, setIsTableLoading] = useState(false);
 
   const debouncedSearch = useDebounce(search, 350);
 
@@ -37,7 +38,7 @@ export function DonorHistoryDashboard() {
       if (!isAuthenticated && typeof window !== "undefined") {
         const stored = localStorage.getItem("ygsm_auth_user");
         if (!stored) {
-          router.replace("/login?redirect=/riwayat-donasi");
+          router.replace("/login?redirect=/donatur/riwayat");
         }
       }
     }, 150);
@@ -48,7 +49,7 @@ export function DonorHistoryDashboard() {
     async (pageToLoad = 1, currentLimit = pagination.limit) => {
       if (!currentUser?.email && !currentUser?.name) return;
 
-      setIsLoading(true);
+      setIsTableLoading(true);
       try {
         const params = new URLSearchParams({
           email: currentUser.email || "",
@@ -71,7 +72,8 @@ export function DonorHistoryDashboard() {
       } catch (err) {
         console.error("Gagal memuat riwayat donasi:", err);
       } finally {
-        setIsLoading(false);
+        setIsInitialLoading(false);
+        setIsTableLoading(false);
       }
     },
     [
@@ -105,9 +107,9 @@ export function DonorHistoryDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* 3 Metric Cards Strip */}
-      <DonorSummaryCards metrics={metrics} isLoading={isLoading} />
+    <div className="space-y-2.5">
+      {/* 3 Metric Cards Strip (Hanya skeleton pada initial loading) */}
+      <DonorSummaryCards metrics={metrics} isLoading={isInitialLoading} />
 
       {/* Transaction Table */}
       <DonorTransactionTable
@@ -116,7 +118,7 @@ export function DonorHistoryDashboard() {
         search={search}
         sortBy={sortBy}
         sortOrder={sortOrder}
-        isLoading={isLoading}
+        isLoading={isTableLoading}
         onSearchChange={setSearch}
         onSortChange={handleSortChange}
         onPageChange={handlePageChange}

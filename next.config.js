@@ -29,6 +29,30 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/donatur",
+        destination: "/donatur/dashboard",
+        permanent: true,
+      },
+      {
+        source: "/dashboard-donatur",
+        destination: "/donatur/dashboard",
+        permanent: true,
+      },
+      {
+        source: "/riwayat-donasi",
+        destination: "/donatur/riwayat",
+        permanent: true,
+      },
+      {
+        source: "/profil",
+        destination: "/donatur/profil",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

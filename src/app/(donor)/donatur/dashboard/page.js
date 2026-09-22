@@ -3,12 +3,8 @@
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { DonorOverviewDashboard } from "@/components/donor/DonorOverviewDashboard";
 
-export default function DashboardDonaturPage() {
+export default function DonaturDashboardPage() {
   const { currentUser } = useCurrentUser();
 
-  return (
-    <div className="space-y-6">
-      <DonorOverviewDashboard currentUser={currentUser} />
-    </div>
-  );
+  return <DonorOverviewDashboard currentUser={currentUser} />;
 }

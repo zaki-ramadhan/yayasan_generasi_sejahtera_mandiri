@@ -1,30 +1,22 @@
 import Image from "next/image";
 import { formatRupiah } from "@/lib/formatters";
-import { cn } from "@/lib/utils";
+import { TableRow, TableCell } from "@/components/ui/table";
 
 /**
  * Single row for the transaction limits table.
  *
  * Adheres strictly to:
  * - Minimum font size: text-sm (no text-xs)
- * - Maximum font weight in data cells: font-medium (no font-semibold or font-bold in tbody)
- * - Official channel logo thumbnail (like in footer)
- * - Natural kerning without artificial tracking
+ * - Maximum font weight in data cells: font-medium
  *
  * @param {object} props
  * @param {object} props.item - Transaction limit channel record
- * @param {boolean} [props.isLast] - Whether this is the final row
  */
-export function TransactionLimitTableRow({ item, isLast = false }) {
+export function TransactionLimitTableRow({ item }) {
   return (
-    <tr
-      className={cn(
-        "border-slate-200 transition-colors hover:bg-slate-50/60",
-        !isLast && "border-b"
-      )}
-    >
+    <TableRow>
       {/* Saluran Pembayaran (Logo + Nama & Platform) */}
-      <td className="py-3.5 sm:py-4 px-4 sm:px-6 align-middle">
+      <TableCell className="align-middle">
         <div className="flex items-center gap-3">
           {item.logo && (
             <div className="w-14 sm:w-16 h-8 sm:h-9 flex items-center justify-center shrink-0">
@@ -49,21 +41,21 @@ export function TransactionLimitTableRow({ item, isLast = false }) {
             )}
           </div>
         </div>
-      </td>
+      </TableCell>
 
       {/* Batas Minimum */}
-      <td className="py-3.5 sm:py-4 px-4 sm:px-6 align-middle">
+      <TableCell className="align-middle">
         <span className="text-sm font-normal text-slate-700 block">
           {formatRupiah(item.minAmount)}
         </span>
-      </td>
+      </TableCell>
 
       {/* Batas Maksimum */}
-      <td className="py-3.5 sm:py-4 px-4 sm:px-6 align-middle">
+      <TableCell className="align-middle">
         <span className="text-sm font-medium text-slate-900 block">
           {formatRupiah(item.maxAmount)}
         </span>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 }

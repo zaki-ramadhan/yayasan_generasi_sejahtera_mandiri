@@ -11,7 +11,7 @@ export function DonorMobileHeader({ currentUser, isOpen, onToggle }) {
   const displayName = `${salutation}${currentUser?.name || "Donatur"}`;
 
   return (
-    <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-2xs">
+    <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
       <div className="flex items-center gap-3">
         <Button
           variant="outline"
@@ -23,7 +23,7 @@ export function DonorMobileHeader({ currentUser, isOpen, onToggle }) {
           {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </Button>
 
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/donatur/dashboard" className="flex items-center gap-2">
           <div className="relative w-8 h-8 rounded-md overflow-hidden bg-white shrink-0 p-0.5 border border-slate-200 flex items-center justify-center">
             <Image
               src="/logo_yayasan_GSM.png"
@@ -34,7 +34,7 @@ export function DonorMobileHeader({ currentUser, isOpen, onToggle }) {
             />
           </div>
           <div>
-            <span className="font-semibold text-sm block text-slate-950 leading-tight">
+            <span className="font-medium text-sm block text-slate-950 leading-tight">
               Portal Donatur
             </span>
             <span className="text-sm font-normal text-slate-500 block">
@@ -46,7 +46,11 @@ export function DonorMobileHeader({ currentUser, isOpen, onToggle }) {
 
       {currentUser && (
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
+          <Link
+            href="/donatur/profil"
+            title={displayName}
+            className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center hover:ring-2 hover:ring-primary/20 transition-all"
+          >
             {currentUser.avatar ? (
               <img
                 src={currentUser.avatar}
@@ -59,7 +63,7 @@ export function DonorMobileHeader({ currentUser, isOpen, onToggle }) {
                 {currentUser.initials || "U"}
               </span>
             )}
-          </div>
+          </Link>
         </div>
       )}
     </header>

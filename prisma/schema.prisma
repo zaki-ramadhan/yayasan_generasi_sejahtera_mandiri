@@ -36,6 +36,7 @@ model Campaign {
   updatedAt       DateTime         @updatedAt
   updates         CampaignUpdate[]
   donations       Donation[]
+  routineDonations RoutineDonation[]
 
   @@index([categoryId])
   @@index([isUrgent])
@@ -179,4 +180,27 @@ model InstagramPost {
   @@index([postedAt])
 }
 
+model RoutineDonation {
+  id           String    @id @default(cuid())
+  campaignId   String?
+  campaign     Campaign? @relation(fields: [campaignId], references: [id])
+  programTitle String
+  amount       Float
+  frequency    String    @default("MONTHLY") // DAILY, WEEKLY, MONTHLY
+  routineType  String    @default("AUTO_DONATION") // REMINDER_ONLY, AUTO_DONATION
+  status       String    @default("ACTIVE") // ACTIVE, PAUSED, CANCELLED
+  selectedDay  String?
+  monthlyDate  DateTime?
+  reminderTime String?   @default("05:00")
+  donorName    String
+  donorEmail   String?
+  donorPhone   String
+  isAnonymous  Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
+  @@index([donorEmail])
+  @@index([donorName])
+  @@index([status])
+  @@index([campaignId])
+}

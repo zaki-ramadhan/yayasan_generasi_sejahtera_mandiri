@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
-import { getDonorHistory } from "@/services/donorService";
+import {
+  getDonorHistory,
+  getDonorDashboardOverview,
+  getDonorMonthlyTrend,
+} from "@/services/donorService";
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const userEmail = searchParams.get("email") || "";
     const userName = searchParams.get("name") || "";
+    const mode = searchParams.get("mode") || "";
+    const year = searchParams.get("year") || "";
     const search = searchParams.get("search") || "";
     const sortBy = searchParams.get("sortBy") || "date";
     const sortOrder = searchParams.get("sortOrder") || "desc";
@@ -20,6 +26,32 @@ export async function GET(request) {
         },
         { status: 400 }
       );
+    }
+
+    if (mode === "trend") {
+      const data = await getDonorMonthlyTrend({
+        userEmail,
+        userName,
+        year,
+      });
+
+      return NextResponse.json({
+        success: true,
+        data,
+      });
+    }
+
+    if (mode === "dashboard") {
+      const data = await getDonorDashboardOverview({
+        userEmail,
+        userName,
+        year,
+      });
+
+      return NextResponse.json({
+        success: true,
+        data,
+      });
     }
 
     const data = await getDonorHistory({

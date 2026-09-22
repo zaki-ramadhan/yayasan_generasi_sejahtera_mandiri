@@ -254,6 +254,7 @@ export function CampaignDonationGrowthChart({
               axisLine={false}
               tickMargin={8}
               minTickGap={28}
+              tick={{ fill: "#64748b", fontSize: 12, fontWeight: 400 }}
               tickFormatter={(value) => {
                 if (!value) return "";
                 const date = new Date(value);
@@ -272,6 +273,7 @@ export function CampaignDonationGrowthChart({
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
+                tick={{ fill: "#64748b", fontSize: 12, fontWeight: 400 }}
                 tickFormatter={(value) => formatCompactNumber(value)}
               />
             )}
@@ -284,6 +286,7 @@ export function CampaignDonationGrowthChart({
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
+                tick={{ fill: "#64748b", fontSize: 12, fontWeight: 400 }}
                 tickFormatter={(value) => formatCompactNumber(value)}
               />
             )}

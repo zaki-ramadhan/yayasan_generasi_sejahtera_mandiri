@@ -137,8 +137,8 @@ export function DonorProfileView() {
     return (
       <div className="space-y-6 animate-pulse">
         {/* Skeleton Cover Banner */}
-        <div className="h-56 sm:h-72 bg-slate-200 rounded-xl" />
-        <div className="h-64 bg-white rounded-lg border border-slate-200 p-6 space-y-4">
+        <div className="h-56 sm:h-72 bg-slate-200 rounded-md" />
+        <div className="h-64 bg-white rounded-md border border-slate-200 p-6 space-y-4">
           <div className="h-6 bg-slate-200 rounded-sm w-48" />
           <div className="h-4 bg-slate-100 rounded-sm w-64" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
@@ -152,7 +152,7 @@ export function DonorProfileView() {
 
   if (!profile) {
     return (
-      <div className="p-8 text-center bg-white rounded-lg border border-slate-200 space-y-3">
+      <div className="p-8 text-center bg-white rounded-md border border-slate-200 space-y-3">
         <p className="text-sm font-medium text-slate-600">
           Memuat data profil donatur...
         </p>

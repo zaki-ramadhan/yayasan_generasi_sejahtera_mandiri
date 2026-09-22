@@ -1,11 +1,36 @@
+"use client";
+
 import Link from "next/link";
 import { Plus, Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { formatRupiah, formatDate } from "@/lib/formatters";
 import { RECENT_TRANSACTIONS, DONOR_ROUTINE_SCHEDULES } from "@/data/adminMockData";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead,
+  TableSortHeader,
+  TableEmptyRow,
+  useTableSort,
+} from "@/components/ui/table";
 
 export function DonorDashboardView() {
+  const paidTransactions = RECENT_TRANSACTIONS.filter((t) => t.status === "PAID");
+
+  const {
+    items: sortedTransactions,
+    sortBy,
+    sortOrder,
+    handleSort,
+  } = useTableSort(paidTransactions, {
+    initialSortBy: "date",
+    initialSortOrder: "desc",
+  });
+
   return (
     <div className="space-y-6">
       {/* Active Recurring Schedules */}
@@ -56,39 +81,74 @@ export function DonorDashboardView() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-700">
-            <thead className="bg-slate-50 text-slate-900 uppercase font-semibold border-y border-slate-200">
-              <tr>
-                <th className="py-2.5 px-3">No. Kwitansi</th>
-                <th className="py-2.5 px-3">Tanggal</th>
-                <th className="py-2.5 px-3">Program / Jenis Akad</th>
-                <th className="py-2.5 px-3">Nominal</th>
-                <th className="py-2.5 px-3">Metode</th>
-                <th className="py-2.5 px-3">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
-              {RECENT_TRANSACTIONS.filter((t) => t.status === "PAID").map((tx) => (
-                <tr key={tx.id} className="hover:bg-slate-50/80">
-                  <td className="py-3 px-3 font-mono text-slate-900">{tx.id}</td>
-                  <td className="py-3 px-3 text-slate-500 whitespace-nowrap">{formatDate(tx.date)}</td>
-                  <td className="py-3 px-3">{tx.program}</td>
-                  <td className="py-3 px-3 font-bold text-slate-900">{formatRupiah(tx.amount)}</td>
-                  <td className="py-3 px-3 text-slate-500">{tx.channel}</td>
-                  <td className="py-3 px-3">
-                    <button
-                      type="button"
-                      onClick={() => toast.success(`Mengunduh e-Kwitansi ${tx.id}...`)}
-                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-semibold cursor-pointer"
-                    >
-                      <Download className="w-3.5 h-3.5" /> e-Kwitansi PDF
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="rounded-lg border border-slate-200/90 overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableSortHeader
+                  label="No. Kwitansi"
+                  sortKey="id"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Tanggal"
+                  sortKey="date"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Program / Akad"
+                  sortKey="program"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableSortHeader
+                  label="Nominal"
+                  sortKey="amount"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                  align="right"
+                />
+                <TableSortHeader
+                  label="Metode"
+                  sortKey="channel"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <TableHead className="text-center font-medium text-slate-900 w-32">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedTransactions.length === 0 ? (
+                <TableEmptyRow colSpan={6} message="Belum ada data" />
+              ) : (
+                sortedTransactions.map((tx) => (
+                  <TableRow key={tx.id}>
+                    <TableCell className="font-mono text-slate-900 font-medium">{tx.id}</TableCell>
+                    <TableCell className="text-slate-600 font-normal whitespace-nowrap">{formatDate(tx.date)}</TableCell>
+                    <TableCell className="font-normal text-slate-800">{tx.program}</TableCell>
+                    <TableCell className="font-medium text-emerald-800 text-right">{formatRupiah(tx.amount)}</TableCell>
+                    <TableCell className="text-slate-600 font-normal">{tx.channel}</TableCell>
+                    <TableCell className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => toast.success(`Mengunduh e-Kwitansi ${tx.id}...`)}
+                        className="inline-flex items-center gap-1 text-sm text-primary hover:underline font-medium cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" /> e-Kwitansi
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>

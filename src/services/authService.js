@@ -142,6 +142,11 @@ export function loginUser(user) {
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
   localStorage.setItem("ygsm_auth_session", JSON.stringify(user));
   sessionStorage.setItem("ygsm_just_logged_in", user.name || "Donatur");
+  
+  // Set session cookie for Next.js edge middleware and server-side route guards
+  const sessionId = encodeURIComponent(user.id || user.email || "ygsm-user");
+  document.cookie = `ygsm_session=${sessionId}; path=/; max-age=604800; SameSite=Lax`;
+
   window.dispatchEvent(new Event("ygsm_auth_change"));
   window.dispatchEvent(new Event("storage"));
 }
@@ -159,6 +164,15 @@ export function logoutUser() {
   localStorage.removeItem("ygsm_auth_session");
   sessionStorage.removeItem("ygsm_just_logged_in");
   sessionStorage.removeItem("zakat_calculator_state");
+
+  // Invalidate session cookie immediately
+  document.cookie = "ygsm_session=; path=/; max-age=0; SameSite=Lax";
+
+  // Trigger server logout if available
+  try {
+    fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+  } catch {}
+
   window.dispatchEvent(new Event("ygsm_auth_change"));
   window.dispatchEvent(new Event("storage"));
 }
@@ -195,7 +209,7 @@ export function findUserByIdentifier(identifier) {
 
 export function getRedirectPathForRole(role) {
   if (role === USER_ROLES.DONOR) {
-    return "/dashboard-donatur";
+    return "/donatur/dashboard";
   }
   return "/dashboard";
 }

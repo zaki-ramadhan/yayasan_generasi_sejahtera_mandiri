@@ -139,17 +139,17 @@ export function NavUserDropdown({ currentUser, onLogout }) {
         {/* Donor Portal Links */}
         <DropdownMenuItem asChild>
           <Link
-            href="/dashboard-donatur"
-            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-900 hover:bg-slate-100 cursor-pointer"
+            href="/donatur/dashboard"
+            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 transition-colors"
           >
-            <span className="flex-1">Dashboard Ikhtisar</span>
+            <span className="flex-1">Dashboard</span>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link
-            href="/riwayat-donasi"
-            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
+            href="/donatur/riwayat"
+            className="px-2.5 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
           >
             <span className="flex-1">Riwayat Donasi</span>
           </Link>
@@ -157,8 +157,8 @@ export function NavUserDropdown({ currentUser, onLogout }) {
 
         <DropdownMenuItem asChild>
           <Link
-            href="/profil"
-            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
+            href="/donatur/profil"
+            className="px-2.5 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
           >
             <span className="flex-1">Profil Saya</span>
           </Link>
@@ -167,7 +167,7 @@ export function NavUserDropdown({ currentUser, onLogout }) {
         <DropdownMenuItem asChild>
           <Link
             href="/donasi-rutin"
-            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
+            className="px-2.5 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
           >
             <span className="flex-1">Komitmen Donasi Rutin</span>
           </Link>

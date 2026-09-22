@@ -62,7 +62,7 @@ export function DonorProfileCover({ profile, onUpdateImage, isUpdating = false }
   const displayName = `${salutation}${profile?.name || "Donatur"}`;
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-2xs overflow-hidden">
+    <div className="rounded-md border border-slate-200/90 bg-sidebar overflow-hidden">
       {/* 1. Cover Photo Banner */}
       <div className="relative h-44 sm:h-56 md:h-64 lg:h-72 w-full bg-slate-200 overflow-hidden group">
         <img
@@ -80,7 +80,7 @@ export function DonorProfileCover({ profile, onUpdateImage, isUpdating = false }
               setNewCoverUrl(defaultCover);
               setIsCoverModalOpen(true);
             }}
-            className="h-8.5 px-3 rounded-md text-sm font-medium bg-white/95 hover:bg-white text-slate-800 border-slate-300 shadow-sm backdrop-blur-xs flex items-center gap-1.5"
+            className="h-8.5 px-3 rounded-md text-sm font-medium bg-white hover:bg-slate-50 text-slate-800 border-slate-300 shadow-sm backdrop-blur-xs flex items-center gap-1.5 cursor-pointer"
           >
             <Camera className="w-4 h-4 text-slate-600" />
             <span>Ubah Sampul</span>
@@ -120,10 +120,10 @@ export function DonorProfileCover({ profile, onUpdateImage, isUpdating = false }
             {/* Identity Information */}
             <div className="text-center sm:text-left space-y-1">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <h1 className="text-xl sm:text-2xl font-semibold text-slate-950 tracking-tight">
+                <h1 className="text-xl sm:text-2xl font-medium text-slate-950 tracking-tight">
                   {displayName}
                 </h1>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-200">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium text-emerald-800 bg-white border border-slate-200">
                   {profile?.role === "SUPER_ADMIN" ? "Super Admin" : "Donatur Aktif"}
                 </span>
               </div>
@@ -162,7 +162,7 @@ export function DonorProfileCover({ profile, onUpdateImage, isUpdating = false }
       <Dialog open={isCoverModalOpen} onOpenChange={setIsCoverModalOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-base font-semibold text-slate-950">
+            <DialogTitle className="text-base font-medium text-slate-950">
               Ganti Foto Sampul
             </DialogTitle>
             <DialogDescription className="text-sm font-normal text-slate-600">
@@ -237,7 +237,7 @@ export function DonorProfileCover({ profile, onUpdateImage, isUpdating = false }
       <Dialog open={isAvatarModalOpen} onOpenChange={setIsAvatarModalOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-base font-semibold text-slate-950">
+            <DialogTitle className="text-base font-medium text-slate-950">
               Ganti Foto Profil
             </DialogTitle>
             <DialogDescription className="text-sm font-normal text-slate-600">

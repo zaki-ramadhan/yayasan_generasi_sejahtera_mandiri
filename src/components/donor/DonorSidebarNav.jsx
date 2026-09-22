@@ -8,16 +8,9 @@ import {
   LayoutDashboard,
   FileSpreadsheet,
   User,
-  CalendarHeart,
-  HeartHandshake,
-  FileText,
-  Calculator,
-  ArrowLeft,
   LogOut,
   ChevronRight,
   Shield,
-  PanelLeftClose,
-  PanelLeftOpen,
 } from "lucide-react";
 import { logoutUser } from "@/services/authService";
 import { cn } from "@/lib/utils";
@@ -25,7 +18,6 @@ import { cn } from "@/lib/utils";
 export function DonorSidebarNav({
   currentUser,
   isCollapsed = false,
-  onToggleCollapse,
   onCloseMobile,
 }) {
   const pathname = usePathname();
@@ -39,162 +31,144 @@ export function DonorSidebarNav({
 
   const mainNavItems = [
     {
-      label: "Dashboard Ikhtisar",
-      href: "/dashboard-donatur",
+      label: "Dashboard",
+      href: "/donatur/dashboard",
       icon: LayoutDashboard,
-      description: "Ringkasan kontribusi kebaikan",
     },
     {
       label: "Riwayat Donasi",
-      href: "/riwayat-donasi",
+      href: "/donatur/riwayat",
       icon: FileSpreadsheet,
-      description: "Daftar transaksi & kuitansi",
     },
     {
       label: "Profil Saya",
-      href: "/profil",
+      href: "/donatur/profil",
       icon: User,
-      description: "Data diri, bank & sandi",
-    },
-    {
-      label: "Donasi Rutin",
-      href: "/donasi-rutin",
-      icon: CalendarHeart,
-      description: "Komitmen sedekah otomatis",
-    },
-  ];
-
-  const exploreNavItems = [
-    {
-      label: "Program Kebaikan",
-      href: "/program",
-      icon: HeartHandshake,
-    },
-    {
-      label: "Laporan Akuntabilitas",
-      href: "/laporan",
-      icon: FileText,
-    },
-    {
-      label: "Kalkulator Zakat",
-      href: "/kalkulator-zakat",
-      icon: Calculator,
     },
   ];
 
   const isStaff = currentUser?.role && currentUser.role !== "DONOR";
-
   const salutation = currentUser?.salutation ? `${currentUser.salutation} ` : "";
   const displayName = `${salutation}${currentUser?.name || "Donatur"}`;
 
   return (
-    <div className="h-full flex flex-col justify-between bg-white border-r border-slate-200 transition-all duration-200">
+    <div className="h-full flex flex-col justify-between bg-sidebar border-r border-slate-200 overflow-hidden transition-all duration-200 select-none">
       {/* Top Section */}
-      <div className={cn("space-y-5", isCollapsed ? "p-3" : "p-5")}>
-        {/* Brand Header & Toggle */}
-        <div className="flex items-center justify-between pb-1 border-b border-slate-100">
+      <div className={cn("space-y-4", isCollapsed ? "p-2.5" : "p-4")}>
+        {/* Brand Header */}
+        <div className="flex items-center pb-3 border-b border-slate-200">
           <Link
-            href="/"
+            href="/donatur/dashboard"
             onClick={onCloseMobile}
             className={cn(
-              "flex items-center group",
-              isCollapsed ? "justify-center w-full" : "gap-3"
+              "flex items-center group transition-all",
+              isCollapsed ? "justify-center w-full" : "gap-2.5 w-full"
             )}
-            title="Kembali ke Beranda"
+            title="Portal Donatur YGSM"
           >
-            <div className="relative w-9 h-9 rounded-md overflow-hidden bg-white shrink-0 p-0.5 border border-slate-200 shadow-2xs flex items-center justify-center">
+            <div className="relative w-8.5 h-8.5 rounded-md overflow-hidden bg-white shrink-0 p-0.5 border border-slate-200 flex items-center justify-center">
               <Image
                 src="/logo_yayasan_GSM.png"
                 alt="Logo YGSM"
-                width={36}
-                height={36}
+                width={34}
+                height={34}
                 className="w-full h-full object-contain rounded-xs"
               />
             </div>
             {!isCollapsed && (
-              <div>
-                <span className="font-semibold text-sm block text-slate-950 leading-tight group-hover:text-primary transition-colors">
+              <div className="min-w-0 flex-1 truncate">
+                <span className="font-medium text-sm block text-slate-950 leading-tight group-hover:text-primary transition-colors truncate">
                   Portal Donatur
                 </span>
-                <span className="text-sm font-normal text-slate-500 block">
+                <span className="text-xs font-normal text-slate-500 block truncate">
                   Yayasan GSM
                 </span>
               </div>
             )}
           </Link>
-
-          {/* Desktop Toggle Button */}
-          {onToggleCollapse && (
-            <button
-              type="button"
-              onClick={onToggleCollapse}
-              aria-label={isCollapsed ? "Buka sidebar" : "Tutup sidebar"}
-              className={cn(
-                "hidden lg:flex items-center justify-center p-1.5 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer",
-                isCollapsed && "mx-auto mt-2"
-              )}
-              title={isCollapsed ? "Perlebar Sidebar" : "Ciutkan Sidebar"}
-            >
-              {isCollapsed ? (
-                <PanelLeftOpen className="w-4 h-4" />
-              ) : (
-                <PanelLeftClose className="w-4 h-4" />
-              )}
-            </button>
-          )}
         </div>
 
-        {/* User Identity Mini Card (Expanded Mode) */}
-        {!isCollapsed && currentUser && (
-          <div className="p-3 rounded-lg border border-slate-200 bg-slate-50/70 space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-slate-200 border border-slate-300 shrink-0 flex items-center justify-center">
-                {currentUser.avatar ? (
-                  <img
-                    src={currentUser.avatar}
-                    alt={displayName}
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
+        {/* Main Navigation */}
+        <div className="space-y-1">
+          {!isCollapsed && (
+            <p className="px-2 text-xs font-medium text-slate-400 uppercase tracking-wider truncate">
+              Menu Utama
+            </p>
+          )}
+          <nav className="space-y-1 pt-0.5">
+            {mainNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive =
+                pathname === item.href ||
+                (item.href === "/donatur/dashboard" && pathname === "/donatur");
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onCloseMobile}
+                  title={isCollapsed ? item.label : undefined}
+                  className={cn(
+                    "flex items-center rounded-md text-sm font-normal transition-colors",
+                    isCollapsed
+                      ? "justify-center p-2.5"
+                      : "gap-2.5 px-3 py-2",
+                    isActive
+                      ? "bg-white text-slate-950 font-normal border border-slate-200/90"
+                      : "text-slate-600 hover:text-slate-950 hover:bg-slate-200/50"
+                  )}
+                >
+                  <Icon
+                    className={cn(
+                      "w-5 h-5 shrink-0",
+                      isActive
+                        ? "text-emerald-700"
+                        : "text-slate-400 group-hover:text-slate-600"
+                    )}
                   />
-                ) : (
-                  <span className="font-medium text-sm text-slate-700">
-                    {currentUser.initials || "U"}
-                  </span>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-sm text-slate-950 truncate leading-snug">
-                  {displayName}
-                </p>
-                <p className="text-sm font-normal text-slate-500 truncate leading-snug">
-                  {currentUser.email || "Donatur Terdaftar"}
-                </p>
-              </div>
-            </div>
+                  {!isCollapsed && (
+                    <span className="flex-1 truncate whitespace-nowrap">
+                      {item.label}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
-            {isStaff && (
-              <Link
-                href="/dashboard"
-                onClick={onCloseMobile}
-                className="flex items-center justify-between px-2.5 py-1.5 rounded-md bg-purple-50 hover:bg-purple-100/80 border border-purple-200 text-purple-900 text-sm font-medium transition-colors"
-              >
-                <div className="flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-purple-700" />
-                  <span>Akses Dashboard Pengurus</span>
-                </div>
-                <ChevronRight className="w-3.5 h-3.5 text-purple-600" />
-              </Link>
-            )}
+        {/* Staff / Admin Shortcut if applicable */}
+        {!isCollapsed && isStaff && (
+          <div className="pt-2 border-t border-slate-200/80">
+            <Link
+              href="/dashboard"
+              onClick={onCloseMobile}
+              className="flex items-center justify-between px-2.5 py-1.5 rounded-md bg-purple-50 hover:bg-purple-100/80 border border-purple-200 text-purple-900 text-xs font-normal transition-colors"
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Shield className="w-3.5 h-3.5 text-purple-700 shrink-0" />
+                <span className="truncate">Dashboard Pengurus</span>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+            </Link>
           </div>
         )}
+      </div>
 
-        {/* User Avatar Mini (Collapsed Mode) */}
-        {isCollapsed && currentUser && (
-          <div className="flex justify-center" title={displayName}>
+      {/* Bottom Section: Profile Minicard with Integrated Logout Button on the Right */}
+      <div
+        className={cn(
+          "border-t border-slate-200 bg-sidebar",
+          isCollapsed ? "p-2.5 flex flex-col items-center" : "p-3"
+        )}
+      >
+        {isCollapsed ? (
+          /* Collapsed Mode: Only leaves user avatar */
+          currentUser && (
             <Link
-              href="/profil"
+              href="/donatur/profil"
               onClick={onCloseMobile}
-              className="relative w-10 h-10 rounded-full overflow-hidden bg-slate-200 border border-slate-300 shrink-0 flex items-center justify-center hover:ring-2 hover:ring-primary/20 transition-all"
+              title={displayName}
+              className="relative w-7 h-7 rounded-full overflow-hidden bg-white border border-slate-300 shrink-0 flex items-center justify-center hover:ring-2 hover:ring-primary/20 transition-all cursor-pointer"
             >
               {currentUser.avatar ? (
                 <img
@@ -204,135 +178,58 @@ export function DonorSidebarNav({
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <span className="font-medium text-sm text-slate-700">
+                <span className="font-medium text-[11px] text-slate-700">
                   {currentUser.initials || "U"}
                 </span>
               )}
             </Link>
-          </div>
-        )}
-
-        {/* Main Donor Navigation */}
-        <div className="space-y-1">
-          {!isCollapsed && (
-            <p className="px-2 text-sm font-medium text-slate-400">
-              Menu Utama
-            </p>
-          )}
-          <nav className="space-y-1">
-            {mainNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onCloseMobile}
-                  title={isCollapsed ? item.label : undefined}
-                  className={cn(
-                    "flex items-center rounded-lg text-sm font-medium transition-colors",
-                    isCollapsed
-                      ? "justify-center p-2.5"
-                      : "gap-3 px-3 py-2.5",
-                    isActive
-                      ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
-                      : "text-slate-700 hover:text-slate-950 hover:bg-slate-100"
+          )
+        ) : (
+          /* Expanded Mode: Minicard with Avatar + Info + Logout Button on the Right */
+          currentUser && (
+            <div className="p-2 rounded-md bg-white border border-slate-200 flex items-center justify-between gap-2">
+              <Link
+                href="/donatur/profil"
+                onClick={onCloseMobile}
+                className="flex items-center gap-2 min-w-0 flex-1 hover:opacity-85 transition-opacity"
+              >
+                <div className="relative w-7 h-7 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center">
+                  {currentUser.avatar ? (
+                    <img
+                      src={currentUser.avatar}
+                      alt={displayName}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <span className="font-medium text-[11px] text-slate-700">
+                      {currentUser.initials || "U"}
+                    </span>
                   )}
-                >
-                  <Icon
-                    className={cn(
-                      "w-4 h-4 shrink-0",
-                      isActive ? "text-emerald-700" : "text-slate-500"
-                    )}
-                  />
-                  {!isCollapsed && <span className="flex-1">{item.label}</span>}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-xs text-slate-900 truncate leading-snug">
+                    {displayName}
+                  </p>
+                  <p className="text-xs font-normal text-slate-500 truncate leading-tight">
+                    {currentUser.email || "donatur@ygsm.or.id"}
+                  </p>
+                </div>
+              </Link>
 
-        {/* Foundation Exploration Links */}
-        <div className="space-y-1 pt-1">
-          {!isCollapsed && (
-            <p className="px-2 text-sm font-medium text-slate-400">
-              Jelajahi Program
-            </p>
-          )}
-          <nav className="space-y-1">
-            {exploreNavItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onCloseMobile}
-                  title={isCollapsed ? item.label : undefined}
-                  className={cn(
-                    "flex items-center rounded-lg text-sm font-medium text-slate-600 hover:text-slate-950 hover:bg-slate-50 transition-colors",
-                    isCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2"
-                  )}
-                >
-                  <Icon className="w-4 h-4 text-slate-400 shrink-0" />
-                  {!isCollapsed && <span>{item.label}</span>}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Motivation Card (Reference: Get more with BankLY) */}
-        {!isCollapsed && (
-          <div className="p-3.5 rounded-lg border border-emerald-100 bg-emerald-50/50 space-y-2">
-            <h3 className="text-emerald-950 font-semibold text-sm">
-              Sedekah Rutin Subuh
-            </h3>
-            <p className="text-sm font-normal text-slate-600 leading-relaxed">
-              Jaga istiqomah kebaikan setiap hari dengan sedekah otomatis untuk yatim dhuafa.
-            </p>
-            <Link
-              href="/donasi-rutin"
-              onClick={onCloseMobile}
-              className="inline-flex items-center justify-center w-full py-1.5 px-3 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium transition-colors"
-            >
-              Aktifkan Sekarang
-            </Link>
-          </div>
+              {/* Integrated Logout Button */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                title="Keluar dari Akun"
+                aria-label="Keluar"
+                className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )
         )}
-      </div>
-
-      {/* Bottom Section */}
-      <div
-        className={cn(
-          "border-t border-slate-200 bg-slate-50/50",
-          isCollapsed ? "p-3 space-y-2 flex flex-col items-center" : "p-4 space-y-1"
-        )}
-      >
-        <Link
-          href="/"
-          onClick={onCloseMobile}
-          title="Kembali ke Beranda Utama"
-          className={cn(
-            "flex items-center rounded-lg text-sm font-medium text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors",
-            isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
-          )}
-        >
-          <ArrowLeft className="w-4 h-4 text-slate-500 shrink-0" />
-          {!isCollapsed && <span>Kembali ke Beranda</span>}
-        </Link>
-
-        <button
-          type="button"
-          onClick={handleLogout}
-          title="Keluar dari Akun"
-          className={cn(
-            "w-full flex items-center rounded-lg text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer text-left",
-            isCollapsed ? "justify-center p-2.5" : "gap-2.5 px-3 py-2"
-          )}
-        >
-          <LogOut className="w-4 h-4 text-rose-500 shrink-0" />
-          {!isCollapsed && <span>Keluar dari Akun</span>}
-        </button>
       </div>
     </div>
   );
