@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ChevronDown, ArrowUpRight, Check } from "lucide-react";
 import {
 	DropdownMenu,
@@ -19,26 +18,14 @@ import {
 import { cn } from "@/lib/utils";
 
 export function NavDesktopMenu({ pathname }) {
-	const router = useRouter();
 	const [isProgramOpen, setIsProgramOpen] = useState(false);
 	const [isInformasiOpen, setIsInformasiOpen] = useState(false);
 
-	const programTimerRef = useRef(null);
-	const informasiTimerRef = useRef(null);
+	const isProgramActive = isParentMenuActive(PROGRAM_MENU, pathname);
+	const isArtikelActive = isNavItemActive("/artikel", pathname);
+	const isInformasiActive = isParentMenuActive(INFORMASI_MENU, pathname);
 
-	const isProgramActive = isParentMenuActive(
-		PROGRAM_MENU,
-		pathname,
-	);
-	const isArtikelActive = isNavItemActive(
-		"/artikel",
-		pathname,
-	);
-	const isInformasiActive = isParentMenuActive(
-		INFORMASI_MENU,
-		pathname,
-	);
-
+	// Otomatis tutup menu saat route berubah
 	const [prevPathname, setPrevPathname] = useState(pathname);
 	if (prevPathname !== pathname) {
 		setPrevPathname(pathname);
@@ -46,72 +33,14 @@ export function NavDesktopMenu({ pathname }) {
 		setIsInformasiOpen(false);
 	}
 
-	useEffect(() => {
-		return () => {
-			if (programTimerRef.current) clearTimeout(programTimerRef.current);
-			if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
-		};
-	}, []);
-
-	const closeAllMenus = () => {
-		if (programTimerRef.current) clearTimeout(programTimerRef.current);
-		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
-		setIsProgramOpen(false);
-		setIsInformasiOpen(false);
-	};
-
-	const handleProgramEnter = () => {
-		if (programTimerRef.current) clearTimeout(programTimerRef.current);
-		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
-		setIsInformasiOpen(false);
-		setIsProgramOpen(true);
-	};
-
-	const handleProgramLeave = () => {
-		if (programTimerRef.current) clearTimeout(programTimerRef.current);
-		programTimerRef.current = setTimeout(() => {
-			setIsProgramOpen(false);
-		}, 150);
-	};
-
-	const handleInformasiEnter = () => {
-		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
-		if (programTimerRef.current) clearTimeout(programTimerRef.current);
-		setIsProgramOpen(false);
-		setIsInformasiOpen(true);
-	};
-
-	const handleInformasiLeave = () => {
-		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
-		informasiTimerRef.current = setTimeout(() => {
-			setIsInformasiOpen(false);
-		}, 150);
-	};
-
-	const handleProgramItemClick = (href) => {
-		if (programTimerRef.current) clearTimeout(programTimerRef.current);
-		setIsProgramOpen(false);
-		router.push(href);
-	};
-
-	const handleInformasiItemClick = (href) => {
-		if (informasiTimerRef.current) clearTimeout(informasiTimerRef.current);
-		setIsInformasiOpen(false);
-		router.push(href);
-	};
-
 	return (
 		<nav className="hidden lg:flex items-stretch h-full gap-1 xl:gap-2">
 			{/* 1. Home */}
 			<Link
 				href="/"
-				onMouseEnter={closeAllMenus}
 				className={cn(
 					"inline-flex items-center px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
-					isNavItemActive(
-						"/",
-						pathname,
-					)
+					isNavItemActive("/", pathname)
 						? "text-primary border-primary -mb-px"
 						: "text-slate-700 hover:text-slate-950 border-transparent hover:border-slate-300 -mb-px",
 				)}
@@ -122,122 +51,74 @@ export function NavDesktopMenu({ pathname }) {
 			{/* 2. Tentang Kami */}
 			<Link
 				href="/tentang-kami"
-				onMouseEnter={closeAllMenus}
 				className={cn(
 					"inline-flex items-center px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
-					isNavItemActive(
-						"/tentang-kami",
-						pathname,
-					)
+					isNavItemActive("/tentang-kami", pathname)
 						? "text-primary border-primary -mb-px"
 						: "text-slate-700 hover:text-slate-950 border-transparent hover:border-slate-300 -mb-px",
 				)}
 			>
-				Tentang
-				Kami
+				Tentang Kami
 			</Link>
 
-			{/* 3. Program Dropdown (2 items) */}
+			{/* 3. Program Dropdown (Click to toggle) */}
 			<DropdownMenu open={isProgramOpen} onOpenChange={setIsProgramOpen}>
-				<DropdownMenuTrigger
-					asChild
-				>
+				<DropdownMenuTrigger asChild>
 					<button
 						type="button"
-						onMouseEnter={handleProgramEnter}
-						onMouseLeave={handleProgramLeave}
-						onPointerDown={(e) => {
-							e.preventDefault();
-							handleProgramEnter();
-						}}
-						onClick={(e) => {
-							e.preventDefault();
-							handleProgramEnter();
-						}}
 						className={cn(
-							"inline-flex items-center gap-1.5 px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
-							isProgramActive
+							"inline-flex items-center gap-1.5 px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full select-none outline-none",
+							isProgramActive || isProgramOpen
 								? "text-primary border-primary -mb-px"
 								: "text-slate-700 hover:text-slate-950 border-transparent hover:border-slate-300 -mb-px",
 						)}
 					>
-						<span>
-							Program
-						</span>
-						<ChevronDown className="w-4 h-4 opacity-70" />
+						<span>Program</span>
+						<ChevronDown
+							className={cn(
+								"w-4 h-4 opacity-70 transition-transform duration-200",
+								isProgramOpen && "rotate-180"
+							)}
+						/>
 					</button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align="start"
-					className="w-60 p-1.5 shadow-md"
-					onMouseEnter={handleProgramEnter}
-					onMouseLeave={handleProgramLeave}
-					onOpenAutoFocus={(e) => e.preventDefault()}
+					className="w-60 p-1.5 shadow-md bg-white border border-slate-200 rounded-lg"
 				>
-					{PROGRAM_MENU.map(
-						(
-							item,
-						) => {
-							const isActive =
-								isNavItemActive(
-									item.href,
-									pathname,
-								);
-							return (
-								<DropdownMenuItem
-									key={
-										item.label
-									}
-									asChild
-									onSelect={() => handleProgramItemClick(item.href)}
+					{PROGRAM_MENU.map((item) => {
+						const isActive = isNavItemActive(item.href, pathname);
+						return (
+							<DropdownMenuItem
+								key={item.label}
+								asChild
+								onSelect={() => setIsProgramOpen(false)}
+							>
+								<Link
+									href={item.href}
+									className={cn(
+										"group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
+										isActive
+											? "bg-primary text-white shadow-xs select-none pointer-events-none"
+											: "text-slate-800 hover:bg-slate-100 hover:text-slate-950 cursor-pointer",
+									)}
 								>
-									<Link
-										href={
-											item.href
-										}
-										onClick={(e) => {
-											e.preventDefault();
-											handleProgramItemClick(item.href);
-										}}
-										className={cn(
-											"group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
-											isActive
-												? "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white shadow-xs hover:bg-gradient-to-r hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 hover:text-white focus:bg-blue-700 focus:text-white cursor-default select-none pointer-events-none"
-												: "text-slate-800 hover:bg-slate-100 hover:text-slate-950 focus:bg-slate-100 focus:text-slate-950 cursor-pointer",
-										)}
-									>
-										<span>
-											{
-												item.label
-											}
-										</span>
-										{isActive ? (
-											<Check
-												className="w-4 h-4 text-white shrink-0"
-												strokeWidth={
-													2.5
-												}
-											/>
-										) : (
-											<ArrowUpRight
-												className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0"
-												strokeWidth={
-													2.5
-												}
-											/>
-										)}
-									</Link>
-								</DropdownMenuItem>
-							);
-						},
-					)}
+									<span>{item.label}</span>
+									{isActive ? (
+										<Check className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
+									) : (
+										<ArrowUpRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" strokeWidth={2.5} />
+									)}
+								</Link>
+							</DropdownMenuItem>
+						);
+					})}
 				</DropdownMenuContent>
 			</DropdownMenu>
 
 			{/* 4. Artikel (Direct Link) */}
 			<Link
 				href="/artikel"
-				onMouseEnter={closeAllMenus}
 				className={cn(
 					"inline-flex items-center px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
 					isArtikelActive
@@ -248,100 +129,58 @@ export function NavDesktopMenu({ pathname }) {
 				Artikel
 			</Link>
 
-			{/* 5. Informasi Dropdown */}
+			{/* 5. Informasi Dropdown (Click to toggle) */}
 			<DropdownMenu open={isInformasiOpen} onOpenChange={setIsInformasiOpen}>
-				<DropdownMenuTrigger
-					asChild
-				>
+				<DropdownMenuTrigger asChild>
 					<button
 						type="button"
-						onMouseEnter={handleInformasiEnter}
-						onMouseLeave={handleInformasiLeave}
-						onPointerDown={(e) => {
-							e.preventDefault();
-							handleInformasiEnter();
-						}}
-						onClick={(e) => {
-							e.preventDefault();
-							handleInformasiEnter();
-						}}
 						className={cn(
-							"inline-flex items-center gap-1.5 px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full",
-							isInformasiActive
+							"inline-flex items-center gap-1.5 px-3.5 text-sm font-medium border-b-2 transition-all cursor-pointer h-full select-none outline-none",
+							isInformasiActive || isInformasiOpen
 								? "text-primary border-primary -mb-px"
 								: "text-slate-700 hover:text-slate-950 border-transparent hover:border-slate-300 -mb-px",
 						)}
 					>
-						<span>
-							Informasi
-						</span>
-						<ChevronDown className="w-4 h-4 opacity-70" />
+						<span>Informasi</span>
+						<ChevronDown
+							className={cn(
+								"w-4 h-4 opacity-70 transition-transform duration-200",
+								isInformasiOpen && "rotate-180"
+							)}
+						/>
 					</button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align="start"
-					className="w-64 p-1.5 shadow-md"
-					onMouseEnter={handleInformasiEnter}
-					onMouseLeave={handleInformasiLeave}
-					onOpenAutoFocus={(e) => e.preventDefault()}
+					className="w-64 p-1.5 shadow-md bg-white border border-slate-200 rounded-lg"
 				>
-					{INFORMASI_MENU.map(
-						(
-							item,
-						) => {
-							const isActive =
-								isNavItemActive(
-									item.href,
-									pathname,
-								);
-							return (
-								<DropdownMenuItem
-									key={
-										item.label
-									}
-									asChild
-									onSelect={() => handleInformasiItemClick(item.href)}
+					{INFORMASI_MENU.map((item) => {
+						const isActive = isNavItemActive(item.href, pathname);
+						return (
+							<DropdownMenuItem
+								key={item.label}
+								asChild
+								onSelect={() => setIsInformasiOpen(false)}
+							>
+								<Link
+									href={item.href}
+									className={cn(
+										"group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
+										isActive
+											? "bg-primary text-white shadow-xs select-none pointer-events-none"
+											: "text-slate-800 hover:bg-slate-100 hover:text-slate-950 cursor-pointer",
+									)}
 								>
-									<Link
-										href={
-											item.href
-										}
-										onClick={(e) => {
-											e.preventDefault();
-											handleInformasiItemClick(item.href);
-										}}
-										className={cn(
-											"group flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
-											isActive
-												? "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white shadow-xs hover:bg-gradient-to-r hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 hover:text-white focus:bg-blue-700 focus:text-white cursor-default select-none pointer-events-none"
-												: "text-slate-800 hover:bg-slate-100 hover:text-slate-950 focus:bg-slate-100 focus:text-slate-950 cursor-pointer",
-										)}
-									>
-										<span>
-											{
-												item.label
-											}
-										</span>
-										{isActive ? (
-											<Check
-												className="w-4 h-4 text-white shrink-0"
-												strokeWidth={
-													2.5
-												}
-											/>
-										) : (
-											<ArrowUpRight
-												className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0"
-												strokeWidth={
-													2.5
-												}
-											/>
-										)}
-									</Link>
-								</DropdownMenuItem>
-							);
-						},
-					)}
+									<span>{item.label}</span>
+									{isActive ? (
+										<Check className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
+									) : (
+										<ArrowUpRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" strokeWidth={2.5} />
+									)}
+								</Link>
+							</DropdownMenuItem>
+						);
+					})}
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</nav>

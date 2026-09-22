@@ -1,7 +1,10 @@
 "use client";
 
+import { ReportSectionHeader } from "./ReportSectionHeader";
 import { FinancialMetricCard } from "./FinancialMetricCard";
 import { TopProgramsRankingCard } from "./TopProgramsRankingCard";
+import { FinancialDetailsSection } from "./FinancialDetailsSection";
+import { CashFlowDetailsSection } from "./CashFlowDetailsSection";
 import { formatRupiah } from "@/lib/formatters";
 
 /**
@@ -23,9 +26,11 @@ export function FinancialLedgerDashboard({
     netBalance: 1500000000,
   },
   nextDistributionDate = "25 Sep 2026",
+  financialDetails,
+  cashFlowDetails,
 }) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Top Header */}
       <div className="space-y-1.5 border-b border-slate-200 pb-5">
         <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950 tracking-tight">
@@ -38,15 +43,10 @@ export function FinancialLedgerDashboard({
 
       {/* Section 1: Grand Total Keseluruhan */}
       <section className="space-y-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-1 h-5 rounded-xs bg-primary" />
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-950 tracking-tight">
-            Grand Total Keseluruhan
-          </h2>
-        </div>
+        <ReportSectionHeader title="Grand Total Keseluruhan" />
 
         {/* 4 Summary Metric Cards (Bersebelahan 4 Kolom ke Samping) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <FinancialMetricCard
             label="Total Penghimpunan"
             value={formatRupiah(grandTotals.totalIncome)}
@@ -75,6 +75,12 @@ export function FinancialLedgerDashboard({
           transactions={transactions}
         />
       </section>
+
+      {/* Section 2: Rincian Laporan Keuangan */}
+      <FinancialDetailsSection data={financialDetails} />
+
+      {/* Section 3: Rincian Arus Kas */}
+      <CashFlowDetailsSection data={cashFlowDetails} />
     </div>
   );
 }

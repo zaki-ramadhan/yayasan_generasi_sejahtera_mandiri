@@ -31,23 +31,23 @@ export function DistributionAreaChart({ data = [] }) {
           >
             <defs>
               <linearGradient id="distributionGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#1e3a8a" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#1e3a8a" stopOpacity={0.02} />
+                <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0.0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
             <XAxis
               dataKey="month"
-              stroke="#475569"
+              stroke="#64748b"
               tickLine={false}
-              tick={{ fontSize: 12, fill: "#475569", fontWeight: 500 }}
+              tick={{ fontSize: 13, fill: "#64748b", fontWeight: 500 }}
               dy={6}
             />
             <YAxis
-              stroke="#475569"
+              stroke="#64748b"
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 12, fill: "#475569" }}
+              tick={{ fontSize: 13, fill: "#64748b", fontWeight: 500 }}
               tickFormatter={(v) => `${(v / 1000000).toFixed(0)} jt`}
               width={50}
             />
@@ -56,17 +56,21 @@ export function DistributionAreaChart({ data = [] }) {
                 if (active && payload && payload.length) {
                   const item = payload[0].payload;
                   return (
-                    <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-md text-sm space-y-1">
-                      <p className="font-medium text-slate-900">{item.fullMonth}</p>
-                      <div className="flex items-center justify-between gap-4 text-slate-700">
+                    <div className="bg-white border border-slate-200 rounded-md p-3 shadow-md text-sm space-y-1.5">
+                      <p className="font-semibold text-slate-950 border-b border-slate-100 pb-1">
+                        {item.fullMonth}
+                      </p>
+                      <div className="flex items-center justify-between gap-4 text-slate-600">
                         <span>Penyaluran:</span>
-                        <strong className="text-slate-900">{formatRupiah(item.amount)}</strong>
+                        <span className="font-semibold text-slate-950">
+                          {formatRupiah(item.amount)}
+                        </span>
                       </div>
-                      <div className="flex items-center justify-between gap-4 text-slate-700">
+                      <div className="flex items-center justify-between gap-4 text-slate-600">
                         <span>Penerima:</span>
-                        <strong className="text-slate-900 font-medium">
+                        <span className="font-semibold text-slate-950">
                           {formatNumber(item.beneficiaries)} Jiwa
-                        </strong>
+                        </span>
                       </div>
                     </div>
                   );
@@ -77,8 +81,8 @@ export function DistributionAreaChart({ data = [] }) {
             <Area
               type="monotone"
               dataKey="amount"
-              stroke="#1e3a8a"
-              strokeWidth={2}
+              stroke="#0ea5e9"
+              strokeWidth={2.5}
               fillOpacity={1}
               fill="url(#distributionGradient)"
             />

@@ -24,25 +24,25 @@ export function DistributionSyariahRadarChart({ metrics = [] }) {
       <div className="w-full h-52 sm:h-56">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="75%" data={metrics}>
-            <PolarGrid stroke="#cbd5e1" strokeDasharray="3 3" />
+            <PolarGrid stroke="#e2e8f0" strokeDasharray="3 3" />
             <PolarAngleAxis
               dataKey="dimension"
-              tick={{ fill: "#334155", fontSize: 12, fontWeight: 500 }}
+              tick={{ fill: "#475569", fontSize: 13, fontWeight: 500 }}
             />
             <PolarRadiusAxis
               angle={30}
               domain={[0, 100]}
-              tick={{ fill: "#64748b", fontSize: 11 }}
+              tick={{ fill: "#64748b", fontSize: 12 }}
             />
             <Tooltip
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-md text-sm space-y-1">
-                      <p className="font-medium text-slate-900">{data.dimension}</p>
-                      <p className="text-slate-800 font-medium">
-                        Skor: {data.score} / {data.fullMark}
+                    <div className="bg-white border border-slate-200 rounded-md p-3 shadow-md text-sm space-y-1">
+                      <p className="font-semibold text-slate-950">{data.dimension}</p>
+                      <p className="text-slate-700 font-medium">
+                        Skor: <span className="font-semibold text-slate-950">{data.score}</span> / {data.fullMark}
                       </p>
                     </div>
                   );
@@ -53,10 +53,11 @@ export function DistributionSyariahRadarChart({ metrics = [] }) {
             <Radar
               name="Kepatuhan Syariah"
               dataKey="score"
-              stroke="#1e3a8a"
-              fill="#1e3a8a"
-              fillOpacity={0.18}
+              stroke="#0ea5e9"
+              fill="#0ea5e9"
+              fillOpacity={0.25}
               strokeWidth={2}
+              dot={{ fill: "#0ea5e9", r: 3.5, stroke: "#ffffff", strokeWidth: 1.5 }}
             />
           </RadarChart>
         </ResponsiveContainer>

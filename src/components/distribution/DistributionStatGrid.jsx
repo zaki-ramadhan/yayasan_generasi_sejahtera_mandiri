@@ -27,7 +27,7 @@ export function DistributionStatItem({
         {value}
       </span>
       {subtext && (
-        <span className="text-slate-500 block text-xs">{subtext}</span>
+        <span className="text-slate-500 block text-sm">{subtext}</span>
       )}
     </div>
   );

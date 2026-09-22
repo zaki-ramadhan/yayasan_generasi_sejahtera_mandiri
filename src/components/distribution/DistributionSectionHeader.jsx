@@ -24,11 +24,14 @@ export function DistributionSectionHeader({
       )}
     >
       <div className="space-y-1">
-        <h2 className="text-lg sm:text-xl font-medium text-slate-900 tracking-tight">
-          {title}
-        </h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-1 h-5 rounded-xs bg-primary shrink-0" />
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-950 tracking-tight">
+            {title}
+          </h2>
+        </div>
         {description && (
-          <p className="text-sm font-normal text-slate-700 leading-relaxed">
+          <p className="text-sm font-normal text-slate-600 leading-relaxed pl-3.5">
             {description}
           </p>
         )}
