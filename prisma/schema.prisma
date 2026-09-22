@@ -145,13 +145,21 @@ model User {
   username     String?  @unique
   passwordHash String?
   phone        String?
-  role         String   @default("DONOR") // SUPER_ADMIN, ADMIN, FINANCE, VOLUNTEER, DONOR
-  title        String?  @default("Donatur Terdaftar")
-  avatar       String?
-  provider     String   @default("CREDENTIALS") // CREDENTIALS, GOOGLE, FACEBOOK
-  providerId   String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role            String   @default("DONOR") // SUPER_ADMIN, ADMIN, FINANCE, VOLUNTEER, DONOR
+  title           String?  @default("Donatur Terdaftar")
+  salutation      String?  @default("Bpk.")
+  bio             String?
+  city            String?
+  address         String?
+  coverImage      String?
+  bankName        String?
+  bankAccount     String?
+  bankAccountName String?
+  avatar          String?
+  provider        String   @default("CREDENTIALS") // CREDENTIALS, GOOGLE, FACEBOOK
+  providerId      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([email])
   @@index([role])

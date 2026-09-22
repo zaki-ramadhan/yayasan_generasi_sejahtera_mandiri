@@ -5,7 +5,7 @@ import { ProgramCatalog } from "@/components/modules/ProgramCatalog";
 import { CampaignCardSkeleton } from "@/components/shared/CampaignCardSkeleton";
 
 export const metadata = {
-  title: "Katalog Program Donasi & ZISWAF",
+  title: "Program Kebaikan & ZISWAF",
   description: "Temukan berbagai program kebaikan, beasiswa santri, tanggap bencana, dan zakat produktif YGSM.",
 };
 
@@ -18,7 +18,7 @@ export default async function ProgramPage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
       <PageHeader
-        title="Katalog Program Donasi & Penyaluran"
+        title="Program Kebaikan & Penyaluran Amanah"
         description="Pilih program yang ingin Anda bantu. Seluruh dana disalurkan secara transparan dan dilaporkan secara berkala kepada donatur."
       />
 

@@ -195,7 +195,7 @@ export function findUserByIdentifier(identifier) {
 
 export function getRedirectPathForRole(role) {
   if (role === USER_ROLES.DONOR) {
-    return "/";
+    return "/dashboard-donatur";
   }
   return "/dashboard";
 }

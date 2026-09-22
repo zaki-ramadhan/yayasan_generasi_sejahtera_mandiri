@@ -3,16 +3,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  User,
-  LogOut,
-  LayoutDashboard,
-  ChevronDown,
-  ShieldCheck,
-  HeartHandshake,
-  CalendarHeart,
-  FileSpreadsheet,
-} from "lucide-react";
+import { User, LogOut, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -115,16 +106,16 @@ export function NavUserDropdown({ currentUser, onLogout }) {
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <span className="font-bold text-xs text-slate-800">
+                <span className="font-medium text-sm text-slate-800">
                   {currentUser.initials || "U"}
                 </span>
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-sm text-slate-950 truncate leading-tight">
+              <p className="font-medium text-sm text-slate-950 truncate leading-tight">
                 {currentUser.name}
               </p>
-              <p className="text-xs text-slate-500 truncate leading-tight">
+              <p className="text-sm font-normal text-slate-500 truncate leading-tight">
                 {currentUser.email || roleLabel}
               </p>
             </div>
@@ -138,36 +129,65 @@ export function NavUserDropdown({ currentUser, onLogout }) {
           <DropdownMenuItem asChild>
             <Link
               href="/dashboard"
-              className="px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-900 hover:bg-slate-100 cursor-pointer"
+              className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-900 hover:bg-slate-100 cursor-pointer"
             >
               <span className="flex-1">Dashboard Yayasan</span>
             </Link>
           </DropdownMenuItem>
         )}
 
-        {/* Navigation Items */}
+        {/* Donor Portal Links */}
         <DropdownMenuItem asChild>
           <Link
-            href="/program"
-            className="px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
+            href="/dashboard-donatur"
+            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-900 hover:bg-slate-100 cursor-pointer"
           >
-            <span className="flex-1">Program Donasi</span>
+            <span className="flex-1">Dashboard Ikhtisar</span>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link
+            href="/riwayat-donasi"
+            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
+          >
+            <span className="flex-1">Riwayat Donasi</span>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link
+            href="/profil"
+            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
+          >
+            <span className="flex-1">Profil Saya</span>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link
             href="/donasi-rutin"
-            className="px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
+            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
           >
             <span className="flex-1">Komitmen Donasi Rutin</span>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator className="my-1 border-slate-100" />
+
+        <DropdownMenuItem asChild>
+          <Link
+            href="/program"
+            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
+          >
+            <span className="flex-1">Program Kebaikan</span>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link
             href="/laporan"
-            className="px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
+            className="px-2.5 py-2 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-100 cursor-pointer"
           >
             <span className="flex-1">Laporan Transparansi</span>
           </Link>
@@ -175,10 +195,10 @@ export function NavUserDropdown({ currentUser, onLogout }) {
 
         <DropdownMenuSeparator className="my-1 border-slate-100" />
 
-        {/* Logout Item */}
+        {/* Logout Item (Only item with icon) */}
         <DropdownMenuItem
           onClick={onLogout}
-          className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 cursor-pointer focus:bg-rose-50 focus:text-rose-700"
+          className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 cursor-pointer focus:bg-rose-50 focus:text-rose-700"
         >
           <LogOut className="w-4 h-4 text-rose-500 shrink-0" />
           <span>Keluar dari Akun</span>

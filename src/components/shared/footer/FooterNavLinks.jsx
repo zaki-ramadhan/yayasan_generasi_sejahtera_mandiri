@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const DEFAULT_NAV_LINKS = [
-  { href: "/program", label: "Katalog Program" },
+  { href: "/program", label: "Program Kebaikan" },
   { href: "/kalkulator-zakat", label: "Kalkulator ZISWAF" },
   { href: "/laporan", label: "Laporan Keuangan" },
   { href: "/tentang-kami", label: "Profil Pengurus" },
