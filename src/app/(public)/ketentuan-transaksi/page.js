@@ -24,14 +24,12 @@ export default function KetentuanTransaksiPage() {
       {/* Table 1: Virtual Account (VA) */}
       <TransactionLimitTable
         title="Virtual Account (VA)"
-        description="Batas nominal donasi per transaksi melalui Virtual Account perbankan."
         items={VA_TRANSACTION_LIMITS}
       />
 
       {/* Table 2: E-Wallet & QRIS */}
       <TransactionLimitTable
         title="E-Wallet & QRIS"
-        description="Batas nominal donasi per transaksi melalui QRIS dan dompet digital."
         items={EWALLET_QRIS_TRANSACTION_LIMITS}
       />
     </main>

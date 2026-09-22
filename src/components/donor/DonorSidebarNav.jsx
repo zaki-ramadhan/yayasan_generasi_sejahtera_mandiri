@@ -11,6 +11,9 @@ import {
   LogOut,
   ChevronRight,
   Shield,
+  Home,
+  HeartHandshake,
+  Newspaper,
 } from "lucide-react";
 import { logoutUser } from "@/services/authService";
 import { cn } from "@/lib/utils";
@@ -47,6 +50,24 @@ export function DonorSidebarNav({
     },
   ];
 
+  const publicNavItems = [
+    {
+      label: "Beranda Utama",
+      href: "/",
+      icon: Home,
+    },
+    {
+      label: "Program Donasi",
+      href: "/program",
+      icon: HeartHandshake,
+    },
+    {
+      label: "Kabar & Artikel",
+      href: "/artikel",
+      icon: Newspaper,
+    },
+  ];
+
   const isStaff = currentUser?.role && currentUser.role !== "DONOR";
   const salutation = currentUser?.salutation ? `${currentUser.salutation} ` : "";
   const displayName = `${salutation}${currentUser?.name || "Donatur"}`;
@@ -58,13 +79,13 @@ export function DonorSidebarNav({
         {/* Brand Header */}
         <div className="flex items-center pb-3 border-b border-slate-200">
           <Link
-            href="/donatur/dashboard"
+            href="/"
             onClick={onCloseMobile}
             className={cn(
               "flex items-center group transition-all",
               isCollapsed ? "justify-center w-full" : "gap-2.5 w-full"
             )}
-            title="Portal Donatur YGSM"
+            title="Kembali ke Beranda Utama Yayasan GSM"
           >
             <div className="relative w-8.5 h-8.5 rounded-md overflow-hidden bg-white shrink-0 p-0.5 border border-slate-200 flex items-center justify-center">
               <Image
@@ -78,21 +99,21 @@ export function DonorSidebarNav({
             {!isCollapsed && (
               <div className="min-w-0 flex-1 truncate">
                 <span className="font-medium text-sm block text-slate-950 leading-tight group-hover:text-primary transition-colors truncate">
-                  Portal Donatur
+                  Yayasan GSM
                 </span>
                 <span className="text-xs font-normal text-slate-500 block truncate">
-                  Yayasan GSM
+                  Kembali ke Beranda
                 </span>
               </div>
             )}
           </Link>
         </div>
 
-        {/* Main Navigation */}
+        {/* Main Navigation (Portal Donatur) */}
         <div className="space-y-1">
           {!isCollapsed && (
             <p className="px-2 text-xs font-medium text-slate-400 uppercase tracking-wider truncate">
-              Menu Utama
+              Menu Donatur
             </p>
           )}
           <nav className="space-y-1 pt-0.5">
@@ -125,6 +146,45 @@ export function DonorSidebarNav({
                         : "text-slate-400 group-hover:text-slate-600"
                     )}
                   />
+                  {!isCollapsed && (
+                    <span className="flex-1 truncate whitespace-nowrap">
+                      {item.label}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Website Utama Navigation */}
+        <div className="space-y-1 pt-3 border-t border-slate-200">
+          {!isCollapsed && (
+            <p className="px-2 text-xs font-medium text-slate-400 uppercase tracking-wider truncate">
+              Website Utama
+            </p>
+          )}
+          <nav className="space-y-1 pt-0.5">
+            {publicNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onCloseMobile}
+                  title={isCollapsed ? item.label : undefined}
+                  className={cn(
+                    "flex items-center rounded-md text-sm font-normal transition-colors",
+                    isCollapsed
+                      ? "justify-center p-2.5"
+                      : "gap-2.5 px-3 py-2",
+                    isActive
+                      ? "bg-white text-slate-950 font-normal border border-slate-200/90"
+                      : "text-slate-600 hover:text-slate-950 hover:bg-slate-200/50"
+                  )}
+                >
+                  <Icon className="w-5 h-5 shrink-0 text-slate-400 group-hover:text-slate-600" />
                   {!isCollapsed && (
                     <span className="flex-1 truncate whitespace-nowrap">
                       {item.label}

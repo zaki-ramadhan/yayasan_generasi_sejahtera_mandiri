@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function DonorMobileHeader({ currentUser, isOpen, onToggle }) {
@@ -23,7 +23,7 @@ export function DonorMobileHeader({ currentUser, isOpen, onToggle }) {
           {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </Button>
 
-        <Link href="/donatur/dashboard" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2" title="Kembali ke Beranda Utama Yayasan GSM">
           <div className="relative w-8 h-8 rounded-md overflow-hidden bg-white shrink-0 p-0.5 border border-slate-200 flex items-center justify-center">
             <Image
               src="/logo_yayasan_GSM.png"
@@ -35,17 +35,25 @@ export function DonorMobileHeader({ currentUser, isOpen, onToggle }) {
           </div>
           <div>
             <span className="font-medium text-sm block text-slate-950 leading-tight">
-              Portal Donatur
+              Yayasan GSM
             </span>
-            <span className="text-sm font-normal text-slate-500 block">
-              YGSM
+            <span className="text-xs font-normal text-slate-500 block">
+              Beranda Utama
             </span>
           </div>
         </Link>
       </div>
 
-      {currentUser && (
-        <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2">
+        <Link
+          href="/"
+          title="Ke Beranda Utama"
+          className="p-1.5 rounded-md border border-slate-200 text-slate-600 hover:text-slate-950 hover:bg-slate-50 transition-colors"
+        >
+          <Home className="w-4 h-4" />
+        </Link>
+
+        {currentUser && (
           <Link
             href="/donatur/profil"
             title={displayName}
@@ -64,8 +72,8 @@ export function DonorMobileHeader({ currentUser, isOpen, onToggle }) {
               </span>
             )}
           </Link>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 }

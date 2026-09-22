@@ -1,14 +1,11 @@
-"use client";
-
 import { TransactionLimitTableRow } from "./TransactionLimitTableRow";
 import {
   Table,
   TableHeader,
   TableBody,
   TableRow,
-  TableSortHeader,
+  TableHead,
   TableEmptyRow,
-  useTableSort,
 } from "@/components/ui/table";
 
 /**
@@ -25,16 +22,6 @@ import {
  * @param {Array<object>} props.items - Array of channel limit records
  */
 export function TransactionLimitTable({ title, description, items = [] }) {
-  const {
-    items: sortedItems,
-    sortBy,
-    sortOrder,
-    handleSort,
-  } = useTableSort(items, {
-    initialSortBy: "",
-    initialSortOrder: "asc",
-  });
-
   return (
     <div className="rounded-lg border border-slate-200 bg-white shadow-2xs overflow-hidden">
       {/* Table Header Bar */}
@@ -53,35 +40,20 @@ export function TransactionLimitTable({ title, description, items = [] }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableSortHeader
-              label="Saluran Pembayaran"
-              sortKey="name"
-              currentSortBy={sortBy}
-              currentSortOrder={sortOrder}
-              onSort={handleSort}
-              className="w-1/2"
-            />
-            <TableSortHeader
-              label="Batas Minimum"
-              sortKey="minAmount"
-              currentSortBy={sortBy}
-              currentSortOrder={sortOrder}
-              onSort={handleSort}
-              className="w-1/4"
-            />
-            <TableSortHeader
-              label="Batas Maksimum"
-              sortKey="maxAmount"
-              currentSortBy={sortBy}
-              currentSortOrder={sortOrder}
-              onSort={handleSort}
-              className="w-1/4"
-            />
+            <TableHead className="w-1/2 font-medium text-slate-900">
+              Saluran Pembayaran
+            </TableHead>
+            <TableHead className="w-1/4 font-medium text-slate-900">
+              Batas Minimum
+            </TableHead>
+            <TableHead className="w-1/4 font-medium text-slate-900">
+              Batas Maksimum
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedItems && sortedItems.length > 0 ? (
-            sortedItems.map((item) => (
+          {items && items.length > 0 ? (
+            items.map((item) => (
               <TransactionLimitTableRow
                 key={item.id}
                 item={item}
