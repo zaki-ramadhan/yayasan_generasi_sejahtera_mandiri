@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Info } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SocialAuthGroup } from "@/components/auth/SocialAuthGroup";
 import { AuthFormHeader } from "@/components/auth/AuthFormHeader";
+import { AuthNoticeBanner } from "@/components/auth/AuthNoticeBanner";
 import { AuthDivider } from "@/components/auth/AuthDivider";
 import { AuthPasswordInput } from "@/components/auth/AuthPasswordInput";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
@@ -162,15 +162,11 @@ export function LoginForm() {
 
       {/* Donation Auth Notice Banner */}
       {isDonationRedirect && (
-        <div className="p-3.5 rounded-lg bg-amber-50 border border-amber-300 text-amber-950 text-sm flex items-start gap-2.5 shadow-xs">
-          <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="space-y-0.5">
-            <p className="font-semibold text-amber-900">Perlu Masuk Akun Terlebih Dahulu</p>
-            <p className="text-xs text-amber-800 leading-relaxed">
-              Silakan masuk atau daftar akun untuk melanjutkan proses donasi dan pencatatan e-Kwitansi resmi atas nama Anda.
-            </p>
-          </div>
-        </div>
+        <AuthNoticeBanner
+          title="Perlu Masuk Akun Terlebih Dahulu"
+          description="Silakan masuk atau daftar akun untuk melanjutkan proses donasi dan pencatatan e-Kwitansi resmi atas nama Anda."
+          variant="amber"
+        />
       )}
 
       {/* Social Login Options (Google & Facebook) */}
@@ -253,7 +249,8 @@ export function LoginForm() {
         <Button
           type="submit"
           disabled={isLoading || isGoogleLoading}
-          className="w-full h-11 rounded-lg text-sm font-semibold text-white bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700 border-t border-t-blue-400 border-x border-x-blue-600 border-b-2 border-b-blue-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_6px_rgba(29,78,216,0.25)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all flex items-center justify-center cursor-pointer mt-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          variant="primary3d"
+          className="w-full h-11 rounded-lg text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? "Memverifikasi Kredensial..." : "Masuk ke Akun"}
         </Button>

@@ -56,7 +56,7 @@ function generateAllDonationsForCampaign(camp, campaignId) {
 
     const today = new Date("2026-09-17T12:00:00Z");
     const startDate = new Date(today);
-    startDate.setDate(today.getDate() - 45);
+    startDate.setDate(today.getDate() - 365);
 
     for (let i = 0; i < neededCount - 1; i++) {
       let amount = Math.max(25000, Math.round((avg * (0.5 + Math.random() * 0.9)) / 25000) * 25000);

@@ -149,6 +149,7 @@ export function loginUser(user) {
 export function redirectToGoogleOAuth(callbackUrl = "/") {
   if (typeof window === "undefined") return;
   const target = `/api/auth/google?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
   window.location.href = target;
 }
 
@@ -157,6 +158,7 @@ export function logoutUser() {
   localStorage.removeItem(AUTH_STORAGE_KEY);
   localStorage.removeItem("ygsm_auth_session");
   sessionStorage.removeItem("ygsm_just_logged_in");
+  sessionStorage.removeItem("zakat_calculator_state");
   window.dispatchEvent(new Event("ygsm_auth_change"));
   window.dispatchEvent(new Event("storage"));
 }
