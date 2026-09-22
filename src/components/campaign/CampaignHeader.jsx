@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { formatRupiah } from "@/lib/formatters";
+import { FundedAmountDisplay } from "@/components/campaign/FundedAmountDisplay";
 
 export function CampaignHeader({ campaign, progress }) {
 	const hasTarget = Boolean(
@@ -60,57 +61,32 @@ export function CampaignHeader({ campaign, progress }) {
 			<div className="lg:hidden space-y-3 pt-3 border-t border-slate-200">
 				{hasTarget ? (
 					<>
-						<Progress
-							value={
-								progress
-							}
-							className="h-2.5"
-						/>
+						<Progress value={progress} className="h-2.5" />
 						<div className="flex justify-between items-baseline text-sm sm:text-base">
-							<div>
-								<span className="text-sm text-slate-700 block">
-									Dana
-									Terkumpul
-								</span>
-								<span className="text-lg sm:text-xl font-semibold text-primary">
-									{formatRupiah(
-										campaign.collectedAmount,
-									)}
-								</span>
-							</div>
+							<FundedAmountDisplay
+								amount={campaign.collectedAmount}
+								labelClassName="text-sm text-slate-700 block"
+								amountClassName="text-lg sm:text-xl font-semibold text-primary block"
+							/>
 							<div className="text-right">
 								<span className="text-sm text-slate-700 block">
-									Target
-									(
-									{
-										progress
-									}
-									%)
+									Target ({progress}%)
 								</span>
 								<span className="text-slate-900 font-medium text-sm sm:text-base">
-									{formatRupiah(
-										campaign.targetAmount,
-									)}
+									{formatRupiah(campaign.targetAmount)}
 								</span>
 							</div>
 						</div>
 					</>
 				) : (
 					<div className="flex justify-between items-center">
-						<div>
-							<span className="text-sm text-slate-700 block">
-								Dana
-								Terkumpul
-							</span>
-							<span className="text-lg sm:text-xl font-semibold text-primary">
-								{formatRupiah(
-									campaign.collectedAmount,
-								)}
-							</span>
-						</div>
+						<FundedAmountDisplay
+							amount={campaign.collectedAmount}
+							labelClassName="text-sm text-slate-700 block"
+							amountClassName="text-lg sm:text-xl font-semibold text-primary block"
+						/>
 						<span className="text-xs sm:text-sm font-medium text-slate-600">
-							Program
-							Berkelanjutan
+							Program Berkelanjutan
 						</span>
 					</div>
 				)}

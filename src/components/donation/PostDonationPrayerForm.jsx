@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { AnonymousCheckbox } from "@/components/donation/AnonymousCheckbox";
+import { PrayerTextarea } from "@/components/donation/PrayerTextarea";
 import { sanitizePrayer } from "@/lib/security";
 import { markPrayerSubmitted } from "@/lib/donorStorage";
 import { cn } from "@/lib/utils";
@@ -82,50 +84,20 @@ export function PostDonationPrayerForm({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
-        <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor={`prayer-input-${invoiceId}`}
-              className="text-xs font-semibold text-slate-700"
-            >
-              Pesan Doa atau Harapan <span className="text-rose-500">*</span>
-            </label>
-            <span className="text-xs text-slate-500 font-normal">
-              {prayer.length}/150 karakter
-            </span>
-          </div>
+        <PrayerTextarea
+          id={`prayer-input-${invoiceId}`}
+          rows={2}
+          value={prayer}
+          onChange={handlePrayerChange}
+          error={errorMessage}
+        />
 
-          <textarea
-            id={`prayer-input-${invoiceId}`}
-            rows={2}
-            maxLength={150}
-            value={prayer}
-            onChange={handlePrayerChange}
-            placeholder="Tuliskan doa atau permohonan kebaikan Anda..."
-            className={cn(
-              "w-full rounded-lg border bg-white p-2.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors resize-none font-normal",
-              errorMessage
-                ? "border-rose-400 focus:ring-rose-200"
-                : "border-slate-300 focus:ring-primary/20 focus:border-primary"
-            )}
-          />
-
-          {errorMessage && (
-            <p className="text-xs text-rose-600 font-medium">{errorMessage}</p>
-          )}
-        </div>
-
-        <label className="flex items-center gap-2 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={isAnonymous}
-            onChange={(e) => setIsAnonymous(e.target.checked)}
-            className="w-3.5 h-3.5 text-primary rounded border-slate-300 focus:ring-primary cursor-pointer"
-          />
-          <span className="text-xs text-slate-600 font-normal">
-            Kirim sebagai Hamba Allah (tanpa nama terang)
-          </span>
-        </label>
+        <AnonymousCheckbox
+          id={`prayer-anonymous-${invoiceId}`}
+          checked={isAnonymous}
+          onChange={setIsAnonymous}
+          variant="inline"
+        />
 
         <div className="flex justify-end pt-0.5">
           <Button

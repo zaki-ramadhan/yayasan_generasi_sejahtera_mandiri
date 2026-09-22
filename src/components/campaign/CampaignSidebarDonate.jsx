@@ -4,8 +4,10 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { formatRupiah, isCampaignClosed } from "@/lib/formatters";
 import { CampaignPrayersSidebar } from "@/components/modules/CampaignPrayersSidebar";
+import { FundedAmountDisplay } from "@/components/campaign/FundedAmountDisplay";
+import { SidebarTourButton } from "@/components/campaign/SidebarTourButton";
 
-export function CampaignSidebarDonate({ campaign, progress, daysLeft }) {
+export function CampaignSidebarDonate({ campaign, progress, daysLeft, hasDonations = false }) {
 	const hasTarget = Boolean(
 		campaign.targetAmount &&
 		Number(
@@ -19,19 +21,15 @@ export function CampaignSidebarDonate({ campaign, progress, daysLeft }) {
 	const isClosed = isCampaignClosed(campaign);
 
 	return (
-		<div className="lg:col-span-4 hidden lg:block sticky top-24 space-y-4">
+		<div id="tour-sidebar-donate" className="lg:col-span-4 hidden lg:block sticky top-24 space-y-4">
 			<div className="px-6 sm:px-7 py-6 sm:py-5 bg-white rounded-xl border border-slate-300 space-y-4 shadow-xs">
 				{hasTarget ? (
 					<div className="space-y-2.5">
-						<span className="text-sm sm:text-base text-slate-700 block font-normal">
-							Dana
-							Terkumpul
-						</span>
-						<div className="text-3xl font-semibold text-slate-950 tracking-tight">
-							{formatRupiah(
-								campaign.collectedAmount,
-							)}
-						</div>
+						<FundedAmountDisplay
+							amount={campaign.collectedAmount}
+							labelClassName="text-sm sm:text-base text-slate-700 block font-normal"
+							amountClassName="text-3xl font-semibold text-slate-950 tracking-tight block"
+						/>
 						<div className="text-sm sm:text-base text-slate-700 flex justify-between items-center pt-1">
 							<span>
 								Target:{" "}
@@ -57,74 +55,39 @@ export function CampaignSidebarDonate({ campaign, progress, daysLeft }) {
 					</div>
 				) : (
 					<div className="space-y-2.5">
-						<span className="text-sm sm:text-base text-slate-700 block font-normal">
-							Dana
-							Terkumpul
-						</span>
-						<div className="text-3xl font-semibold text-slate-950 tracking-tight">
-							{formatRupiah(
-								campaign.collectedAmount,
-							)}
-						</div>
-						<p className="text-xs text-slate-500 leading-relaxed pt-0.5">
-							Program
-							bantuan
-							dan
-							operasional
-							rutin
-							berkelanjutan
-							untuk
-							kemaslahatan
-							umat.
-						</p>
+						<FundedAmountDisplay
+							amount={campaign.collectedAmount}
+							labelClassName="text-sm sm:text-base text-slate-700 block font-normal"
+							amountClassName="text-3xl font-semibold text-slate-950 tracking-tight block"
+						/>
 					</div>
 				)}
 
 				{/* Metrics row */}
-				{hasEndDate ? (
-					<div className="grid grid-cols-2 divide-x divide-slate-200 py-3.5 border-y border-slate-200 text-center">
-						<div className="pr-3">
-							<span className="block font-semibold text-slate-950 text-xl sm:text-2xl">
-								{
-									campaign.donorCount
-								}
-							</span>
-							<span className="text-sm text-slate-700">
-								Orang
-								Baik
-							</span>
-						</div>
-						<div className="pl-3">
-							<span className="block font-semibold text-slate-950 text-xl sm:text-2xl">
-								{isClosed
-									? "Selesai"
-									: daysLeft >
-										  0
-										? daysLeft
-										: 0}
-							</span>
-							<span className="text-sm text-slate-700">
-								{isClosed
-									? "Status"
-									: "Hari Tersisa"}
-							</span>
-						</div>
-					</div>
-				) : (
-					<div className="py-3.5 border-y border-slate-200 text-center">
+				<div className="grid grid-cols-2 divide-x divide-slate-200 py-3.5 border-y border-slate-200 text-center">
+					<div className="pr-3">
 						<span className="block font-semibold text-slate-950 text-xl sm:text-2xl">
-							{
-								campaign.donorCount
-							}
+							{campaign.donorCount}
 						</span>
 						<span className="text-sm text-slate-700">
-							Orang
-							Baik
-							Telah
-							Berdonasi
+							Orang Baik
 						</span>
 					</div>
-				)}
+					<div className="pl-3">
+						<span className="block font-semibold text-slate-950 text-xl sm:text-2xl">
+							{isClosed
+								? "Selesai"
+								: hasEndDate && daysLeft > 0
+								? daysLeft
+								: hasEndDate && daysLeft <= 0
+								? 0
+								: "-"}
+						</span>
+						<span className="text-sm text-slate-700">
+							{isClosed ? "Status" : "Hari Tersisa"}
+						</span>
+					</div>
+				</div>
 
 				{/* Donation CTA or Closed State */}
 				{isClosed ? (
@@ -160,18 +123,20 @@ export function CampaignSidebarDonate({ campaign, progress, daysLeft }) {
 					</div>
 				) : (
 					<>
-						<Link
-							href={`/campaign/${campaign.slug}/donate`}
-							className="block"
-						>
-							<Button
-								size="lg"
-								className="w-full text-base font-semibold h-12 shadow-xs rounded-lg bg-primary hover:bg-primary-hover text-white cursor-pointer"
+						<div className="flex items-center gap-2">
+							<Link
+								href={`/campaign/${campaign.slug}/donate`}
+								className="flex-1"
 							>
-								Donasi
-								Sekarang
-							</Button>
-						</Link>
+								<Button
+									size="lg"
+									className="w-full text-base font-semibold h-12 shadow-xs rounded-lg bg-primary hover:bg-primary-hover text-white cursor-pointer"
+								>
+									Donasi Sekarang
+								</Button>
+							</Link>
+							<SidebarTourButton slug={campaign.slug} hasDonations={hasDonations} />
+						</div>
 
 						<div className="text-sm text-slate-700 text-center flex items-center justify-center gap-1.5">
 							<ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />

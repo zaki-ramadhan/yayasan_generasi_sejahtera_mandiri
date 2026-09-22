@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AnonymousCheckbox } from "@/components/donation/AnonymousCheckbox";
+import { PrayerTextarea } from "@/components/donation/PrayerTextarea";
 import { toast } from "@/hooks/use-toast";
 import { sanitizePrayer } from "@/lib/security";
 import { cn } from "@/lib/utils";
@@ -111,54 +113,23 @@ export function PrayerWriteDialog({
             />
 
             {/* Opsi Anonim */}
-            <label className="flex items-center gap-2 pt-0.5 cursor-pointer select-none">
-              <input
-                id="prayer-anonymous-checkbox"
-                type="checkbox"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-                className="w-3.5 h-3.5 text-primary rounded border-slate-300 focus:ring-primary cursor-pointer"
-              />
-              <span className="text-xs text-slate-600 font-normal">
-                Sembunyikan nama saya (sebagai Hamba Allah)
-              </span>
-            </label>
+            <AnonymousCheckbox
+              id="prayer-anonymous-checkbox"
+              checked={isAnonymous}
+              onChange={setIsAnonymous}
+              variant="inline"
+              className="pt-0.5"
+            />
           </div>
 
           {/* Input Pesan Doa */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label htmlFor="prayer-message-text" className="text-xs font-medium text-slate-800">
-                Untaian Doa &amp; Harapan
-              </label>
-              <span
-                className={`text-[11px] tabular-nums ${
-                  prayer.length >= 140 ? "text-amber-600 font-semibold" : "text-slate-400"
-                }`}
-              >
-                {prayer.length}/150
-              </span>
-            </div>
-            <textarea
-              id="prayer-message-text"
-              rows={3}
-              maxLength={150}
-              placeholder="Tuliskan doa terbaik untuk saudara kita yang membutuhkan..."
-              value={prayer}
-              onChange={handlePrayerChange}
-              className={cn(
-                "w-full rounded-lg border bg-white p-2.5 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors resize-none font-normal",
-                errorMessage
-                  ? "border-rose-400 focus:ring-rose-200"
-                  : "border-slate-300 focus:ring-primary/20 focus:border-primary"
-              )}
-            />
-            {errorMessage && (
-              <p className="text-xs text-rose-600 font-medium" role="alert">
-                {errorMessage}
-              </p>
-            )}
-          </div>
+          <PrayerTextarea
+            id="prayer-message-text"
+            value={prayer}
+            onChange={handlePrayerChange}
+            error={errorMessage}
+            placeholder="Tuliskan doa terbaik untuk saudara kita yang membutuhkan..."
+          />
 
           {/* Aksi Kirim */}
           <div className="pt-2 flex flex-col gap-2.5">

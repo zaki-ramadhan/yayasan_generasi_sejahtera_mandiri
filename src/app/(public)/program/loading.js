@@ -23,7 +23,7 @@ export default function ProgramLoading() {
       </div>
 
       {/* Campaign Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 pt-2">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
           <CampaignCardSkeleton key={n} />
         ))}

@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { ChevronDown, Check } from "lucide-react";
-
 import {
   ChartContainer,
   ChartLegend,
@@ -11,26 +9,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { SortDropdown } from "@/components/shared/SortDropdown";
 import { formatRupiah, formatCompactNumber } from "@/lib/formatters";
+import { TIME_RANGE_OPTIONS, VIEW_MODE_OPTIONS } from "@/data/chartOptions";
 import { cn } from "@/lib/utils";
-
-const TIME_RANGE_OPTIONS = [
-  { value: "90d", label: "90 Hari Terakhir" },
-  { value: "30d", label: "30 Hari Terakhir" },
-  { value: "7d", label: "7 Hari Terakhir" },
-];
-
-const VIEW_MODE_OPTIONS = [
-  { value: "all", label: "Grafik Gabungan" },
-  { value: "daily", label: "Donasi Harian" },
-  { value: "cumulative", label: "Total Akumulasi" },
-];
 
 const chartConfig = {
   cumulativeAmount: {
@@ -197,69 +179,22 @@ export function CampaignDonationGrowthChart({
 
         {/* Controls: View Mode Selector + Range Selector */}
         <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
-          {/* View Mode Selector Dropdown */}
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 w-fit whitespace-nowrap"
-              >
-                <span>
-                  {VIEW_MODE_OPTIONS.find((opt) => opt.value === viewMode)?.label || "Pilih Tampilan"}
-                </span>
-                <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-auto min-w-[var(--radix-dropdown-menu-trigger-width)] max-w-xs bg-white border border-slate-200 shadow-md rounded-lg p-1 z-50 whitespace-nowrap">
-              {VIEW_MODE_OPTIONS.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.value}
-                  onClick={() => setViewMode(opt.value)}
-                  className={cn(
-                    "flex items-center justify-between gap-3 px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors whitespace-nowrap",
-                    viewMode === opt.value
-                      ? "bg-slate-100 font-semibold text-primary"
-                      : "text-slate-800 hover:bg-slate-100"
-                  )}
-                >
-                  <span>{opt.label}</span>
-                  {viewMode === opt.value && <Check className="w-4 h-4 text-primary shrink-0 ml-1.5" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Range Selector */}
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 w-fit whitespace-nowrap"
-              >
-                <span>
-                  {TIME_RANGE_OPTIONS.find((opt) => opt.value === timeRange)?.label || "Pilih Rentang"}
-                </span>
-                <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-auto min-w-[var(--radix-dropdown-menu-trigger-width)] max-w-xs bg-white border border-slate-200 shadow-md rounded-lg p-1 z-50 whitespace-nowrap">
-              {TIME_RANGE_OPTIONS.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.value}
-                  onClick={() => setTimeRange(opt.value)}
-                  className={cn(
-                    "flex items-center justify-between gap-3 px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors whitespace-nowrap",
-                    timeRange === opt.value
-                      ? "bg-slate-100 font-semibold text-primary"
-                      : "text-slate-800 hover:bg-slate-100"
-                  )}
-                >
-                  <span>{opt.label}</span>
-                  {timeRange === opt.value && <Check className="w-4 h-4 text-primary shrink-0 ml-1.5" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <SortDropdown
+            options={VIEW_MODE_OPTIONS}
+            value={viewMode}
+            onChange={setViewMode}
+            label="Pilih Tampilan"
+            align="end"
+            className="h-9 text-xs sm:text-sm w-fit whitespace-nowrap"
+          />
+          <SortDropdown
+            options={TIME_RANGE_OPTIONS}
+            value={timeRange}
+            onChange={setTimeRange}
+            label="Pilih Rentang"
+            align="end"
+            className="h-9 text-xs sm:text-sm w-fit whitespace-nowrap"
+          />
         </div>
       </div>
 

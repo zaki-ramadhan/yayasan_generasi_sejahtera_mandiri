@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { formatRupiah, formatNumber } from "@/lib/formatters";
+import { CurrencyInput } from "@/components/ui/CurrencyInput";
+import { NominalGridPicker } from "@/components/donation/NominalGridPicker";
+import { formatRupiah } from "@/lib/formatters";
 import { getStoredUser } from "@/services/authService";
-import { cn } from "@/lib/utils";
 
 const PRESET_AMOUNTS = [25000, 50000, 100000];
 
@@ -28,13 +28,17 @@ export function QuickDonateBar({ defaultCampaignSlug = "beasiswa-santri-penghafa
     setSelectedAmount(num || 0);
   };
 
-  const handleCustomChange = (e) => {
-    const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
-    const num = Number(raw);
-    const clamped = Math.min(num, 100000000);
-    const finalRaw = clamped > 0 ? String(clamped) : (raw === "" ? "" : "0");
-    setCustomAmount(finalRaw);
+  const handleCustomChange = (clamped, raw) => {
+    setCustomAmount(raw);
     setSelectedAmount(clamped);
+  };
+
+  const handleCustomBlur = () => {
+    const num = Number(customAmount);
+    if (customAmount !== "" && num < 10000) {
+      setCustomAmount("10000");
+      setSelectedAmount(10000);
+    }
   };
 
   const finalAmount = isCustomMode ? (customAmount ? Number(customAmount) : 0) : selectedAmount;
@@ -59,9 +63,9 @@ export function QuickDonateBar({ defaultCampaignSlug = "beasiswa-santri-penghafa
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative bg-white rounded-xl border border-slate-300 p-6 sm:p-7 space-y-5 shadow-md"
+      className="relative bg-white rounded-xl border border-slate-300 p-6 sm:p-7 space-y-3 shadow-md"
     >
-      {/* Header Form: Teks dan Aset 3D Sejajar dalam satu parent */}
+      {/* Header Form */}
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-0.5 min-w-0">
           <h2 className="text-base font-semibold text-slate-950">
@@ -71,73 +75,43 @@ export function QuickDonateBar({ defaultCampaignSlug = "beasiswa-santri-penghafa
         </div>
       </div>
 
-      {/* Amount Presets */}
+      {/* Amount Presets Grid */}
       <div className="space-y-2">
-        <div className="grid grid-cols-2 sm:grid-cols-2 gap-2.5">
-          {PRESET_AMOUNTS.map((amt) => {
-            const isSelected = !isCustomMode && selectedAmount === amt;
-            return (
-              <button
-                key={amt}
-                type="button"
-                onClick={() => handlePresetSelect(amt)}
-                className={cn(
-                  "py-2.5 px-3 rounded-lg text-sm border transition-all text-center cursor-pointer min-h-[56px] flex items-center justify-center",
-                  isSelected
-                    ? "bg-blue-50 text-blue-950 border-blue-600 ring-1 ring-blue-600 font-semibold shadow-2xs"
-                    : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50 font-medium"
-                )}
-              >
-                {formatRupiah(amt)}
-              </button>
-            );
-          })}
-
-          {/* Option: Nominal Lainnya */}
-          <button
-            type="button"
-            onClick={handleCustomModeClick}
-            className={cn(
-              "py-2.5 px-3 rounded-lg text-sm border transition-all text-center cursor-pointer min-h-[42px] flex items-center justify-center",
-              isCustomMode
-                ? "bg-blue-50 text-blue-950 border-blue-600 ring-1 ring-blue-600 font-semibold shadow-2xs"
-                : "bg-white border-slate-300 text-slate-800 hover:bg-slate-50 font-medium"
-            )}
-          >
-            Lainnya
-          </button>
-        </div>
+        <NominalGridPicker
+          presets={PRESET_AMOUNTS}
+          selectedAmount={selectedAmount}
+          isCustomMode={isCustomMode}
+          onSelectPreset={handlePresetSelect}
+          onSelectCustom={handleCustomModeClick}
+          columns="2"
+          buttonHeight="lg"
+        />
       </div>
 
-      {/* Custom Nominal Input: Only rendered when isCustomMode is active */}
+      {/* Custom Nominal Input */}
       {isCustomMode && (
         <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
           <label className="text-sm font-semibold text-slate-800 block">
             Nominal Lainnya (Min. Rp 10.000)
           </label>
-          <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-normal text-slate-500">
-              Rp
-            </span>
-            <input
-              type="text"
-              inputMode="numeric"
-              autoFocus
-              value={customAmount ? formatNumber(Number(customAmount)) : ""}
-              onChange={handleCustomChange}
-              placeholder="0"
-              className="w-full h-11 pl-10 pr-3 rounded-lg border border-slate-300 text-base font-normal text-slate-950 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-            />
-          </div>
+          <CurrencyInput
+            autoFocus
+            min={10000}
+            placeholder="10.000"
+            value={customAmount}
+            onChange={handleCustomChange}
+            onBlur={handleCustomBlur}
+          />
         </div>
       )}
 
-      {/* CTA Button with Primary 3D styling */}
-      <div className="space-y-2.5 pt-1">
+      {/* CTA Button */}
+      <div className="space-y-2.5">
         <Button
           type="submit"
           disabled={finalAmount < 10000}
-          className="w-full h-12 rounded-lg text-base font-semibold text-white bg-gradient-to-b from-blue-600 via-blue-700 to-blue-800 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700 border-t border-t-blue-400 border-x border-x-blue-600 border-b-2 border-b-blue-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_6px_rgba(29,78,216,0.25)] active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all flex items-center justify-center cursor-pointer"
+          variant="primary3d"
+          className="w-full h-12 rounded-lg text-base"
         >
           Lanjutkan {formatRupiah(finalAmount)}
         </Button>

@@ -1,5 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { sanitizeName, sanitizePhone, sanitizeEmail } from "@/lib/security";
+import { AnonymousCheckbox } from "@/components/donation/AnonymousCheckbox";
+import { PrayerTextarea } from "@/components/donation/PrayerTextarea";
+import { CheckoutStepHeader } from "@/components/donation/CheckoutStepHeader";
 
 export function DonorIdentitySection({
   isAnonymous,
@@ -17,27 +20,13 @@ export function DonorIdentitySection({
 }) {
   return (
     <div className="bg-white p-5 sm:p-6 rounded-xl border border-slate-300 space-y-4 shadow-xs">
-      <div className="flex items-center gap-2.5">
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold shrink-0">
-          3
-        </span>
-        <h2 className="text-base sm:text-lg font-semibold text-slate-950">
-          Data Donatur &amp; Doa Kebaikan
-        </h2>
-      </div>
+      <CheckoutStepHeader step={3} title="Data Donatur & Doa Kebaikan" />
 
       {/* Anonim checkbox */}
-      <label className="flex items-center gap-2.5 p-3 rounded-lg bg-slate-50 border border-slate-300 cursor-pointer select-none">
-        <input
-          type="checkbox"
-          checked={isAnonymous}
-          onChange={(e) => setIsAnonymous(e.target.checked)}
-          className="w-4 h-4 text-primary rounded border-slate-300 focus:ring-primary cursor-pointer"
-        />
-        <span className="text-sm font-normal text-slate-800">
-          Sembunyikan nama saya (Tampilkan sebagai Hamba Allah)
-        </span>
-      </label>
+      <AnonymousCheckbox
+        checked={isAnonymous}
+        onChange={setIsAnonymous}
+      />
 
       {!isAnonymous && (
         <div className="space-y-1.5">
@@ -85,34 +74,18 @@ export function DonorIdentitySection({
 
       {/* Doa / Pesan Kebaikan (Maksimal 1 doa per orang) */}
       <div className="space-y-1.5 pt-1">
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-slate-800 block">
-            Doa atau Titipan Harapan (Opsional)
-          </label>
-          <span className="text-sm text-slate-500 font-normal">
-            {prayer.length}/150 karakter
-          </span>
-        </div>
-
         {hasExistingPrayer && !prayer && (
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-600 font-normal">
             Anda telah menitipkan doa untuk program ini sebelumnya. Tuliskan pesan di bawah jika ingin memperbarui doa Anda.
           </div>
         )}
 
-        <textarea
-          rows={3}
-          maxLength={150}
+        <PrayerTextarea
           value={prayer}
           onChange={onPrayerChange}
           onBlur={() => setPrayer((prev) => prev.trim().replace(/\s+/g, " "))}
-          placeholder="Tuliskan doa atau permohonan kebaikan Anda..."
-          className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors font-normal resize-none"
+          showInfo
         />
-
-        <p className="text-sm text-slate-700 font-normal">
-          Untaian doa Anda akan ditampilkan di tab doa program untuk diaminkan bersama donatur lainnya.
-        </p>
       </div>
     </div>
   );

@@ -15,14 +15,12 @@ import { PrayerChatBubble } from "@/components/modules/PrayerChatBubble";
 import { PrayerInputBar } from "@/components/modules/PrayerInputBar";
 import { usePrayersSync } from "@/hooks/usePrayersSync";
 import { getStoredUser } from "@/services/authService";
+import { PRAYER_SORT_OPTIONS } from "@/data/sortOptions";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 5;
 
-const SORT_OPTIONS = [
-  { value: "terbaru", label: "Terbaru" },
-  { value: "terpopuler", label: "Terbanyak Diaminkan" },
-];
+
 
 export function CampaignPrayersSidebar({ initialDonors = [], campaignSlug }) {
   const { donors, aminedSet, handleToggleAmin } = usePrayersSync(initialDonors);
@@ -122,10 +120,10 @@ export function CampaignPrayersSidebar({ initialDonors = [], campaignSlug }) {
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[130px] shadow-2xs"
+              className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm font-normal text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer h-9 min-w-[130px] shadow-2xs"
             >
               <span className="truncate">
-                {SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || "Urutkan"}
+                {PRAYER_SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || "Urutkan"}
               </span>
               <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
             </button>
@@ -134,14 +132,14 @@ export function CampaignPrayersSidebar({ initialDonors = [], campaignSlug }) {
             align="end"
             className="w-52 bg-white border border-slate-200 shadow-md rounded-lg p-1"
           >
-            {SORT_OPTIONS.map((opt) => (
+            {PRAYER_SORT_OPTIONS.map((opt) => (
               <DropdownMenuItem
                 key={opt.value}
                 onClick={() => setSortBy(opt.value)}
                 className={cn(
-                  "flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors",
+                  "flex items-center justify-between px-3 py-2 text-sm font-normal rounded-md cursor-pointer transition-colors",
                   sortBy === opt.value
-                    ? "bg-slate-100 font-semibold text-primary"
+                    ? "bg-slate-100 text-primary"
                     : "text-slate-800 hover:bg-slate-100"
                 )}
               >
@@ -184,7 +182,9 @@ export function CampaignPrayersSidebar({ initialDonors = [], campaignSlug }) {
       </div>
 
       {/* Input bar */}
-      <PrayerInputBar onSend={handleSend} />
+      <div id="tour-prayer-input">
+        <PrayerInputBar onSend={handleSend} />
+      </div>
     </div>
   );
 }

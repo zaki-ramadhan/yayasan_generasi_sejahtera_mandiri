@@ -1,13 +1,9 @@
 "use client";
 
 import { useState, useMemo, useCallback, useSyncExternalStore } from "react";
-import { ChevronDown, Check, Loader2 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { Loader2 } from "lucide-react";
+import { PRAYER_SORT_OPTIONS } from "@/data/sortOptions";
+import { SortDropdown } from "@/components/shared/SortDropdown";
 import { PrayerCard } from "@/components/modules/PrayerCard";
 import { PostDonationPrayerForm } from "@/components/donation/PostDonationPrayerForm";
 import { getPendingDonationForCampaign, PRAYER_SUBMITTED_EVENT } from "@/lib/donorStorage";
@@ -17,10 +13,7 @@ import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 6;
 
-const SORT_OPTIONS = [
-  { value: "terbaru", label: "Terbaru" },
-  { value: "terpopuler", label: "Terbanyak Diaminkan" },
-];
+
 
 function subscribePendingDonation(callback) {
   window.addEventListener(PRAYER_SUBMITTED_EVENT, callback);
@@ -104,39 +97,22 @@ export function CampaignPrayersFeed({ initialDonors = [], campaignSlug, campaign
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 hover:bg-slate-50 focus:outline-none transition-colors cursor-pointer"
-              >
-                <span>{SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label || "Urutkan"}</span>
-                <ChevronDown className="h-4 w-4 text-slate-500 shrink-0" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 bg-white border border-slate-200 shadow-md rounded-lg p-1">
-              {SORT_OPTIONS.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.value}
-                  onClick={() => { setSortBy(opt.value); setVisibleCount(PAGE_SIZE); }}
-                  className={cn(
-                    "flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md cursor-pointer transition-colors",
-                    sortBy === opt.value
-                      ? "bg-slate-100 font-semibold text-primary"
-                      : "text-slate-800 hover:bg-slate-100"
-                  )}
-                >
-                  <span>{opt.label}</span>
-                  {sortBy === opt.value && <Check className="w-4 h-4 text-primary shrink-0 ml-2" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <SortDropdown
+            options={PRAYER_SORT_OPTIONS}
+            value={sortBy}
+            onChange={(val) => {
+              setSortBy(val);
+              setVisibleCount(PAGE_SIZE);
+            }}
+            label="Urutkan"
+            className="h-9 text-xs sm:text-sm"
+          />
         </div>
       </div>
 
       {/* Post-Donation Prayer Form */}
       {pendingDonation && (
+        <div id="tour-prayer-input">
         <PostDonationPrayerForm
           invoiceId={pendingDonation.invoiceId}
           campaignSlug={campaignSlug}
@@ -156,6 +132,7 @@ export function CampaignPrayersFeed({ initialDonors = [], campaignSlug, campaign
             }
           }}
         />
+        </div>
       )}
 
       {/* Scrollable prayer grid — scroll ke bawah untuk load lebih */}
