@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { ChevronRight } from "lucide-react";
+import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { getDonationByInvoiceId } from "@/services/donationService";
 import { InvoiceDisplay } from "@/components/modules/InvoiceDisplay";
 
@@ -33,13 +32,13 @@ export default async function InvoicePage({ params, searchParams }) {
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
-      <nav aria-label="Breadcrumb" className="text-xs sm:text-sm text-slate-600 flex items-center gap-1.5 sm:gap-2 flex-wrap font-normal">
-        <Link href="/" className="hover:text-primary hover:underline transition-colors">Beranda</Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" strokeWidth={2} />
-        <Link href="/program" className="hover:text-primary hover:underline transition-colors">Program</Link>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" strokeWidth={2} />
-        <span className="text-slate-900 font-medium truncate" aria-current="page">Instruksi Pembayaran</span>
-      </nav>
+      <Breadcrumb
+        items={[
+          { label: "Beranda", href: "/" },
+          { label: "Program", href: "/program" },
+          { label: "Instruksi Pembayaran" },
+        ]}
+      />
 
       <InvoiceDisplay donation={donation} />
     </main>

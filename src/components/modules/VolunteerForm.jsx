@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
-import { Heart, Send, CheckCircle2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { VolunteerSuccessCard } from "@/components/volunteer/VolunteerSuccessCard";
 import { getStoredUser } from "@/services/authService";
 import {
   sanitizeName,
@@ -113,19 +114,7 @@ export function VolunteerForm() {
   };
 
   if (isSubmitted) {
-    return (
-      <div className="bg-white p-6 sm:p-8 rounded-xl border border-border-subtle text-center space-y-4 shadow-sm">
-        <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-          <CheckCircle2 className="w-6 h-6" />
-        </div>
-        <h3 className="text-lg font-bold text-slate-900">
-          Jazakumullahu Khairan Katsiran
-        </h3>
-        <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-          Terima kasih atas niat mulia Anda untuk bergabung sebagai Relawan YGSM. Tim koordinator kami akan menghubungi nomor WhatsApp Anda saat ada aksi kemanusiaan di wilayah Anda.
-        </p>
-      </div>
-    );
+    return <VolunteerSuccessCard />;
   }
 
   return (

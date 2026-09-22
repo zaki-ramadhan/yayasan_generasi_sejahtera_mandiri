@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { notFound } from "next/navigation";
+import { BackLink } from "@/components/shared/BackLink";
 import { getArticleBySlug, getArticles } from "@/services/articleService";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/formatters";
@@ -32,13 +32,10 @@ export default async function ArticleDetailPage({ params }) {
 
   return (
     <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-5">
-      <Link
+      <BackLink
         href="/artikel"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-primary hover:underline transition-colors py-0.5 group"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Kembali ke Berita &amp; Artikel</span>
-      </Link>
+        label="Kembali ke Berita &amp; Artikel"
+      />
 
       {/* Title & Metadata Header */}
       <div className="space-y-3">

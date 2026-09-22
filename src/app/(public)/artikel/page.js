@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { getArticles, getArticleCategories } from "@/services/articleService";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { ArticleCatalog } from "@/components/modules/ArticleCatalog";
 
 export const metadata = {
@@ -13,17 +15,15 @@ export default async function ArtikelIndexPage() {
   ]);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
-      <div className="space-y-3">
-        <h1 className="text-3xl sm:text-4xl font-semibold text-slate-950 tracking-tight leading-tight">
-          Artikel &amp; Kabar Filantropi
-        </h1>
-        <p className="text-base sm:text-lg text-slate-800 max-w-2xl leading-relaxed">
-          Wawasan fiqih ZISWAF dan laporan aktual kegiatan pemberdayaan santri dan dhuafa di lapangan.
-        </p>
-      </div>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+      <PageHeader
+        title="Artikel &amp; Kabar Filantropi"
+        description="Wawasan fiqih ZISWAF dan laporan aktual kegiatan pemberdayaan santri dan dhuafa di lapangan."
+      />
 
-      <ArticleCatalog initialArticles={articles} categories={categories} />
+      <Suspense>
+        <ArticleCatalog initialArticles={articles} categories={categories} />
+      </Suspense>
     </main>
   );
 }

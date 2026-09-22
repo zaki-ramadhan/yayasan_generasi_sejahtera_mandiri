@@ -1,14 +1,8 @@
 "use client";
 
 import { useState, useMemo, useSyncExternalStore, useId } from "react";
-import { ThumbsUp, ThumbsDown, Share2, Link as LinkIcon, Check, MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuTrigger,
-	DropdownMenuContent,
-	DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ShareDropdown } from "@/components/shared/ShareDropdown";
 import { cn } from "@/lib/utils";
 
 const LIKE_STORAGE_KEY = "ygsm_liked_articles";
@@ -48,7 +42,6 @@ export function ArticleActionBar({
 	const instanceId = useId();
 	const [likes, setLikes] = useState(initialLikes);
 	const [dislikes, setDislikes] = useState(initialDislikes);
-	const [copied, setCopied] = useState(false);
 	const targetSlug = slug || articleId;
 
 	const storedLikesRaw = useSyncExternalStore(subscribeReactions, getLikesSnapshot, getServerSnapshot);
@@ -186,30 +179,6 @@ export function ArticleActionBar({
 		}
 	};
 
-	const handleCopyLink = async () => {
-		try {
-			if (typeof window !== "undefined") {
-				await navigator.clipboard.writeText(window.location.href);
-				setCopied(true);
-				setTimeout(() => setCopied(false), 2000);
-			}
-		} catch {
-			// ignore clipboard error
-		}
-	};
-
-	const handleShareWhatsApp = () => {
-		if (typeof window === "undefined") return;
-		const url = window.location.href;
-		const text = encodeURIComponent(
-			`*${title}*\n\nBaca artikel selengkapnya di:\n${url}`,
-		);
-		window.open(
-			`https://api.whatsapp.com/send?text=${text}`,
-			"_blank",
-			"noopener,noreferrer",
-		);
-	};
 
 	return (
 		<div
@@ -275,41 +244,12 @@ export function ArticleActionBar({
 					</span>
 				</button>
 
-				{/* Share Dropdown */}
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							variant="outline"
-							size="sm"
-							className="h-8.5 px-2.5 sm:px-3 text-xs sm:text-sm font-medium border-slate-300 text-slate-700 hover:bg-slate-50 gap-1.5 rounded-lg cursor-pointer"
-						>
-							<Share2 className="w-3.5 h-3.5 text-slate-500" />
-							<span>Bagikan</span>
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="start" className="w-48">
-						<DropdownMenuItem
-							onClick={handleShareWhatsApp}
-							className="cursor-pointer gap-2 text-xs sm:text-sm"
-						>
-							<MessageCircle className="w-4 h-4 text-emerald-600" />
-							<span>WhatsApp</span>
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							onClick={handleCopyLink}
-							className="cursor-pointer gap-2 text-xs sm:text-sm"
-						>
-							{copied ? (
-								<Check className="w-4 h-4 text-emerald-600" />
-							) : (
-								<LinkIcon className="w-4 h-4 text-slate-500" />
-							)}
-							<span>
-								{copied ? "Tautan Tersalin!" : "Salin Tautan"}
-							</span>
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+				<ShareDropdown
+					url={targetSlug ? `/artikel/${targetSlug}` : undefined}
+					title={title}
+					variant="button"
+					align="start"
+				/>
 			</div>
 		</div>
 	);
